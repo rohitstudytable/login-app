@@ -5,6 +5,7 @@
 <title> {{ $intern->name }} Attendance</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+
 <style>
 * {
     margin: 0;
@@ -171,18 +172,31 @@ tr:hover {
 
     <!-- CONTENT -->
     <div class="content">
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+
 
         <div class="card">
             <h3>Attendance History</h3>
 
             <table>
                 <tr>
+                    <th>Sl no</th>
                     <th>Date</th>
                     <th>Status</th>
                 </tr>
+                @php
+                    $i=1;
+                @endphp
 
                 @forelse($intern->attendances as $attendance)
                 <tr>
+                    <td>{{ $i++ }}</td>
                     <td>{{ $attendance->date }}</td>
                     <td>
                         <span class="badge {{ $attendance->status }}">
@@ -200,6 +214,9 @@ tr:hover {
 
     </div>
 </div>
+
+
+
 
 </body>
 </html>

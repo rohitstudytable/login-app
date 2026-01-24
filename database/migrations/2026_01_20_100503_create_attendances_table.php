@@ -16,8 +16,8 @@ return new class extends Migration
 
             // Reference to the intern
             $table->foreignId('intern_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+                ->constrained()
+                ->cascadeOnDelete();
 
             // Attendance status
             $table->enum('status', ['present', 'absent', 'half_day']);
@@ -26,11 +26,12 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->string('date')->nullable();
 
+
             // Exact submission timestamp
             $table->timestamps();
 
             // Prevent duplicate attendance per intern per day
-            
+
         });
     }
 

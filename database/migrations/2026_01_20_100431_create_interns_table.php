@@ -10,10 +10,11 @@ return new class extends Migration {
         Schema::create('interns', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('random_id');
             $table->string('email')->unique();
+            $table->string('intern_code');
             $table->timestamps();
         });
-
     }
 
     public function down(): void

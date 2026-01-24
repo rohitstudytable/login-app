@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController;
 | Public Route
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -53,16 +54,19 @@ Route::middleware(['auth'])->group(function () {
 | Public Attendance URLs for interns
 |--------------------------------------------------------------------------
 */
+Route::get('/enter-empcode', [AttendanceController::class, 'searchEMpCode'])->name('empcode');
+Route::post('/search-empcode', [AttendanceController::class, 'searchByEmployeeId'])->name('submit.empcode');
 // Public attendance form by token
-Route::get('/attendance/public/{token}', [AttendanceController::class, 'publicFormByToken'])
+Route::get('/attendance/public/{date}/{token}', [AttendanceController::class, 'publicFormByToken'])
     ->name('attendance.publicFormByToken');
 
 // Store attendance from public form
-Route::post('/attendance/public/{token}', [AttendanceController::class, 'publicStoreByToken'])
+Route::post('/attendance/public/', [AttendanceController::class, 'publicStoreByToken'])
     ->name('attendance.publicStoreByToken');
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
