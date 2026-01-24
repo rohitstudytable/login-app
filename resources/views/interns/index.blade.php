@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title> Interns</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
 
 <style>
     * {
@@ -173,14 +175,19 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th width="220">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $i=1;
+                    @endphp
                 @foreach($interns as $intern)
                     <tr>
+                        <td>{{ $i++ }}</td>
                         <td>{{ $intern->name }}</td>
                         <td>{{ $intern->email }}</td>
                         <td>

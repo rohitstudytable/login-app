@@ -40,8 +40,9 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate([
-            'date'       => 'required|date',
+            'date'       => 'required|string',
             'intern_id'  => 'required|exists:interns,id',
             'status'     => 'required|in:present,absent,half_day',
             'photo'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -50,7 +51,7 @@ class AttendanceController extends Controller
 
         $photoPath = $this->handlePhoto($request);
 
-        Attendance::updateOrCreate(
+        $attendance = Attendance::updateOrCreate(
             [
                 'intern_id' => $request->intern_id,
                 'date'      => $request->date,
@@ -60,29 +61,79 @@ class AttendanceController extends Controller
                 'photo'  => $photoPath,
             ]
         );
+        if ($attendance->wasRecentlyCreated) {
+            return back()->with('success', 'Attendance created successfully');
+        } else {
+            return back()->with('success', 'Attendance updated successfully');
+        }
 
-        return back()->with('success', 'Attendance saved successfully');
+
+
+        // return back()->with('success', 'Attendance saved successfully');
     }
 
-    /**
-     * Show public attendance form via token
-     */
-    public function publicFormByToken($token)
-    {
-        $intern = Intern::where('attendance_token', $token)->firstOrFail();
-        return view('attendance.public', compact('intern'));
-    }
+
 
     /**
      * Store public attendance submitted by intern via token
      */
-    public function publicStoreByToken(Request $request, $token)
+    public function searchEMpCode()
     {
-        $intern = Intern::where('attendance_token', $token)->firstOrFail();
+        return view('attendance.empcode');
+    }
+    public function searchByEmployeeId(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|string',
+        ]);
+
+        $intern = Intern::where('Intern_code', $request->employee_id)->first();
+
+        if (!$intern) {
+            return back()->with('error', 'Employee ID not found');
+        }
+        $encryptedDate  = dataEncrypt(now()->toDateString());
+        $encryptedToken = dataEncrypt($intern->random_id);
+        $encryptedName  = dataEncrypt($intern->name);
+
+
+
+        // Show attendance form with token
+        return redirect()->route('attendance.publicFormByToken', [
+            'date'  => $encryptedDate,
+            'token' => $encryptedToken,
+            'name'  => $encryptedName,
+        ]);
+    }
+    /**
+     * Show public attendance form via token
+     */
+    public function publicFormByToken($date, $token)
+    {
+        $decryptToken = dataDecrypt($token);
+        $encryptdate = $date;
+        $encryptToken = $token;
+        $intern = Intern::where('random_id', $decryptToken)->firstOrFail();
+        return view('attendance.public', compact('intern', 'encryptdate', 'encryptToken'));
+    }
+
+    public function publicStoreByToken(Request $request)
+    {
+        $decryptToken = dataDecrypt($request->random_code);
+        $decryptid = dataDecrypt($request->intern);
+
+        $decryptDate = dataDecrypt($request->date);
+
+        if ($decryptDate != Carbon::today()->toDateString()) {
+            return back()->with('error', 'Attendance cannot be submitted for today\'s date.');
+        }
+
+        $intern = Intern::where('random_id', $decryptToken)->where('id', $decryptid)->first();
+        if (!$intern) {
+            return back()->with('error', 'User not found contact Admin');
+        }
 
         $request->validate([
-            'date'       => 'required|date|before_or_equal:today',
-            'status'     => 'required|in:present,absent,half_day',
             'photo'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'photo_data' => 'nullable|string',
         ]);
@@ -92,15 +143,15 @@ class AttendanceController extends Controller
         Attendance::updateOrCreate(
             [
                 'intern_id' => $intern->id,
-                'date'      => $request->date,
+                'date'      => $decryptDate,
             ],
             [
-                'status' => $request->status,
+                'status' => 'present',
                 'photo'  => $photoPath,
             ]
         );
 
-        return redirect()->back()->with('success', 'Attendance submitted successfully!');
+        return redirect()->route('empcode')->with('success', 'Attendance submitted successfully!');
     }
 
     /**
@@ -109,8 +160,8 @@ class AttendanceController extends Controller
     public function show(Intern $intern)
     {
         $attendances = $intern->attendances()
-                              ->orderBy('date', 'desc')
-                              ->get();
+            ->orderBy('date', 'desc')
+            ->get();
 
         return view('attendance.show', compact('intern', 'attendances'));
     }

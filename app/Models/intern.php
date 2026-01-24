@@ -12,9 +12,11 @@ class Intern extends Model
     protected $fillable = [
         'name',
         'email',
+        'random_id',
+        'intern_code',
     ];
 
-    // ✅ ADD THIS RELATIONSHIP
+
     public function attendances()
     {
         return $this->hasMany(Attendance::class);

@@ -23,6 +23,7 @@ class Attendance extends Model
         'status',
         'photo',
         'created_at', // optional if you want to override timestamp
+        'date',
     ];
 
     /**
@@ -31,7 +32,7 @@ class Attendance extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'attendance_date' => 'date', // generated column in DB
+        // 'attendance_date' => 'date', // generated column in DB
     ];
 
     /**
@@ -45,8 +46,8 @@ class Attendance extends Model
     /**
      * Optional helper: get date only for attendance
      */
-    public function getDateAttribute()
-    {
-        return $this->created_at->toDateString();
-    }
+    // public function getDateAttribute()
+    // {
+    //     return $this->created_at->toDateString();
+    // }
 }

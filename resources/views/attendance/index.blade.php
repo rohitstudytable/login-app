@@ -27,6 +27,16 @@ th{background:#f1f5f9}
 .photo-preview{width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
 video{border:1px solid #ccc;border-radius:6px;width:150px;height:100px;object-fit:cover}
 canvas{display:none}
+
+.custom-alert {
+    background-color: #4CAF50; /* green */
+    color: white;
+    padding: 12px 20px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: opacity 0.5s ease;
+}
 </style>
 </head>
 <body>
@@ -48,7 +58,6 @@ canvas{display:none}
     </form>
 </div>
 
-<div class="content">
 
 {{-- ================= MARK ATTENDANCE ================= --}}
 <div class="card">
@@ -86,6 +95,7 @@ canvas{display:none}
 </td>
 
 <td>
+
     <!-- Mobile input -->
     {{-- <input type="file" accept="image/*" capture="environment" form="att_form_{{ $intern->id }}" onchange="handleFileUpload(event, {{ $intern->id }})"> --}}
 
@@ -107,19 +117,42 @@ canvas{display:none}
 </div>
 
 {{-- ================= RECORDS ================= --}}
+
+<div class="content">
+   @if(session('success'))
+    <div id="success-alert" class="custom-alert">
+        {{ session('success') }}
+    </div>
+
+    <script>
+        // Auto remove after 3 seconds
+        setTimeout(function() {
+            let alertBox = document.getElementById('success-alert');
+            if (alertBox) {
+                alertBox.style.opacity = '0';   // fade out
+                setTimeout(() => alertBox.remove(), 500); // remove after fade
+            }
+        }, 3000);
+    </script>
+@endif
 <div class="card">
 <h3>Attendance Records</h3>
 
 <table>
 <tr>
+    <th>Sl no</th>
     <th>Intern</th>
     <th>Date</th>
     <th>Status</th>
     <th>Photo</th>
 </tr>
+@php
+    $i=1;
+@endphp
 
 @foreach($records as $att)
 <tr>
+    <td>{{ $i++ }}</td>
     <td>{{ $att->intern->name }}</td>
     <td>{{ $att->date }}</td>
     <td>{{ ucfirst(str_replace('_',' ',$att->status)) }}</td>

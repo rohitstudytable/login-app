@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Intern;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class InternController extends Controller
 {
@@ -24,10 +26,21 @@ class InternController extends Controller
         $validated = $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:interns,email',
+
         ]);
 
+        $stringAlphanumeric = Str::random(10);
+
+
         // ✅ save to DB
-        Intern::create($validated);
+        $validated['random_id'] = $stringAlphanumeric;
+
+        $intern = Intern::create($validated);
+        $interncode = 'INT' . Carbon::now()->format('y')  . $intern->id;
+
+        $intern->intern_code = $interncode;
+        $intern->save();
+
 
         return redirect()->route('interns.index')
             ->with('success', 'Intern added successfully');
