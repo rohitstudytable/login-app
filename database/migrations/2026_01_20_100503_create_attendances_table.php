@@ -6,38 +6,37 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // bigint unsigned auto_increment
 
-            // Reference to the intern
-            $table->foreignId('intern_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            // intern_id (indexed + foreign key)
+            $table->unsignedBigInteger('intern_id');
+            $table->index('intern_id');
 
-            // Attendance status
+            // status enum
             $table->enum('status', ['present', 'absent', 'half_day']);
 
-            // Photo proof of attendance
+            // photo nullable
             $table->string('photo')->nullable();
-            $table->string('date')->nullable();
 
+            // date indexed
+            $table->date('date');
+            $table->index('date');
 
-            // Exact submission timestamp
-            $table->timestamps();
+            // timestamps nullable
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
 
-            // Prevent duplicate attendance per intern per day
-
+            // foreign key
+            $table->foreign('intern_id')
+                  ->references('id')
+                  ->on('interns')
+                  ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('attendances');

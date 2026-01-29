@@ -21,35 +21,29 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f9;min-height:100vh;displ
 table{width:100%;border-collapse:collapse;margin-top:15px}
 th,td{padding:12px;border-bottom:1px solid #e5e7eb;text-align:left}
 th{background:#f1f5f9}
-.btn{padding:8px 14px;border-radius:6px;border:none;cursor:pointer;font-size:14px;color:white}
+input, select{padding:6px 10px;border:1px solid #ccc;border-radius:6px;margin-right:8px;}
+.btn{padding:10px 18px;border-radius:6px;border:none;cursor:pointer;font-size:15px;color:white}
 .btn-primary{background:#2563eb}
 .btn-primary:hover{background:#1d4ed8}
-.photo-preview{width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
-video{border:1px solid #ccc;border-radius:6px;width:150px;height:100px;object-fit:cover}
-canvas{display:none}
-
-.custom-alert {
-    background-color: #4CAF50; /* green */
-    color: white;
-    padding: 12px 20px;
-    margin: 10px 0;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: opacity 0.5s ease;
-}
+.btn-reset{background:#6b7280}
+.btn-reset:hover{background:#4b5563}
+.custom-alert{background:#16a34a;color:#fff;padding:12px 20px;margin-bottom:15px;border-radius:6px;font-weight:bold}
+.badge{padding:4px 10px;border-radius:20px;font-size:13px;font-weight:600;display:inline-block}
+.present{background:#dcfce7;color:#166534}
+.absent{background:#fee2e2;color:#991b1b}
+.half_day{background:#fef3c7;color:#92400e}
+.unmark{background:#e5e7eb;color:#374151}
+.filter-form{margin-bottom:20px;display:flex;align-items:center;flex-wrap:wrap;}
 </style>
 </head>
+
 <body>
 
-<div class="sidebar">
-    <h2>Admin</h2>
-    <a href="{{ route('dashboard') }}">Dashboard</a>
-    <a href="{{ route('interns.index') }}">Interns</a>
-    <a href="{{ route('attendance.index') }}">Attendance</a>
-</div>
+@include('layouts.sidebar')
 
 <div class="main">
 
+{{-- TOPBAR --}}
 <div class="topbar">
     <h2>Attendance</h2>
     <form method="POST" action="{{ route('logout') }}">
@@ -58,152 +52,110 @@ canvas{display:none}
     </form>
 </div>
 
+<div class="content">
 
-{{-- ================= MARK ATTENDANCE ================= --}}
+@if(session('success'))
+    <div class="custom-alert">{{ session('success') }}</div>
+@endif
+
+{{-- FILTER --}}
 <div class="card">
-<h3>Mark Attendance (One Intern at a Time)</h3>
+    <h3>Filter Attendance</h3>
+    <form method="GET" class="filter-form">
+        <input type="date" name="filter_date" value="{{ request('filter_date', $attendanceDate) }}">
+        <input type="text" name="filter_name" value="{{ request('filter_name') }}" placeholder="Intern name">
+        <button class="btn btn-primary">Search</button>
+        <a href="{{ route('attendance.index') }}" class="btn btn-reset">Reset</a>
+    </form>
+</div>
+
+{{-- MARK ATTENDANCE --}}
+<div class="card">
+@php $markDate = request('filter_date', $attendanceDate); @endphp
+
+<h3>Mark Attendance for {{ $markDate }}</h3>
+
+<form method="POST" action="{{ route('attendance.store') }}">
+@csrf
+<input type="hidden" name="date" value="{{ $markDate }}">
 
 <table>
 <tr>
     <th>Intern</th>
     <th>Date</th>
     <th>Status</th>
-    <th>Photo</th>
-    <th>Action</th>
 </tr>
 
 @foreach($interns as $intern)
-<tr>
-<form id="att_form_{{ $intern->id }}" method="POST" action="{{ route('attendance.store') }}" enctype="multipart/form-data">
-@csrf
-<input type="hidden" name="intern_id" value="{{ $intern->id }}">
-<input type="hidden" name="photo_data" id="photo_data_{{ $intern->id }}">
-</form>
-
-<td>{{ $intern->name }}</td>
-
-<td>
-    <input type="date" name="date" value="{{ date('Y-m-d') }}" form="att_form_{{ $intern->id }}" required>
-</td>
-
-<td>
-    <select name="status" form="att_form_{{ $intern->id }}" required>
-        <option value="present">Present</option>
-        <option value="absent">Absent</option>
-        <option value="half_day">Half Day</option>
-    </select>
-</td>
-
-<td>
-
-    <!-- Mobile input -->
-    {{-- <input type="file" accept="image/*" capture="environment" form="att_form_{{ $intern->id }}" onchange="handleFileUpload(event, {{ $intern->id }})"> --}}
-
-    <!-- Desktop camera -->
-    <div>
-        <video id="video_{{ $intern->id }}" autoplay></video>
-        <button type="button" onclick="capturePhoto({{ $intern->id }})">Snap</button>
-        <canvas id="canvas_{{ $intern->id }}"></canvas>
-    </div>
-</td>
-
-<td>
-    <button class="btn btn-primary" type="submit" form="att_form_{{ $intern->id }}">Save</button>
-</td>
-
-</tr>
-@endforeach
-</table>
-</div>
-
-{{-- ================= RECORDS ================= --}}
-
-<div class="content">
-   @if(session('success'))
-    <div id="success-alert" class="custom-alert">
-        {{ session('success') }}
-    </div>
-
-    <script>
-        // Auto remove after 3 seconds
-        setTimeout(function() {
-            let alertBox = document.getElementById('success-alert');
-            if (alertBox) {
-                alertBox.style.opacity = '0';   // fade out
-                setTimeout(() => alertBox.remove(), 500); // remove after fade
-            }
-        }, 3000);
-    </script>
-@endif
-<div class="card">
-<h3>Attendance Records</h3>
-
-<table>
-<tr>
-    <th>Sl no</th>
-    <th>Intern</th>
-    <th>Date</th>
-    <th>Status</th>
-    <th>Photo</th>
-</tr>
 @php
-    $i=1;
+    $saved = $recordsForDate->firstWhere('intern_id', $intern->id);
 @endphp
-
-@foreach($records as $att)
 <tr>
-    <td>{{ $i++ }}</td>
-    <td>{{ $att->intern->name }}</td>
-    <td>{{ $att->date }}</td>
-    <td>{{ ucfirst(str_replace('_',' ',$att->status)) }}</td>
+    <td>{{ $intern->name }}</td>
+    <td>{{ $markDate }}</td>
     <td>
-        @if($att->photo)
-            <img src="{{ asset('storage/'.$att->photo) }}" class="photo-preview">
-        @else
-            —
-        @endif
+        <select name="interns[{{ $intern->id }}][status]">
+
+            <option value="unmark" {{ !$saved ? 'selected' : '' }}>
+                Unmark
+            </option>
+
+            <option value="present" {{ optional($saved)->status === 'present' ? 'selected' : '' }}>
+                Present
+            </option>
+
+            <option value="absent" {{ optional($saved)->status === 'absent' ? 'selected' : '' }}>
+                Absent
+            </option>
+
+            <option value="half_day" {{ optional($saved)->status === 'half_day' ? 'selected' : '' }}>
+                Half Day
+            </option>
+
+        </select>
     </td>
 </tr>
 @endforeach
 </table>
+
+<button class="btn btn-primary" style="margin-top:20px">Save Attendance</button>
+</form>
 </div>
 
+{{-- HISTORY --}}
+<div class="card">
+<h3>Attendance History</h3>
+
+<table>
+<tr>
+    <th>#</th>
+    <th>Intern</th>
+    <th>Date</th>
+    <th>Status</th>
+</tr>
+
+@forelse($allRecords as $i => $att)
+<tr>
+    <td>{{ $i+1 }}</td>
+    <td>{{ $att->intern->name }}</td>
+    <td>{{ $att->date->format('Y-m-d') }}</td> {{-- here is the fix --}}
+    <td>
+        <span class="badge {{ $att->status }}">
+            {{ ucfirst(str_replace('_',' ',$att->status)) }}
+        </span>
+    </td>
+</tr>
+@empty
+<tr>
+    <td colspan="4">No records found</td>
+</tr>
+@endforelse
+</table>
+</div>
+
+
 </div>
 </div>
-
-<script>
-function handleFileUpload(event, id){
-    const file = event.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e){
-        document.getElementById('photo_data_'+id).value = e.target.result;
-    }
-    reader.readAsDataURL(file);
-}
-
-// Setup webcam for desktop
-@foreach($interns as $intern)
-navigator.mediaDevices.getUserMedia({ video: true })
-.then(stream => {
-    const video = document.getElementById('video_{{ $intern->id }}');
-    if(video) video.srcObject = stream;
-})
-.catch(err => console.log('Camera not accessible:', err));
-@endforeach
-
-function capturePhoto(id){
-    const video = document.getElementById('video_'+id);
-    const canvas = document.getElementById('canvas_'+id);
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/png');
-    document.getElementById('photo_data_'+id).value = dataUrl;
-    alert('Photo captured! You can now save attendance.');
-}
-</script>
 
 </body>
 </html>
