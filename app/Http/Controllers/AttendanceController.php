@@ -61,10 +61,8 @@ class AttendanceController extends Controller
         $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
 
         DB::transaction(function () use ($request, $attendanceDate) {
-
             foreach ($request->interns as $internId => $data) {
 
-                // UNMARK → delete record
                 if ($data['status'] === 'unmark') {
                     Attendance::where('intern_id', $internId)
                         ->whereDate('date', $attendanceDate)
@@ -72,7 +70,6 @@ class AttendanceController extends Controller
                     continue;
                 }
 
-                // UPDATE OR CREATE (SAFE – prevents duplicates)
                 Attendance::updateOrCreate(
                     [
                         'intern_id' => $internId,
@@ -92,7 +89,6 @@ class AttendanceController extends Controller
 
     /**
      * SINGLE INTERN – Attendance history (ADMIN)
-     * ✅ UPDATED: Start Date → End Date filter
      */
     public function show(Request $request, $id)
     {
@@ -100,17 +96,14 @@ class AttendanceController extends Controller
 
         $query = Attendance::where('intern_id', $id);
 
-        // START DATE
         if ($request->filled('start_date')) {
             $query->whereDate('date', '>=', $request->start_date);
         }
 
-        // END DATE
         if ($request->filled('end_date')) {
             $query->whereDate('date', '<=', $request->end_date);
         }
 
-        // STATUS
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -128,15 +121,15 @@ class AttendanceController extends Controller
     }
 
     /**
-     * PUBLIC: Search by Employee Code
+     * PUBLIC: Search Intern Code page
      */
-    public function searchEMpCode()
+    public function searchEmpCode()
     {
-        return view('attendance.search-empcode');
+        return view('attendance.empcode');
     }
 
     /**
-     * PUBLIC: Search by Employee ID
+     * PUBLIC: Submit Intern Code
      */
     public function searchByEmployeeId(Request $request)
     {
@@ -144,7 +137,7 @@ class AttendanceController extends Controller
             'employee_id' => 'required',
         ]);
 
-        $intern = Intern::where('employee_id', $request->employee_id)->first();
+        $intern = Intern::where('intern_code', $request->employee_id)->first();
 
         if (!$intern) {
             return back()->with('error', 'Employee not found');
@@ -152,29 +145,31 @@ class AttendanceController extends Controller
 
         return redirect()->route('attendance.publicFormByToken', [
             'date'  => now()->format('Y-m-d'),
-            'token' => $intern->token,
+            'token' => $intern->intern_code,
         ]);
     }
 
     /**
-     * PUBLIC: Attendance form by token
+     * PUBLIC: Attendance form
+     * NOTE: uses intern_code as token
      */
     public function publicFormByToken($date, $token)
     {
-        $intern = Intern::where('token', $token)->firstOrFail();
+        $intern = Intern::where('intern_code', $token)->firstOrFail();
         $date = Carbon::parse($date)->format('Y-m-d');
 
-        return view('attendance.public-form', compact('intern', 'date'));
+        // ✅ CORRECT VIEW NAME
+        return view('attendance.public', compact('intern', 'date'));
     }
 
     /**
-     * PUBLIC: Store attendance by token
+     * PUBLIC: Store attendance
      */
     public function publicStoreByToken(Request $request)
     {
         $request->validate([
             'intern_id' => 'required|exists:interns,id',
-            'status' => 'required|in:present,absent,half_day',
+            'status'    => 'required|in:present,absent,half_day',
         ]);
 
         $attendanceDate = $request->date
@@ -191,6 +186,8 @@ class AttendanceController extends Controller
             ]
         );
 
-        return back()->with('success', 'Attendance saved for ' . $attendanceDate);
+       return redirect()
+            ->route('empcode')
+            ->with('success', 'Attendance submitted successfully');
     }
 }
