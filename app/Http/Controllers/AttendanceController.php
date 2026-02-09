@@ -19,13 +19,21 @@ class AttendanceController extends Controller
             ? Carbon::parse($request->filter_date)->format('Y-m-d')
             : now()->format('Y-m-d');
 
-        $interns = Intern::orderBy('name')->get();
+        $internQuery = Intern::query();
 
-        // Records for selected date
-        $recordsForDate = Attendance::whereDate('date', $attendanceDate)->get();
+        if ($request->filled('role')) {
+            $internQuery->where('role', $request->role);
+        }
 
-        // Attendance history
-        $allRecordsQuery = Attendance::with('intern')->orderBy('date', 'desc');
+        $interns = $internQuery->orderBy('name')->get();
+
+        $recordsForDate = Attendance::whereDate('date', $attendanceDate)
+            ->whereIn('intern_id', $interns->pluck('id'))
+            ->get();
+
+        $allRecordsQuery = Attendance::with('intern')
+            ->whereIn('intern_id', $interns->pluck('id'))
+            ->orderBy('date', 'desc');
 
         if ($request->filled('filter_date')) {
             $allRecordsQuery->whereDate('date', $request->filter_date);
@@ -48,21 +56,26 @@ class AttendanceController extends Controller
     }
 
     /**
-     * SAVE / UPDATE / UNMARK attendance (ADMIN)
+     * ADMIN – Save / Update attendance
      */
     public function store(Request $request)
     {
         $request->validate([
             'date' => 'required|date',
             'interns' => 'required|array',
-            'interns.*.status' => 'required|in:present,absent,half_day,unmark',
+            'interns.*.status' => 'required|in:present,absent,half_day,paid_leave,unmark',
+            'interns.*.location' => 'nullable|string|max:255',
+            'interns.*.in_time' => 'nullable|date_format:H:i',
+            'interns.*.out_time' => 'nullable|date_format:H:i',
         ]);
 
         $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
 
         DB::transaction(function () use ($request, $attendanceDate) {
+
             foreach ($request->interns as $internId => $data) {
 
+                // 🔴 UNMARK → DELETE
                 if ($data['status'] === 'unmark') {
                     Attendance::where('intern_id', $internId)
                         ->whereDate('date', $attendanceDate)
@@ -70,25 +83,53 @@ class AttendanceController extends Controller
                     continue;
                 }
 
+                // 🟡 LEAVE / ABSENT → NO TIME REQUIRED
+                if (in_array($data['status'], ['paid_leave', 'absent'])) {
+                    Attendance::updateOrCreate(
+                        [
+                            'intern_id' => $internId,
+                            'date' => $attendanceDate,
+                        ],
+                        [
+                            'status' => $data['status'],
+                            'location' => $data['location'] ?? 'Admin Marked',
+                            'in_time' => null,
+                            'out_time' => null,
+                        ]
+                    );
+                    continue;
+                }
+
+                // 🟢 PRESENT / HALF DAY → NEED TIME
+                if (empty($data['in_time']) || empty($data['location'])) {
+                    continue;
+                }
+
                 Attendance::updateOrCreate(
                     [
                         'intern_id' => $internId,
-                        'date'      => $attendanceDate,
+                        'date' => $attendanceDate,
                     ],
                     [
-                        'status'    => $data['status'],
+                        'status' => $data['status'],
+                        'location' => $data['location'],
+                        'in_time' => $data['in_time'],
+                        'out_time' => $data['out_time'] ?? null,
                     ]
                 );
             }
         });
 
         return redirect()
-            ->route('attendance.index', ['filter_date' => $attendanceDate])
+            ->route('attendance.index', [
+                'filter_date' => $attendanceDate,
+                'role' => $request->role
+            ])
             ->with('success', 'Attendance updated for ' . $attendanceDate);
     }
 
     /**
-     * SINGLE INTERN – Attendance history (ADMIN)
+     * ADMIN – Single intern history
      */
     public function show(Request $request, $id)
     {
@@ -111,17 +152,18 @@ class AttendanceController extends Controller
         $attendances = $query->orderBy('date', 'desc')->get();
 
         return view('attendance.show', [
-            'intern'        => $intern,
-            'attendances'   => $attendances,
-            'totalDays'     => $attendances->count(),
-            'presentCount'  => $attendances->where('status', 'present')->count(),
-            'absentCount'   => $attendances->where('status', 'absent')->count(),
-            'halfDayCount'  => $attendances->where('status', 'half_day')->count(),
+            'intern' => $intern,
+            'attendances' => $attendances,
+            'totalDays' => $attendances->count(),
+            'presentCount' => $attendances->where('status', 'present')->count(),
+            'absentCount' => $attendances->where('status', 'absent')->count(),
+            'halfDayCount' => $attendances->where('status', 'half_day')->count(),
+            'paidLeaveCount' => $attendances->where('status', 'paid_leave')->count(),
         ]);
     }
 
     /**
-     * PUBLIC: Search Intern Code page
+     * PUBLIC – Search page
      */
     public function searchEmpCode()
     {
@@ -129,7 +171,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * PUBLIC: Submit Intern Code
+     * PUBLIC – Submit employee code
      */
     public function searchByEmployeeId(Request $request)
     {
@@ -144,50 +186,74 @@ class AttendanceController extends Controller
         }
 
         return redirect()->route('attendance.publicFormByToken', [
-            'date'  => now()->format('Y-m-d'),
+            'date' => now()->format('Y-m-d'),
             'token' => $intern->intern_code,
         ]);
     }
 
     /**
-     * PUBLIC: Attendance form
-     * NOTE: uses intern_code as token
+     * PUBLIC – Attendance form
      */
     public function publicFormByToken($date, $token)
     {
         $intern = Intern::where('intern_code', $token)->firstOrFail();
         $date = Carbon::parse($date)->format('Y-m-d');
 
-        // ✅ CORRECT VIEW NAME
-        return view('attendance.public', compact('intern', 'date'));
+        $todayAttendance = Attendance::where('intern_id', $intern->id)
+            ->whereDate('date', $date)
+            ->first();
+
+        return view('attendance.public', compact(
+            'intern',
+            'date',
+            'todayAttendance'
+        ));
     }
 
     /**
-     * PUBLIC: Store attendance
+     * PUBLIC – Punch IN / Punch OUT
      */
     public function publicStoreByToken(Request $request)
     {
         $request->validate([
             'intern_id' => 'required|exists:interns,id',
-            'status'    => 'required|in:present,absent,half_day',
+            'location' => 'required|string|max:255',
+            'date' => 'required|date',
         ]);
 
-        $attendanceDate = $request->date
-            ? Carbon::parse($request->date)->format('Y-m-d')
-            : now()->format('Y-m-d');
+        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+        $currentTime = now()->format('H:i:s');
 
-        Attendance::updateOrCreate(
-            [
+        $attendance = Attendance::where('intern_id', $request->intern_id)
+            ->whereDate('date', $attendanceDate)
+            ->first();
+
+        // 🟢 PUNCH IN
+        if (!$attendance) {
+            Attendance::create([
                 'intern_id' => $request->intern_id,
-                'date'      => $attendanceDate,
-            ],
-            [
-                'status'    => $request->status,
-            ]
-        );
+                'date' => $attendanceDate,
+                'status' => 'present',
+                'location' => $request->location,
+                'in_time' => $currentTime,
+                'out_time' => null,
+            ]);
 
-       return redirect()
-            ->route('empcode')
-            ->with('success', 'Attendance submitted successfully');
+            return redirect()->route('empcode')
+                ->with('success', 'Punch IN recorded at ' . $currentTime);
+        }
+
+        // 🔵 PUNCH OUT
+        if ($attendance->in_time && !$attendance->out_time) {
+            $attendance->update([
+                'out_time' => $currentTime,
+            ]);
+
+            return redirect()->route('empcode')
+                ->with('success', 'Punch OUT recorded at ' . $currentTime);
+        }
+
+        return redirect()->route('empcode')
+            ->with('error', 'Attendance already completed for today.');
     }
 }

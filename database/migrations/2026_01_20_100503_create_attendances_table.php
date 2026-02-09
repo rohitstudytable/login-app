@@ -9,27 +9,36 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->id(); // bigint unsigned auto_increment
 
-            // intern_id (indexed + foreign key)
+            // Primary key
+            $table->id();
+
+            // Intern reference
             $table->unsignedBigInteger('intern_id');
-            $table->index('intern_id');
 
-            // status enum
-            $table->enum('status', ['present', 'absent', 'half_day']);
+            // Attendance date (1 record per intern per day)
+            $table->date('date');
 
-            // photo nullable
+            // Status
+            $table->enum('status', ['present', 'absent', 'half_day','paid_leave']);
+
+            // Location (mandatory)
+            $table->string('location');
+
+            // Time tracking
+            $table->time('in_time');              // must exist
+            $table->time('out_time')->nullable(); // added later when leaving
+
+            // Optional photo
             $table->string('photo')->nullable();
 
-            // date indexed
-            $table->date('date');
-            $table->index('date');
+            // Timestamps
+            $table->timestamps();
 
-            // timestamps nullable
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
+            // 🔐 One intern → one attendance per day
+            $table->unique(['intern_id', 'date']);
 
-            // foreign key
+            // Foreign key
             $table->foreign('intern_id')
                   ->references('id')
                   ->on('interns')

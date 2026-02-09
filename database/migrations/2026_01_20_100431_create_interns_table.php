@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
+
     /**
      * Run the migrations.
      */
@@ -15,9 +16,13 @@ return new class extends Migration {
             $table->string('name');
             $table->string('random_id');
             $table->string('email')->unique();
-            $table->string('intern_code');  
-            $table->string('contact')->nullable();       // New field
-            $table->enum('role', ['intern', 'admin'])->default('intern'); // New field with default
+            $table->string('intern_code');
+            $table->string('contact')->nullable();
+
+            // Updated role types ONLY
+            $table->enum('role', ['intern', 'employee', 'admin'])
+                  ->default('intern');
+
             $table->timestamps();
         });
     }

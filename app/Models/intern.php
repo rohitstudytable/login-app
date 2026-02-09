@@ -16,13 +16,14 @@ class Intern extends Model
         'email',
         'random_id',
         'intern_code',
-        'contact',   // new field
-        'role',      // new field
+        'contact',
+        'role',
     ];
 
     protected static function booted()
     {
         static::creating(function ($intern) {
+
             // Auto-generate random_id if not set
             if (!$intern->random_id) {
                 $intern->random_id = Str::random(10);
