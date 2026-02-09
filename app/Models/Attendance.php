@@ -22,15 +22,16 @@ class Attendance extends Model
         'photo',
     ];
 
-    /**
-     * Correct casts
-     */
     protected $casts = [
         'date' => 'date',
+        'in_time'  => 'datetime:H:i',
+        'out_time' => 'datetime:H:i',
     ];
 
+    protected $appends = ['working_hours'];
+
     /**
-     * Relation: Attendance belongs to Intern / Employee
+     * Relation: Attendance belongs to Intern
      */
     public function intern()
     {
@@ -46,31 +47,14 @@ class Attendance extends Model
     }
 
     /**
-     * Accessor: format in_time
-     */
-    public function getInTimeAttribute($value)
-    {
-        return $value ? Carbon::createFromFormat('H:i:s', $value)->format('H:i') : null;
-    }
-
-    /**
-     * Accessor: format out_time
-     */
-    public function getOutTimeAttribute($value)
-    {
-        return $value ? Carbon::createFromFormat('H:i:s', $value)->format('H:i') : null;
-    }
-
-    /**
-     * Helper: calculate working duration
+     * Accessor: calculate working duration
      */
     public function getWorkingHoursAttribute()
     {
         if ($this->in_time && $this->out_time) {
-            $in  = Carbon::createFromFormat('H:i', $this->in_time);
-            $out = Carbon::createFromFormat('H:i', $this->out_time);
-
-            return $in->diff($out)->format('%H:%I');
+            return Carbon::parse($this->in_time)
+                ->diff(Carbon::parse($this->out_time))
+                ->format('%H:%I');
         }
 
         return null;

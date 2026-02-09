@@ -16,18 +16,23 @@ return new class extends Migration
             // Intern reference
             $table->unsignedBigInteger('intern_id');
 
-            // Attendance date (1 record per intern per day)
-            $table->date('date');
+            // Attendance date
+            $table->date('date')->index();
 
             // Status
-            $table->enum('status', ['present', 'absent', 'half_day','paid_leave']);
+            $table->enum('status', [
+                'present',
+                'absent',
+                'half_day',
+                'paid_leave'
+            ]);
 
-            // Location (mandatory)
+            // Location
             $table->string('location');
 
             // Time tracking
-            $table->time('in_time');              // must exist
-            $table->time('out_time')->nullable(); // added later when leaving
+            $table->time('in_time')->nullable();
+            $table->time('out_time')->nullable();
 
             // Optional photo
             $table->string('photo')->nullable();
@@ -35,7 +40,7 @@ return new class extends Migration
             // Timestamps
             $table->timestamps();
 
-            // 🔐 One intern → one attendance per day
+            // One intern → one attendance per day
             $table->unique(['intern_id', 'date']);
 
             // Foreign key
