@@ -83,7 +83,12 @@ class AttendanceController extends Controller
                     continue;
                 }
 
-                // 🟡 LEAVE / ABSENT → NO TIME REQUIRED
+                // Get existing record (if any)
+                $existingAttendance = Attendance::where('intern_id', $internId)
+                    ->whereDate('date', $attendanceDate)
+                    ->first();
+
+                // 🟡 LEAVE / ABSENT
                 if (in_array($data['status'], ['paid_leave', 'absent'])) {
                     Attendance::updateOrCreate(
                         [
@@ -100,11 +105,7 @@ class AttendanceController extends Controller
                     continue;
                 }
 
-                // 🟢 PRESENT / HALF DAY → NEED TIME
-                if (empty($data['in_time']) || empty($data['location'])) {
-                    continue;
-                }
-
+                // 🟢 PRESENT / HALF DAY (ADMIN CAN SWITCH WITHOUT TIME)
                 Attendance::updateOrCreate(
                     [
                         'intern_id' => $internId,
@@ -112,9 +113,15 @@ class AttendanceController extends Controller
                     ],
                     [
                         'status' => $data['status'],
-                        'location' => $data['location'],
-                        'in_time' => $data['in_time'],
-                        'out_time' => $data['out_time'] ?? null,
+
+                        'location' => $data['location']
+                            ?? ($existingAttendance->location ?? 'Admin Marked'),
+
+                        'in_time' => $data['in_time']
+                            ?? ($existingAttendance->in_time ?? null),
+
+                        'out_time' => $data['out_time']
+                            ?? ($existingAttendance->out_time ?? null),
                     ]
                 );
             }
