@@ -198,24 +198,43 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * PUBLIC – Attendance form
-     */
-    public function publicFormByToken($date, $token)
-    {
-        $intern = Intern::where('intern_code', $token)->firstOrFail();
-        $date = Carbon::parse($date)->format('Y-m-d');
+  /**
+ * PUBLIC – Attendance form
+ */
+public function publicFormByToken($date, $token)
+{
+    $intern = Intern::where('intern_code', $token)->firstOrFail();
+    $date = Carbon::parse($date)->format('Y-m-d');
 
-        $todayAttendance = Attendance::where('intern_id', $intern->id)
-            ->whereDate('date', $date)
-            ->first();
+    $todayAttendance = Attendance::where('intern_id', $intern->id)
+        ->whereDate('date', $date)
+        ->first();
 
-        return view('attendance.public', compact(
-            'intern',
-            'date',
-            'todayAttendance'
-        ));
-    }
+    // 🔹 FETCH ALL ATTENDANCE RECORDS (FOR REPORT SECTION)
+    $attendances = Attendance::where('intern_id', $intern->id)
+        ->orderBy('date', 'desc')
+        ->get();
+
+    // 🔹 REQUIRED VARIABLES USED IN BLADE
+    $totalDays      = $attendances->count();
+    $presentCount   = $attendances->where('status', 'present')->count();
+    $absentCount    = $attendances->where('status', 'absent')->count();
+    $halfDayCount   = $attendances->where('status', 'half_day')->count();
+    $paidLeaveCount = $attendances->where('status', 'paid_leave')->count();
+
+    return view('attendance.public', compact(
+        'intern',
+        'date',
+        'todayAttendance',
+        'attendances',
+        'totalDays',
+        'presentCount',
+        'absentCount',
+        'halfDayCount',
+        'paidLeaveCount'
+    ));
+}
+
 
     /**
      * PUBLIC – Punch IN / Punch OUT
