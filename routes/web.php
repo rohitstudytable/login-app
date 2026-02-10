@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InternController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\ReportController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +49,11 @@ Route::middleware(['auth'])->group(function () {
     // View attendance history of a specific intern (admin)
     Route::get('/attendance/intern/{intern}', [AttendanceController::class, 'show'])
         ->name('attendance.show');
+
+
+    Route::get('/report', [ReportController::class, 'index'])->name('report');
+    Route::get('/report/intern/{intern}', [ReportController::class, 'show'])->name('report.intern');
+
 });
 
 /*

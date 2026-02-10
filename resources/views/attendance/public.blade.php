@@ -1,106 +1,234 @@
 @include('body.headerlink')
 
 <style>
-body { font-family: Arial, sans-serif; padding: 20px; background: #f4f6f9; }
-.card { background:white; padding:20px; border-radius:12px; max-width:400px; margin:auto; box-shadow:0 8px 18px rgba(0,0,0,.08); }
-input, select, button { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc; }
-button { background:#2563eb; color:white; border:none; cursor:pointer; }
-button:hover { background:#1d4ed8; }
-video { width:100%; max-width:300px; border-radius:6px; margin-top:10px; }
+    body {
+        background: #f4f6f9;
+        font-family: Arial, sans-serif;
+    }
+    .card {
+        max-width: 520px;
+        margin: auto;
+        border-radius: 12px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    }
+    .badge {
+        font-size: 14px;
+    }
 </style>
+
 <body>
 
-
-
-
-@if(session('success'))
-    <p style="color:green">{{ session('success') }}</p>
-@endif
 <div class="container-fluid vh-100 d-flex flex-column justify-content-center align-items-center">
 
-    <!-- Page Title -->
-    <h2 class="text-center mb-4">Attendance for {{ $intern->name }}</h2>
+    <h3 class="mb-3 text-center">
+        Attendance for {{ $intern->name }}
+    </h3>
 
-    <div class="col-md-6">
-        <div class="card shadow-lg w-100">
-            <div class="card-header bg-primary text-white text-center">
-                <h4 class="mb-0">Submit Attendance</h4>
-            </div>
-            <div class="card-body">
-                <!-- Success / Error Messages -->
-                @if(session('success'))
-                    <div class="alert alert-success text-center">{{ session('success') }}</div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger text-center">{{ session('error') }}</div>
-                @endif
+    <div class="card w-100">
 
-                <!-- Attendance Form -->
-                <form method="POST" action="{{ route('attendance.publicStoreByToken') }}" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="random_code" value="{{ $encryptToken }}">
-                    <input type="hidden" name="intern" value="{{ dataEncrypt($intern->id) }}">
+        <div class="card-header bg-primary text-white text-center">
+            <h5 class="mb-0">Mark Attendance</h5>
+        </div>
 
-                    <!-- Name (decrypted) -->
-                    <div class="mb-3">
-                        <label class="form-label">Employee Name</label>
-                        <input type="text" class="form-control text-center" value="{{ $intern->name }}" readonly>
-                    </div>
+        <div class="card-body">
 
-                    <!-- Date (decrypted) -->
-                    <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <input type="hidden" name="date" value="{{ $encryptdate }}">
-                        <input type="text" class="form-control text-center" id="date" disabled>
-                    </div>
+            {{-- Alerts --}}
+            @if(session('success'))
+                <div class="alert alert-success text-center">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-                    <!-- Status -->
+            @if(session('error'))
+                <div class="alert alert-danger text-center">
+                    {{ session('error') }}
+                </div>
+            @endif
 
-                    <!-- Photo Capture -->
-                    <div class="mb-3">
-                        <label for="photo" class="form-label">Upload Photo</label>
-                        <input type="file" class="form-control" id="photo" name="photo" accept="image/*" capture="environment" required>
-                    </div>
+            {{-- Attendance Form --}}
+            <form method="POST"
+                  action="{{ route('attendance.publicStoreByToken') }}"
+                  enctype="multipart/form-data">
+                @csrf
 
-                    <button type="submit" class="btn btn-success w-100">Submit Attendance</button>
-                </form>
-            </div>
+                {{-- Hidden --}}
+                <input type="hidden" name="intern_id" value="{{ $intern->id }}">
+                <input type="hidden" name="date" value="{{ $date }}">
+
+                {{-- Employee Name --}}
+                <div class="mb-3">
+                    <label class="form-label">Employee Name</label>
+                    <input type="text" class="form-control" value="{{ $intern->name }}" readonly>
+                </div>
+
+                {{-- Date --}}
+                <div class="mb-3">
+                    <label class="form-label">Date</label>
+                    <input type="text" class="form-control" value="{{ $date }}" readonly>
+                </div>
+
+                {{-- Location --}}
+                <div class="mb-3">
+                    <label class="form-label">Location (Auto)</label>
+                    <input type="text"
+                           class="form-control"
+                           name="location"
+                           id="location"
+                           readonly
+                           required>
+                </div>
+
+                {{-- In Time (Display Only) --}}
+                <div class="mb-3">
+                    <label class="form-label">In Time</label>
+                    <input type="text"
+                           class="form-control"
+                           id="in_time"
+                           placeholder="Will be set automatically"
+                           readonly>
+                </div>
+
+                {{-- Out Time (Display Only) --}}
+                <div class="mb-3">
+                    <label class="form-label">Out Time</label>
+                    <input type="text"
+                           class="form-control"
+                           id="out_time"
+                           placeholder="Will be set on OUT punch"
+                           readonly>
+                </div>
+                
+                {{-- Status (AUTO) --}}
+                <input type="hidden" name="status" value="present">
+
+                <div class="mb-3 text-center">
+                    <span class="badge bg-success p-2">
+                        Status: Present
+                    </span>
+                </div>
+
+
+                {{-- Photo --}}
+                {{-- <div class="mb-3">
+                    <label class="form-label">Photo Proof</label>
+                    <input type="file"
+                           class="form-control"
+                           name="photo"
+                           accept="image/*"
+                           capture="environment"
+                           required>
+                </div> --}}
+
+                <button type="submit"
+                        class="btn btn-success w-100"
+                        id="submitBtn"
+                        disabled>
+                </button>
+
+
+            </form>
+
         </div>
     </div>
 </div>
 
+{{-- Scripts --}}
 <script>
-    // Fill today's date into disabled field
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date').value = today;
+document.addEventListener('DOMContentLoaded', function () {
+
+    const locationInput = document.getElementById('location');
+    const inTimeInput   = document.getElementById('in_time');
+    const submitBtn     = document.getElementById('submitBtn');
+
+    // Attendance state from backend
+    const hasInTime  = @json($todayAttendance && $todayAttendance->in_time);
+    const hasOutTime = @json($todayAttendance && $todayAttendance->out_time);
+
+    // Decide button text
+    if (!hasInTime) {
+        submitBtn.innerText = 'Submit IN Time';
+    } else if (hasInTime && !hasOutTime) {
+        submitBtn.innerText = 'Submit OUT Time';
+        inTimeInput.value = "{{ $todayAttendance->in_time ?? '' }}";
+    } else {
+        submitBtn.innerText = 'Attendance Completed';
+        submitBtn.disabled = true;
+        return;
+    }
+
+    // Show current time (display only)
+    const now = new Date();
+    inTimeInput.value = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    if (!navigator.geolocation) {
+        alert('Geolocation not supported');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async function (position) {
+
+            const lat = position.coords.latitude.toFixed(6);
+            const lon = position.coords.longitude.toFixed(6);
+
+            // Instant fallback
+            locationInput.value = `${lat}, ${lon}`;
+            submitBtn.disabled = false;
+
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'AttendanceApp/1.0'
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                if (data.address) {
+                    let place =
+                        data.address.suburb ||
+                        data.address.village ||
+                        data.address.town ||
+                        data.address.city ||
+                        '';
+
+                    let state = data.address.state || '';
+                    let country = data.address.country || '';
+
+                    const fullLocation = `${place}, ${state}, ${country}`
+                        .replace(/^,|,$/g, '')
+                        .trim();
+
+                    if (fullLocation) {
+                        locationInput.value = fullLocation;
+                    }
+                }
+
+            } catch (e) {
+                console.warn('Location name fetch failed');
+            }
+        },
+        function () {
+            alert('Location permission is required');
+        },
+        {
+            enableHighAccuracy: false,
+            timeout: 7000,
+            maximumAge: 60000
+        }
+    );
+});
 </script>
 
-<script>
-    // Get today's date
-    const today = new Date();
-
-    // Format as YYYY-MM-DD
-    const formattedDate = today.toISOString().split('T')[0];
-
-    // Set value in the disabled input
-    document.getElementById('date').value = formattedDate;
-</script>
 
 
-
-
-                    <!-- Photo Capture -->
-                    <div class="mb-3">
-                        <label for="photo" class="form-label">Upload Photo</label>
-                        <input type="file" class="form-control" id="photo" name="photo" accept="image/*" capture="environment" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Submit Attendance</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 </body>
 </html>

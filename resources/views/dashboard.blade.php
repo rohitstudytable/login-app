@@ -197,13 +197,7 @@
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <h2>Admin</h2>
-    <a href="{{ route('dashboard') }}">Dashboard</a>
-    <a href="{{ route('interns.index') }}">Interns</a>
-    <a href="{{ route('attendance.index') }}">Attendance</a>
-</div>
+    @include('layouts.sidebar')
 
 <!-- MAIN -->
 <div class="main">

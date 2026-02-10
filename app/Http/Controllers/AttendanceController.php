@@ -6,21 +6,143 @@ use App\Models\Attendance;
 use App\Models\Intern;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
     /**
-     * Show the attendance page for admin with interns and attendance records
+     * ADMIN – Daily attendance page
      */
     public function index(Request $request)
     {
-        $date = $request->date ?? Carbon::today()->toDateString();
+        $attendanceDate = $request->filter_date
+            ? Carbon::parse($request->filter_date)->format('Y-m-d')
+            : now()->format('Y-m-d');
 
-        $interns = Intern::orderBy('name')->get();
+        $internQuery = Intern::query();
 
-        $query = Attendance::with('intern');
+        if ($request->filled('role')) {
+            $internQuery->where('role', $request->role);
+        }
+
+        $interns = $internQuery->orderBy('name')->get();
+
+        $recordsForDate = Attendance::whereDate('date', $attendanceDate)
+            ->whereIn('intern_id', $interns->pluck('id'))
+            ->get();
+
+        $allRecordsQuery = Attendance::with('intern')
+            ->whereIn('intern_id', $interns->pluck('id'))
+            ->orderBy('date', 'desc');
+
+        if ($request->filled('filter_date')) {
+            $allRecordsQuery->whereDate('date', $request->filter_date);
+        }
+
+        if ($request->filled('filter_name')) {
+            $allRecordsQuery->whereHas('intern', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->filter_name . '%');
+            });
+        }
+
+        $allRecords = $allRecordsQuery->get();
+
+        return view('attendance.index', compact(
+            'interns',
+            'recordsForDate',
+            'allRecords',
+            'attendanceDate'
+        ));
+    }
+
+    /**
+     * ADMIN – Save / Update attendance
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'interns' => 'required|array',
+            'interns.*.status' => 'required|in:present,absent,half_day,paid_leave,unmark',
+            'interns.*.location' => 'nullable|string|max:255',
+            'interns.*.in_time' => 'nullable|date_format:H:i',
+            'interns.*.out_time' => 'nullable|date_format:H:i',
+        ]);
+
+        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+
+        DB::transaction(function () use ($request, $attendanceDate) {
+
+            foreach ($request->interns as $internId => $data) {
+
+                // 🔴 UNMARK → DELETE
+                if ($data['status'] === 'unmark') {
+                    Attendance::where('intern_id', $internId)
+                        ->whereDate('date', $attendanceDate)
+                        ->delete();
+                    continue;
+                }
+
+                // Get existing record (if any)
+                $existingAttendance = Attendance::where('intern_id', $internId)
+                    ->whereDate('date', $attendanceDate)
+                    ->first();
+
+                // 🟡 LEAVE / ABSENT
+                if (in_array($data['status'], ['paid_leave', 'absent'])) {
+                    Attendance::updateOrCreate(
+                        [
+                            'intern_id' => $internId,
+                            'date' => $attendanceDate,
+                        ],
+                        [
+                            'status' => $data['status'],
+                            'location' => $data['location'] ?? 'Admin Marked',
+                            'in_time' => null,
+                            'out_time' => null,
+                        ]
+                    );
+                    continue;
+                }
+
+                // 🟢 PRESENT / HALF DAY (ADMIN CAN SWITCH WITHOUT TIME)
+                Attendance::updateOrCreate(
+                    [
+                        'intern_id' => $internId,
+                        'date' => $attendanceDate,
+                    ],
+                    [
+                        'status' => $data['status'],
+
+                        'location' => $data['location']
+                            ?? ($existingAttendance->location ?? 'Admin Marked'),
+
+                        'in_time' => $data['in_time']
+                            ?? ($existingAttendance->in_time ?? null),
+
+                        'out_time' => $data['out_time']
+                            ?? ($existingAttendance->out_time ?? null),
+                    ]
+                );
+            }
+        });
+
+        return redirect()
+            ->route('attendance.index', [
+                'filter_date' => $attendanceDate,
+                'role' => $request->role
+            ])
+            ->with('success', 'Attendance updated for ' . $attendanceDate);
+    }
+
+    /**
+     * ADMIN – Single intern history
+     */
+    public function show(Request $request, $id)
+    {
+        $intern = Intern::findOrFail($id);
+
+        $query = Attendance::where('intern_id', $id);
 
         if ($request->filled('start_date')) {
             $query->whereDate('date', '>=', $request->start_date);
@@ -30,170 +152,115 @@ class AttendanceController extends Controller
             $query->whereDate('date', '<=', $request->end_date);
         }
 
-        $records = $query->orderBy('date', 'desc')->get();
-
-        return view('attendance.index', compact('interns', 'date', 'records'));
-    }
-
-    /**
-     * Store or update attendance (admin side)
-     */
-    public function store(Request $request)
-    {
-
-        $request->validate([
-            'date'       => 'required|string',
-            'intern_id'  => 'required|exists:interns,id',
-            'status'     => 'required|in:present,absent,half_day',
-            'photo'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'photo_data' => 'nullable|string',
-        ]);
-
-        $photoPath = $this->handlePhoto($request);
-
-        $attendance = Attendance::updateOrCreate(
-            [
-                'intern_id' => $request->intern_id,
-                'date'      => $request->date,
-            ],
-            [
-                'status' => $request->status,
-                'photo'  => $photoPath,
-            ]
-        );
-        if ($attendance->wasRecentlyCreated) {
-            return back()->with('success', 'Attendance created successfully');
-        } else {
-            return back()->with('success', 'Attendance updated successfully');
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
+        $attendances = $query->orderBy('date', 'desc')->get();
 
-
-        // return back()->with('success', 'Attendance saved successfully');
+        return view('attendance.show', [
+            'intern' => $intern,
+            'attendances' => $attendances,
+            'totalDays' => $attendances->count(),
+            'presentCount' => $attendances->where('status', 'present')->count(),
+            'absentCount' => $attendances->where('status', 'absent')->count(),
+            'halfDayCount' => $attendances->where('status', 'half_day')->count(),
+            'paidLeaveCount' => $attendances->where('status', 'paid_leave')->count(),
+        ]);
     }
 
-
-
     /**
-     * Store public attendance submitted by intern via token
+     * PUBLIC – Search page
      */
-    public function searchEMpCode()
+    public function searchEmpCode()
     {
         return view('attendance.empcode');
     }
+
+    /**
+     * PUBLIC – Submit employee code
+     */
     public function searchByEmployeeId(Request $request)
     {
         $request->validate([
-            'employee_id' => 'required|string',
+            'employee_id' => 'required',
         ]);
 
-        $intern = Intern::where('Intern_code', $request->employee_id)->first();
+        $intern = Intern::where('intern_code', $request->employee_id)->first();
 
         if (!$intern) {
-            return back()->with('error', 'Employee ID not found');
+            return back()->with('error', 'Employee not found');
         }
-        $encryptedDate  = dataEncrypt(now()->toDateString());
-        $encryptedToken = dataEncrypt($intern->random_id);
-        $encryptedName  = dataEncrypt($intern->name);
 
-
-
-        // Show attendance form with token
         return redirect()->route('attendance.publicFormByToken', [
-            'date'  => $encryptedDate,
-            'token' => $encryptedToken,
-            'name'  => $encryptedName,
+            'date' => now()->format('Y-m-d'),
+            'token' => $intern->intern_code,
         ]);
     }
+
     /**
-     * Show public attendance form via token
+     * PUBLIC – Attendance form
      */
     public function publicFormByToken($date, $token)
     {
-        $decryptToken = dataDecrypt($token);
-        $encryptdate = $date;
-        $encryptToken = $token;
-        $intern = Intern::where('random_id', $decryptToken)->firstOrFail();
-        return view('attendance.public', compact('intern', 'encryptdate', 'encryptToken'));
+        $intern = Intern::where('intern_code', $token)->firstOrFail();
+        $date = Carbon::parse($date)->format('Y-m-d');
+
+        $todayAttendance = Attendance::where('intern_id', $intern->id)
+            ->whereDate('date', $date)
+            ->first();
+
+        return view('attendance.public', compact(
+            'intern',
+            'date',
+            'todayAttendance'
+        ));
     }
 
+    /**
+     * PUBLIC – Punch IN / Punch OUT
+     */
     public function publicStoreByToken(Request $request)
     {
-        $decryptToken = dataDecrypt($request->random_code);
-        $decryptid = dataDecrypt($request->intern);
-
-        $decryptDate = dataDecrypt($request->date);
-
-        if ($decryptDate != Carbon::today()->toDateString()) {
-            return back()->with('error', 'Attendance cannot be submitted for today\'s date.');
-        }
-
-        $intern = Intern::where('random_id', $decryptToken)->where('id', $decryptid)->first();
-        if (!$intern) {
-            return back()->with('error', 'User not found contact Admin');
-        }
-
         $request->validate([
-            'photo'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'photo_data' => 'nullable|string',
+            'intern_id' => 'required|exists:interns,id',
+            'location' => 'required|string|max:255',
+            'date' => 'required|date',
         ]);
 
-        $photoPath = $this->handlePhoto($request);
+        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+        $currentTime = now()->format('H:i:s');
 
-        Attendance::updateOrCreate(
-            [
-                'intern_id' => $intern->id,
-                'date'      => $decryptDate,
-            ],
-            [
+        $attendance = Attendance::where('intern_id', $request->intern_id)
+            ->whereDate('date', $attendanceDate)
+            ->first();
+
+        // 🟢 PUNCH IN
+        if (!$attendance) {
+            Attendance::create([
+                'intern_id' => $request->intern_id,
+                'date' => $attendanceDate,
                 'status' => 'present',
-                'photo'  => $photoPath,
-            ]
-        );
+                'location' => $request->location,
+                'in_time' => $currentTime,
+                'out_time' => null,
+            ]);
 
-        return redirect()->route('empcode')->with('success', 'Attendance submitted successfully!');
-    }
-
-    /**
-     * Show attendance history for a specific intern (admin)
-     */
-    public function show(Intern $intern)
-    {
-        $attendances = $intern->attendances()
-            ->orderBy('date', 'desc')
-            ->get();
-
-        return view('attendance.show', compact('intern', 'attendances'));
-    }
-
-    /**
-     * Helper function to handle mobile upload or webcam Base64 photo
-     */
-    protected function handlePhoto(Request $request)
-    {
-        $photoPath = null;
-
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('attendance_photos', 'public');
-        } elseif ($request->filled('photo_data')) {
-            $data = $request->photo_data;
-            if (preg_match('/^data:image\/(\w+);base64,/', $data, $type)) {
-                $data = substr($data, strpos($data, ',') + 1);
-                $type = strtolower($type[1]);
-            } else {
-                $type = 'png';
-            }
-
-            $data = base64_decode($data);
-            if ($data === false) {
-                return back()->withErrors(['photo_data' => 'Invalid photo data']);
-            }
-
-            $fileName = 'attendance_photos/' . Str::uuid() . '.' . $type;
-            Storage::disk('public')->put($fileName, $data);
-            $photoPath = $fileName;
+            return redirect()->route('empcode')
+                ->with('success', 'Punch IN recorded at ' . $currentTime);
         }
 
-        return $photoPath;
+        // 🔵 PUNCH OUT
+        if ($attendance->in_time && !$attendance->out_time) {
+            $attendance->update([
+                'out_time' => $currentTime,
+            ]);
+
+            return redirect()->route('empcode')
+                ->with('success', 'Punch OUT recorded at ' . $currentTime);
+        }
+
+        return redirect()->route('empcode')
+            ->with('error', 'Attendance already completed for today.');
     }
 }
