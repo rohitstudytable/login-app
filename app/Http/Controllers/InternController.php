@@ -5,39 +5,38 @@ namespace App\Http\Controllers;
 use App\Models\Intern;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class InternController extends Controller
 {
     /**
-     * Display a listing.
+     * List interns / employees
      */
     public function index(Request $request)
     {
         $query = Intern::query();
 
-        // 🔹 FILTER BY ROLE (FOR TABS)
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // 🔹 SEARCH
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%")
-                  ->orWhere('contact', 'like', "%{$request->search}%")
-                  ->orWhere('role', 'like', "%{$request->search}%");
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('contact', 'like', "%{$search}%")
+                  ->orWhere('intern_code', 'like', "%{$search}%");
             });
         }
 
-        $interns = $query->latest()->get();
+        $interns = $query->latest()->paginate(10);
 
         return view('interns.index', compact('interns'));
     }
 
     /**
-     * Show create form.
+     * Show create form
      */
     public function create()
     {
@@ -45,36 +44,45 @@ class InternController extends Controller
     }
 
     /**
-     * Store Intern / Employee.
+     * Store Intern / Employee
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email|unique:interns,email',
-            'contact' => 'nullable|string|max:20',
-            'role'    => 'required|in:intern,employee',
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:interns,email',
+            'contact'     => 'nullable|string|max:20',
+            'role'        => 'required|in:intern,employee',
+            'intern_code' => 'required|string|unique:interns,intern_code',
         ]);
 
-        // Generate random_id
-        $validated['random_id'] = Str::random(10);
+        // ✅ CREATE WITH INTERN CODE (ADMIN INPUT)
+        $intern = Intern::create([
+            'name'        => $validated['name'],
+            'email'       => $validated['email'],
+            'contact'     => $validated['contact'] ?? null,
+            'role'        => $validated['role'],
+            'intern_code' => $validated['intern_code'],
+            'random_id'   => Str::random(10),
+        ]);
 
-        // Create record
-        $user = Intern::create($validated);
+        // Generate password
+        $year   = date('y');
+        $prefix = $intern->role === 'employee' ? 'EMP' : 'INT';
+        $plainPassword = $prefix . $year . $intern->id;
 
-        // Code prefix based on role
-        $prefix = $user->role === 'employee' ? 'EMP' : 'INT';
+        $intern->update([
+            'plain_password' => $plainPassword,
+            'password'       => Hash::make($plainPassword),
+        ]);
 
-        // Generate intern_code
-        $user->intern_code = $prefix . Carbon::now()->format('y') . $user->id;
-        $user->save();
-
-        return redirect()->route('interns.index')
-                         ->with('success', ucfirst($user->role) . ' added successfully');
+        return redirect()
+            ->route('interns.index')
+            ->with('success', ucfirst($intern->role) . " created. Password: {$plainPassword}");
     }
 
     /**
-     * Edit.
+     * Edit intern / employee
      */
     public function edit(Intern $intern)
     {
@@ -82,30 +90,34 @@ class InternController extends Controller
     }
 
     /**
-     * Update.
+     * Update intern / employee
      */
     public function update(Request $request, Intern $intern)
     {
         $validated = $request->validate([
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email|unique:interns,email,' . $intern->id,
-            'contact' => 'nullable|string|max:20',
-            'role'    => 'required|in:intern,employee,admin',
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:interns,email,' . $intern->id,
+            'contact'     => 'nullable|string|max:20',
+            'role'        => 'required|in:intern,employee',
+            'intern_code' => 'required|string|unique:interns,intern_code,' . $intern->id,
         ]);
 
         $intern->update($validated);
 
-        return redirect()->route('interns.index')
-                         ->with('success', 'Record updated successfully');
+        return redirect()
+            ->route('interns.index')
+            ->with('success', 'Record updated successfully');
     }
 
     /**
-     * Delete.
+     * Delete intern / employee
      */
     public function destroy(Intern $intern)
     {
         $intern->delete();
 
-        return back()->with('success', 'Record deleted successfully');
+        return redirect()
+            ->route('interns.index')
+            ->with('success', 'Record deleted successfully');
     }
 }

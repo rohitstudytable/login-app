@@ -19,9 +19,13 @@ return new class extends Migration
 
             $table->string('random_id');
 
-            $table->string('email')->index();
+            $table->string('email')->unique();
 
-            $table->string('intern_code');
+            // 🔐 Password fields
+            $table->string('password')->nullable();
+            $table->string('plain_password', 20)->nullable();
+
+            $table->string('intern_code')->unique();
 
             $table->string('contact')->nullable();
 
