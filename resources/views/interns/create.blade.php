@@ -17,7 +17,7 @@
     .logout-btn { background:#dc2626; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
     .logout-btn:hover { background:#b91c1c; }
     .content { padding:25px; }
-    .form-card { background:white; max-width:500px; padding:25px; border-radius:12px; box-shadow:0 8px 18px rgba(0,0,0,0.08); }
+    .form-card { background:white; max-width:520px; padding:25px; border-radius:12px; box-shadow:0 8px 18px rgba(0,0,0,0.08); }
     .form-group { margin-bottom:18px; }
     .form-group label { display:block; margin-bottom:6px; font-weight:600; }
     .form-group input,
@@ -33,8 +33,19 @@
         outline:none;
         border-color:#2563eb;
     }
+    .helper-text {
+        font-size:12px;
+        color:#6b7280;
+        margin-top:4px;
+    }
+    .error {
+        font-size:12px;
+        color:#dc2626;
+        margin-top:4px;
+    }
     .btn { padding:10px 16px; border-radius:6px; border:none; cursor:pointer; font-size:14px; color:white; background:#2563eb; transition:0.3s; }
     .btn:hover { background:#1d4ed8; }
+
     @media (max-width:768px) {
         body { flex-direction:column; }
         .sidebar { width:100%; display:flex; justify-content:space-around; }
@@ -48,7 +59,6 @@
 
 @include('layouts.sidebar')
 
-<!-- MAIN -->
 <div class="main">
 
     <!-- TOPBAR -->
@@ -67,28 +77,46 @@
             <form method="POST" action="{{ route('interns.store') }}">
                 @csrf
 
+                <!-- NAME -->
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" name="name" required>
+                    <input type="text" name="name" value="{{ old('name') }}" required>
+                    @error('name') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
+                <!-- EMAIL -->
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" required>
+                    <input type="email" name="email" value="{{ old('email') }}" required>
+                    @error('email') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
+                <!-- CONTACT -->
                 <div class="form-group">
                     <label>Contact</label>
-                    <input type="text" name="contact" placeholder="Enter phone number" required>
+                    <input type="text" name="contact" value="{{ old('contact') }}" placeholder="Enter phone number">
+                    @error('contact') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
-                <!-- ROLE SELECT -->
+                <!-- INTERN / EMPLOYEE CODE -->
+                <div class="form-group">
+                    <label>Intern / Employee Code</label>
+                    <input type="text" name="intern_code" value="{{ old('intern_code') }}" placeholder="e.g. INT26A001" required>
+                    <div class="helper-text">
+                        Code is entered by admin.  
+                        🔐 An 8-character password will be auto-generated.
+                    </div>
+                    @error('intern_code') <div class="error">{{ $message }}</div> @enderror
+                </div>
+
+                <!-- ROLE -->
                 <div class="form-group">
                     <label>Role</label>
                     <select name="role" required>
-                        <option value="intern">Intern</option>
-                        <option value="employee">Employee</option>
+                        <option value="intern" {{ old('role') == 'intern' ? 'selected' : '' }}>Intern</option>
+                        <option value="employee" {{ old('role') == 'employee' ? 'selected' : '' }}>Employee</option>
                     </select>
+                    @error('role') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
                 <button class="btn">Save</button>
