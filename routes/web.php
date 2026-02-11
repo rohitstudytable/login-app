@@ -28,7 +28,7 @@ Route::get('/', function () {
         if ($user->role === 'intern') {
             $date = Carbon::now()->format('Y-m-d');
             return redirect()->route('attendance.publicFormByToken', [
-                'date'  => $date,
+                'date' => $date,
                 'token' => $user->intern_code,
             ]);
         }
@@ -107,3 +107,10 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';
+
+
+
+
+Route::get('/', function () {
+    return view('attendance.empDashboard');
+});
