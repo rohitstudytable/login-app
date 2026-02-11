@@ -1,3 +1,261 @@
+/*---------------------------------------------------- Color------------------------- ------------*/
+:root {
+
+    --white: #fff;
+    --white-three: #e2e2e2;
+    --primary-color: #1E40AF;
+    --black-one: #1d1d1d;
+    --black-three: #64748b;
+}
+
+/*---------------------------------------------------- Text Selection------------------------- ------------*/
+::-moz-selection {
+    /* Code for Firefox */
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+::selection {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/*---------------------------------------------------- Universal selector ------------------------- ------------*/
+html {
+    scroll-behavior: smooth;
+}
+
 * {
-    background-color: aquamarine;
+    padding: 0;
+    margin: 0;
+
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    font-family: "Source Sans 3", sans-serif;
+    background-color: var(--white);
+    color: var(--black-three);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+.conWrepper {
+    display: flex;
+    justify-content: center;
+}
+
+.myCon {
+    width: 97vw;
+}
+
+.myConSm {
+    width: 85vw;
+}
+
+.myBodySection {
+    margin-top: 64px;
+    padding: 32px 0;
+}
+
+
+
+
+/* header */
+header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: var(--white);
+    width: 100%;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo img {
+    height: 48px;
+}
+
+.logo h5 {
+    color: var(--primary-color);
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.logo p {
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+.topMenu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.topMenu .menuItem {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 8px 18px;
+    border-radius: 3px;
+
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.topMenu .menuItem ion-icon {
+    margin-top: -2px;
+}
+
+.topMenu .menuItem:hover {
+    background: var(--white-three);
+    color: var(--black-one);
+}
+
+.topMenu .menuItem.active,
+.topMenu .menuItem.active:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+
+
+
+/* dashboard */
+
+.perentCardFlex {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.myCard {
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+}
+
+.welcomeFlex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.welcomeFlex ion-icon {
+    font-size: 32px;
+}
+
+.welcomeFlex h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 0;
+    font-family: "Inter", sans-serif;
+}
+
+.myCard h2 {
+    font-size: 30px;
+}
+
+.welcomeFlex p {
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.primaryCard {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.myCard .myCardFoot p {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.myCard .myCardFoot p ion-icon {
+    margin-top: -2px;
+}
+
+.myCard .cardDate {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background-color: #dddddd1f;
+    border-radius: 6px;
+}
+
+.myCard .cardDate h2 {
+    font-weight: 800;
+    font-size: 30px;
+    margin-bottom: 0;
+}
+
+.myCard .cardDate p {
+    margin-bottom: 0;
+    font-size: 12px;
+}
+
+.myCard .cardIcon ion-icon {
+    font-size: 30px;
+    padding: 12px;
+}
+
+.myCard p {
+    font-size: 14px;
+}
+
+
+
+
+
+
+/* attendance page */
+
+.clockCard p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.clockCard p ion-icon {
+    margin-top: -2px;
+}
+
+.clockCard h2 {
+    font-size: 72px;
+    font-weight: 500;
+
+}
+
+.clockCard h6 {
+    font-size: 20px;
+    font-weight: 500;
 }
