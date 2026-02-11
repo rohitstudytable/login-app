@@ -11,19 +11,14 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\InternLoginController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Root Route
 |--------------------------------------------------------------------------
-| Redirect logged-in interns to attendance
-| Otherwise redirect to employee code entry
 */
 Route::get('/', function () {
 
-    // ✅ CHECK INTERN GUARD (NOT admin)
     if (Auth::guard('intern')->check()) {
-
         $intern = Auth::guard('intern')->user();
 
         return redirect()->route('attendance.publicFormByToken', [
@@ -34,7 +29,6 @@ Route::get('/', function () {
 
     return redirect()->route('empcode');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -53,10 +47,9 @@ Route::get('/attendance/public/{date}/{token}', [AttendanceController::class, 'p
 Route::post('/attendance/public', [AttendanceController::class, 'publicStoreByToken'])
     ->name('attendance.publicStoreByToken');
 
-
 /*
 |--------------------------------------------------------------------------
-| Intern / Employee Login Routes
+| Intern Login Routes
 |--------------------------------------------------------------------------
 */
 Route::get('/login-intern', [InternLoginController::class, 'showLoginForm'])
@@ -68,14 +61,12 @@ Route::post('/login-intern', [InternLoginController::class, 'login'])
 Route::post('/logout-intern', [InternLoginController::class, 'logout'])
     ->name('intern.logout');
 
-
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes (ADMIN ONLY)
+| ADMIN ROUTES (web guard ONLY)
 |--------------------------------------------------------------------------
-| Uses default web guard
 */
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])
         ->name('dashboard');
@@ -84,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // ✅ INTERN MANAGEMENT (ADMIN ONLY)
     Route::resource('interns', InternController::class);
 
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
@@ -93,13 +85,13 @@ Route::middleware(['auth'])->group(function () {
         ->name('attendance.show');
 
     Route::get('/report', [ReportController::class, 'index'])->name('report');
-    Route::get('/report/intern/{intern}', [ReportController::class, 'show'])->name('report.intern');
+    Route::get('/report/intern/{intern}', [ReportController::class, 'show'])
+        ->name('report.intern');
 });
-
 
 /*
 |--------------------------------------------------------------------------
-| Laravel Default Auth Routes (ADMIN LOGIN)
+| Laravel Default Auth (Admin Login)
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';
