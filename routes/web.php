@@ -22,7 +22,7 @@ Route::get('/', function () {
         $intern = Auth::guard('intern')->user();
 
         return redirect()->route('attendance.publicFormByToken', [
-            'date'  => Carbon::now()->format('Y-m-d'),
+            'date' => Carbon::now()->format('Y-m-d'),
             'token' => $intern->intern_code,
         ]);
     }
@@ -95,3 +95,10 @@ Route::middleware(['auth:web'])->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';
+
+
+
+
+Route::get('/', function () {
+    return view('attendance.empDashboard');
+});
