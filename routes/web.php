@@ -102,3 +102,12 @@ require __DIR__ . '/auth.php';
 Route::get('/', function () {
     return view('attendance.empDashboard');
 });
+Route::get('/empattendance', function () {
+    return view('attendance.empAttendance');
+});
+Route::get('/empreport', function () {
+    return view('attendance.empReport');
+});
+Route::get('/empprofile', function () {
+    return view('attendance.empProfile');
+});
