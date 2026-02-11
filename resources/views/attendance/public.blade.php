@@ -247,7 +247,7 @@ th {
                         <input  class="form-control" id="out_time" readonly>
                     </div>
 
-                    {{-- <div class="text-center mb-3">
+                    {{-- <div class="text-center mb-3"> 
                         <span class="badge bg-success p-2">Status: Present</span>
                     </div> --}}
 
