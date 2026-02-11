@@ -10,18 +10,29 @@ use Illuminate\Support\Facades\Hash;
 class InternController extends Controller
 {
     /**
+     * Only admin (web guard) can manage interns
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:web');
+    }
+
+    /**
      * List interns / employees
      */
     public function index(Request $request)
     {
         $query = Intern::query();
 
+        // Filter by role
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
+        // Search
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
@@ -56,7 +67,7 @@ class InternController extends Controller
             'intern_code' => 'required|string|unique:interns,intern_code',
         ]);
 
-        // ✅ CREATE WITH INTERN CODE (ADMIN INPUT)
+        // Create intern/employee
         $intern = Intern::create([
             'name'        => $validated['name'],
             'email'       => $validated['email'],
@@ -66,19 +77,19 @@ class InternController extends Controller
             'random_id'   => Str::random(10),
         ]);
 
-        // Generate password
+        // Generate password automatically
         $year   = date('y');
         $prefix = $intern->role === 'employee' ? 'EMP' : 'INT';
         $plainPassword = $prefix . $year . $intern->id;
 
         $intern->update([
-            'plain_password' => $plainPassword,
+            'plain_password' => $plainPassword, // optional (remove in production)
             'password'       => Hash::make($plainPassword),
         ]);
 
         return redirect()
             ->route('interns.index')
-            ->with('success', ucfirst($intern->role) . " created. Password: {$plainPassword}");
+            ->with('success', ucfirst($intern->role) . " created successfully. Password: {$plainPassword}");
     }
 
     /**
