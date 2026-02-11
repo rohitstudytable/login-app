@@ -12,79 +12,67 @@ use Carbon\Carbon;
 class InternLoginController extends Controller
 {
     /**
-     * Show the intern login form.
-     *
-     * If the intern is already logged in, redirect to their attendance page.
+     * Show intern login form
      */
     public function showLoginForm()
     {
-        if (Auth::check()) {
-            $intern = Auth::user();
+        // If already logged in as intern
+        if (Auth::guard('intern')->check()) {
 
-            // Optional: Only redirect if it's an intern (role check)
-            if ($intern->role === 'intern') {
-                $date = Carbon::now()->format('Y-m-d');
-                return redirect()->route('attendance.publicFormByToken', [
-                    'date' => $date,
-                    'token' => $intern->intern_code, 
-                ]);
-            }
+            $intern = Auth::guard('intern')->user();
+
+            return redirect()->route('attendance.publicFormByToken', [
+                'date'  => Carbon::now()->format('Y-m-d'),
+                'token' => $intern->intern_code,
+            ]);
         }
 
-        return view('auth.intern-login'); // Blade view for login
+        return view('auth.intern-login');
     }
 
+
     /**
-     * Handle intern login.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Handle intern login
      */
     public function login(Request $request)
     {
         $request->validate([
             'intern_code' => 'required|string',
-            'password' => 'required|string',
+            'password'    => 'required|string',
         ]);
 
-        // Find intern by code
+        // Find intern
         $intern = Intern::where('intern_code', $request->intern_code)->first();
 
         if (!$intern) {
             return back()->withInput()->with('error', 'Invalid Employee/Intern code.');
         }
 
-        // Verify password
+        // Check password
         if (!Hash::check($request->password, $intern->password)) {
             return back()->withInput()->with('error', 'Invalid password.');
         }
 
-        // Login the intern
-        Auth::login($intern);
+        // LOGIN using INTERN GUARD (IMPORTANT)
+        Auth::guard('intern')->login($intern);
 
-        // Redirect to public attendance page
-        $date = Carbon::now()->format('Y-m-d');
         return redirect()->route('attendance.publicFormByToken', [
-            'date' => $date,
+            'date'  => Carbon::now()->format('Y-m-d'),
             'token' => $intern->intern_code,
         ])->with('success', 'Logged in successfully.');
     }
 
+
     /**
-     * Handle intern logout.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Logout intern
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('intern')->logout();
 
-        // Invalidate and regenerate session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Redirect to Employee/Intern code entry page
         return redirect()->route('empcode')->with('success', 'Logged out successfully.');
     }
 }

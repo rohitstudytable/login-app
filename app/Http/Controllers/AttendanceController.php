@@ -235,51 +235,53 @@ public function publicFormByToken($date, $token)
     ));
 }
 
+public function publicStoreByToken(Request $request)
+{
+    $request->validate([
+        'intern_id' => 'required|exists:interns,id',
+        'location'  => 'required|string|max:255',
+        'date'      => 'required|date',
+    ]);
 
-    /**
-     * PUBLIC – Punch IN / Punch OUT
-     */
-    public function publicStoreByToken(Request $request)
-    {
-        $request->validate([
-            'intern_id' => 'required|exists:interns,id',
-            'location' => 'required|string|max:255',
-            'date' => 'required|date',
+    $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+    $currentTime = now()->format('H:i:s');
+
+    $intern = Intern::findOrFail($request->intern_id);
+
+    $attendance = Attendance::where('intern_id', $intern->id)
+        ->whereDate('date', $attendanceDate)
+        ->first();
+
+    // 🟢 PUNCH IN
+    if (!$attendance) {
+        Attendance::create([
+            'intern_id' => $intern->id,
+            'date'      => $attendanceDate,
+            'status'    => 'present',
+            'location'  => $request->location,
+            'in_time'   => $currentTime,
         ]);
 
-        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
-        $currentTime = now()->format('H:i:s');
-
-        $attendance = Attendance::where('intern_id', $request->intern_id)
-            ->whereDate('date', $attendanceDate)
-            ->first();
-
-        // 🟢 PUNCH IN
-        if (!$attendance) {
-            Attendance::create([
-                'intern_id' => $request->intern_id,
-                'date' => $attendanceDate,
-                'status' => 'present',
-                'location' => $request->location,
-                'in_time' => $currentTime,
-                'out_time' => null,
-            ]);
-
-            return redirect()->route('empcode')
-                ->with('success', 'Punch IN recorded at ' . $currentTime);
-        }
-
-        // 🔵 PUNCH OUT
-        if ($attendance->in_time && !$attendance->out_time) {
-            $attendance->update([
-                'out_time' => $currentTime,
-            ]);
-
-            return redirect()->route('empcode')
-                ->with('success', 'Punch OUT recorded at ' . $currentTime);
-        }
-
-        return redirect()->route('empcode')
-            ->with('error', 'Attendance already completed for today.');
+        return redirect()->route('attendance.publicFormByToken', [
+            'date'  => $attendanceDate,
+            'token' => $intern->intern_code,
+        ])->with('success', 'Punch IN recorded');
     }
+
+    // 🔵 PUNCH OUT
+    if ($attendance->in_time && !$attendance->out_time) {
+        $attendance->update([
+            'out_time' => $currentTime,
+        ]);
+
+        return redirect()->route('attendance.publicFormByToken', [
+            'date'  => $attendanceDate,
+            'token' => $intern->intern_code,
+        ])->with('success', 'Punch OUT recorded');
+    }
+
+    return redirect()->route('empcode')
+        ->with('error', 'Attendance already completed for today.');
+}
+
 }

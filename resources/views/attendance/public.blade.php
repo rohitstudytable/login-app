@@ -237,17 +237,17 @@ th {
                         <input type="hidden" class="form-control" name="location" id="location" readonly required>
                     </div>
 
-                    <div>
+                    <div class="mb-3">
                         <label>In Time</label>
                         <input  class="form-control" id="in_time" readonly>
                     </div>
 
-                    <div class="">
+                    <div class="mb-3">
                         <label>Out Time</label>
                         <input  class="form-control" id="out_time" readonly>
                     </div>
 
-                    {{-- <div class="text-center mb-3">
+                    {{-- <div class="text-center mb-3"> 
                         <span class="badge bg-success p-2">Status: Present</span>
                     </div> --}}
 
