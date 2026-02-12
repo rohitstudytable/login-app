@@ -36,12 +36,79 @@
 
                 <div class="conWrepper mb-4">
                     <div class="myConSm">
-                        <div class="myCard primaryCard text-center clockCard">
+                        <div class="myCard primaryCard text-center clockCard mb-4">
                             <p class="mb-1"><ion-icon name="time"></ion-icon> Indian Standard Time (IST)</p>
-                            <h2 class="mb-1">12:20:35</h2>
-                            <h6 class="mb-0">Wednesday, 11 February 2026</h6>
+                            <h2 class="mb-1" id="liveTime"></h2>
+                            <script>
+                                function updateTime() {
+                                    const now = new Date();
+
+                                    // Format time for Asia/Kolkata
+                                    const timeString = now.toLocaleTimeString("en-IN", {
+                                        timeZone: "Asia/Kolkata",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        second: "2-digit",
+                                    });
+
+                                    document.getElementById("liveTime").innerText = timeString;
+                                }
+
+                                // Run immediately
+                                updateTime();
+
+                                // Update every second
+                                setInterval(updateTime, 1000);
+
+                            </script>
+                            <h6 class="mb-0" id="todayDate"></h6>
+                            <script>
+                                function showTodayDate() {
+                                    const today = new Date();
+
+                                    const formattedDate = today.toLocaleDateString("en-IN", {
+                                        timeZone: "Asia/Kolkata",
+                                        weekday: "long",
+                                        day: "2-digit",
+                                        month: "long",
+                                        year: "numeric",
+                                    });
+
+                                    document.getElementById("todayDate").innerText = formattedDate;
+                                }
+
+                                showTodayDate();
+
+                            </script>
 
                         </div>
+
+                        <!-- mark attendance alert toaster -->
+                        <div class="myTost tostSuccess mb-4">
+                            <ion-icon name="checkmark-circle" class="text-success me-2"></ion-icon>
+                            <div>
+                                <p class="text-success mb-0">Action Successful</p>
+                                <p class="mb-0">Clocked in at 10:12:17 am</p>
+                            </div>
+                        </div>
+
+                        <!-- clock in clock out Buttons -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <button class="clockBtn clockIn diable">
+                                    <ion-icon name="arrow-forward-circle"></ion-icon>
+                                    Clock In
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="clockBtn clockOut diable">
+                                    <ion-icon name="arrow-back-circle"></ion-icon>
+                                    Clock Out
+                                </button>
+                            </div>
+                        </div>
+                        <!-- last action  -->
+
                     </div>
                 </div>
 

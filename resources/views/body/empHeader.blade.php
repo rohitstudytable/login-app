@@ -9,23 +9,29 @@
                 </div>
             </a>
             <div class="topMenu">
-                <a href="/" class="menuItem active">
+
+                <a href="/" class="menuItem {{ Request::is('/') ? 'active' : '' }}">
                     <ion-icon name="home-outline"></ion-icon>
                     Dashboard
                 </a>
-                <a href="/empattendance" class="menuItem">
+
+                <a href="/empattendance" class="menuItem {{ Request::is('empattendance') ? 'active' : '' }}">
                     <ion-icon name="timer-outline"></ion-icon>
                     Attendance
                 </a>
-                <a class="menuItem">
+
+                <a href="/report" class="menuItem {{ Request::is('report') ? 'active' : '' }}">
                     <ion-icon name="calendar-clear-outline"></ion-icon>
                     Report
                 </a>
-                <a class="menuItem">
+
+                <a href="/profile" class="menuItem {{ Request::is('profile') ? 'active' : '' }}">
                     <ion-icon name="person-outline"></ion-icon>
                     Profile
                 </a>
+
             </div>
+
         </div>
     </div>
 
