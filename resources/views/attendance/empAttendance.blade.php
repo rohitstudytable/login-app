@@ -95,7 +95,7 @@
                         <!-- clock in clock out Buttons -->
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <button class="clockBtn clockIn diable">
+                                <button class="clockBtn clockIn ">
                                     <ion-icon name="arrow-forward-circle"></ion-icon>
                                     Clock In
                                 </button>
@@ -108,13 +108,114 @@
                             </div>
                         </div>
                         <!-- last action  -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="lastActionCard text-center">
+                                    <p class="mb-1">Last Action</p>
+                                    <p class="text-dark mb-0" style="font-size: 16px">Clocked Out at 12:32:08 pm</p>
+                                </div>
+                            </div>
 
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="whiteBigCard">
+                                    <h4 class="mb-3"><ion-icon name="location-outline"></ion-icon> Location Verification
+                                    </h4>
+                                    <p class="locationVerify mb-2 text-success"><ion-icon
+                                            name="checkmark-circle"></ion-icon>
+                                        Location
+                                        Verified
+                                    </p>
+                                    <p class="locationVerify mb-2 text-danger">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Location Fetching...
+                                    </p>
+                                    <div class="myCard2">
+                                        <div class="card2Flex mb-2">
+                                            <ion-icon name="business-outline"></ion-icon>
+                                            <div>
+                                                <h6 class="mb-0"> State Government Office, Sector 12
+                                                </h6>
+                                                <p class="mb-0">New Delhi
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="card2Flex">
+                                            <ion-icon name="globe-outline"></ion-icon>
+                                            <p class="mb-0">New Delhi
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="whiteBigCard">
+                                    <h4 class="mb-3"><ion-icon name="calendar-outline"></ion-icon> Today's Shift
+                                        Schedule</h4>
+                                    <div class="myCard2 myCard2Outline mb-3">
+                                        <p class="mb-2" style="color: #1E40AF"> Shift Type
+                                        </p>
+                                        <h5 class="mb-0 text-dark fw-semibold">Regular Day Shift
+                                        </h5>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="myCard2">
+                                                <div class="card2Flex mb-2">
+                                                    <ion-icon name="arrow-forward-circle-outline"
+                                                        class="text-success"></ion-icon>
+                                                    <p class="mb-0">Start Time
+                                                    </p>
+                                                </div>
+                                                <h5 class="mb-0 text-dark fw-semibold">10:00 AM
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="myCard2">
+                                                <div class="card2Flex mb-2">
+                                                    <ion-icon name="arrow-back-circle-outline"
+                                                        class="text-danger"></ion-icon>
+                                                    <p class="mb-0">End Time
+                                                    </p>
+                                                </div>
+                                                <h5 class="mb-0 text-dark fw-semibold">06:00 PM
+                                                </h5>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <p class="lineFlex">
+                                        <span>Expected Hours</span>
+                                        <span class="text-dark">8 hours</span>
+                                    </p>
+                                    <p class="lineFlex">
+                                        <span>Break Time</span>
+                                        <span class="text-dark">45 minutes</span>
+                                    </p>
+                                    <p class="lineFlex">
+                                        <span>Working Hours</span>
+                                        <span class="text-dark">8 hours</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-            </section>
-            @include('body.empFooter')
+                </div>
         </div>
+
+        </section>
+        @include('body.empFooter')
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
