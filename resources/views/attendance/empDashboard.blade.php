@@ -26,9 +26,20 @@
                                 </div>
                                 <div>
                                     <div class="cardDate">
-                                        <h2>29</h2>
-                                        <p>December</p>
+                                        <h2 id="day"></h2>
+                                        <p id="month"></p>
                                     </div>
+                                    <script>
+                                        const today = new Date();
+
+                                        // Get Day (e.g. 12)
+                                        document.getElementById("day").innerText = today.getDate();
+
+                                        // Get Month Name (e.g. February)
+                                        const monthName = today.toLocaleString("en-IN", { month: "long" });
+                                        document.getElementById("month").innerText = monthName;
+
+                                    </script>
                                 </div>
                             </div>
                             <div class="myCardFoot">
