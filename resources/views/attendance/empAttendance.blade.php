@@ -119,9 +119,9 @@
                         </div>
 
 
-                        <div class="row">
+                        <div class="row mb-4">
                             <div class="col-md-6">
-                                <div class="whiteBigCard">
+                                <div class="whiteBigCard h-100">
                                     <h4 class="mb-3"><ion-icon name="location-outline"></ion-icon> Location Verification
                                     </h4>
                                     <p class="locationVerify mb-2 text-success"><ion-icon
@@ -164,7 +164,7 @@
                                         </h5>
                                     </div>
 
-                                    <div class="row">
+                                    <div class="row mb-4">
                                         <div class="col-md-6">
                                             <div class="myCard2">
                                                 <div class="card2Flex mb-2">
@@ -205,6 +205,103 @@
                                         <span>Working Hours</span>
                                         <span class="text-dark">8 hours</span>
                                     </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="whiteBigCard">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="mb-0"><ion-icon name="time-outline"></ion-icon> Recent Clock
+                                            History
+                                        </h4>
+                                        <p class="mb-0 sm">Last 7 days</p>
+                                    </div>
+
+
+                                    <div class="myCard2 mb-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <p class="mb-0">12 Feb 2026</p>
+                                            <!-- <p class="text-success mb-0">Present</p> -->
+                                            <p class="text-warning mb-0">Half day</p>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock In</p>
+                                                <p class="mb-0 text-dark">10:02 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock Out</p>
+                                                <p class="mb-0 text-dark">06:12 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Duration</p>
+                                                <p class="mb-0 text-dark">8h 10 m</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="myCard2 mb-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <p class="mb-0">12 Feb 2026</p>
+                                            <p class="text-danger mb-0">Absent</p>
+                                            <!-- <p class="text-warning mb-0">Half day</p> -->
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock In</p>
+                                                <p class="mb-0 text-dark">10:02 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock Out</p>
+                                                <p class="mb-0 text-dark">06:12 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Duration</p>
+                                                <p class="mb-0 text-dark">8h 10 m</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="myCard2 mb-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <p class="mb-0">12 Feb 2026</p>
+                                            <p class="text-success mb-0">Present</p>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock In</p>
+                                                <p class="mb-0 text-dark">10:02 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock Out</p>
+                                                <p class="mb-0 text-dark">06:12 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Duration</p>
+                                                <p class="mb-0 text-dark">8h 10 m</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="myCard2 mb-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <p class="mb-0">12 Feb 2026</p>
+                                            <p class="text-success mb-0">Present</p>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock In</p>
+                                                <p class="mb-0 text-dark">10:02 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Clock Out</p>
+                                                <p class="mb-0 text-dark">06:12 am</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <p class="mb-1 sm">Duration</p>
+                                                <p class="mb-0 text-dark">8h 10 m</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
