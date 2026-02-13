@@ -27,7 +27,14 @@
                     Attendance
                 </a>
 
-                {{-- Show ONLY if intern exists --}}
+               
+                <a href="/empreport" class="menuItem {{ Request::is('empreport') ? 'active' : '' }}">
+                    <ion-icon name="calendar-clear-outline"></ion-icon>
+                    Report
+                </a>
+
+                
+                 {{-- Show ONLY if intern exists --}}
                 @if(isset($intern))
                     <span class="menuItem" style="cursor: default;">
                         <ion-icon name="person-outline"></ion-icon>

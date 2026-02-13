@@ -1,8 +1,10 @@
 /*---------------------------------------------------- Color------------------------- ------------*/
 :root {
 
-    --white: #fff;
-    --white-three: #e2e2e2;
+    --white: #F8FAFC;
+    --white-two: #F1F5F9;
+    --white-three: #e2e8f0;
+
     --primary-color: #1E40AF;
     --black-one: #1d1d1d;
     --black-three: #64748b;
@@ -50,6 +52,29 @@ button {
     cursor: pointer;
 }
 
+.myBtn {
+    border: 1px solid var(--white-three);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--black-three);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.myBtn ion-icon {
+    margin-bottom: 0;
+    font-size: 16px;
+}
+
+.myBtn.myBtnPrimary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
 .conWrepper {
     display: flex;
     justify-content: center;
@@ -70,6 +95,10 @@ button {
 
 p {
     font-size: 14px;
+}
+
+p.sm {
+    font-size: 12px;
 }
 
 
@@ -162,6 +191,7 @@ header {
 .myCard {
     padding: 1.5rem;
     border-radius: 6px;
+    background-color: #fff;
     box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
 }
 
@@ -321,7 +351,138 @@ header {
 }
 
 .clockBtn.diable {
-    background-color: #f1f5f9 !important;
+    background-color: var(--white-two) !important;
     color: var(--black-three);
     cursor: not-allowed;
+}
+
+.lastActionCard {
+    background-color: var(--white-two);
+    padding: 16px;
+    border-radius: 10px;
+}
+
+
+.whiteBigCard {
+    padding: 24px;
+    border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    background-color: #fff;
+}
+
+.whiteBigCard h4 {
+    display: flex;
+    gap: 12px;
+    font-size: 18px;
+    font-family: "Inter", sans-serif;
+    color: var(--black-one);
+    font-weight: 600;
+}
+
+.whiteBigCard h4 ion-icon {
+    color: var(--primary-color);
+    font-size: 22px;
+}
+
+.whiteBigCard .locationVerify {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.whiteBigCard .locationVerify ion-icon {
+    font-size: 18px;
+}
+
+.myCard2 {
+    background-color: var(--white-two);
+    padding: 16px;
+    border-radius: 6px;
+}
+
+.myCard2.myCard2Outline {
+    background-color: transparent;
+    border: 1px solid #ddd;
+}
+
+.card2Flex {
+    display: flex;
+    gap: 8px;
+}
+
+.card2Flex h6 {
+    font-weight: 400;
+    color: var(--black-one);
+    font-size: 14px;
+
+}
+
+.card2Flex p {
+    font-size: 12px;
+}
+
+.card2Flex ion-icon {
+    margin-bottom: -2px;
+}
+
+.lineFlex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+
+.lineFlex:last-child {
+    border-bottom: none;
+}
+
+
+/* report page */
+.myForm label {
+    display: block;
+    color: var(--black-three);
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.myForm input,
+.myForm select {
+    padding: 10px 12px;
+    background-color: #fff;
+    border: 1px solid var(--white-three);
+    border-radius: 4px;
+    width: 100%;
+    font-size: 14px;
+    color: var(--black-one);
+    transition: all 0.2s ease-in-out;
+}
+
+.myForm input:focus,
+.myForm select:focus {
+    border: 1px solid var(--primary-color);
+    outline: none;
+}
+
+.myForm select:hover {
+    cursor: pointer;
+}
+
+.mytableCon table {
+    width: 100%;
+}
+
+.mytableCon table tr th {
+    color: var(--black-one);
+}
+
+.mytableCon table th,
+.mytableCon table td {
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.mytableCon table tr {
+    border-bottom: 1px solid var(--white-three);
 }
