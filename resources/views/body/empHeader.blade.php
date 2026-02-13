@@ -20,7 +20,7 @@
                     Attendance
                 </a>
 
-                <a href="/report" class="menuItem {{ Request::is('report') ? 'active' : '' }}">
+                <a href="/empreport" class="menuItem {{ Request::is('empreport') ? 'active' : '' }}">
                     <ion-icon name="calendar-clear-outline"></ion-icon>
                     Report
                 </a>
