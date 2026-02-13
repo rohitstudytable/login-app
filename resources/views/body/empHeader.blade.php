@@ -15,14 +15,14 @@
             <div class="topMenu">
 
                 {{-- Home --}}
-                <a href="/" class="menuItem {{ Request::is('/') ? 'active' : '' }}">
+                <a href="/" class="menuItem {{ Request::is('empdashboard') ? 'active' : '' }}">
                     <ion-icon name="home-outline"></ion-icon>
                     Home
                 </a>
 
                 {{-- Attendance (Public Safe) --}}
                 <a href="{{ route('empattendance') }}"
-                   class="menuItem {{ Request::is('attendance/search*') ? 'active' : '' }}">
+                class="menuItem {{ Request::is('empattendance') ? 'active' : '' }}">
                     <ion-icon name="timer-outline"></ion-icon>
                     Attendance
                 </a>

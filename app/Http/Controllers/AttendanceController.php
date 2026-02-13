@@ -192,9 +192,16 @@ class AttendanceController extends Controller
 
         $isHoliday = $this->isHolidayOrSunday($date);
 
+        // Today's attendance
         $todayAttendance = Attendance::where('intern_id', $intern->id)
             ->whereDate('date', $date)
             ->first();
+
+        // Recent 7-day history
+        $recentAttendances = Attendance::where('intern_id', $intern->id)
+            ->orderBy('date', 'desc')
+            ->limit(7)
+            ->get();
 
         // ALL-TIME attendance stats
         $allAttendances = Attendance::where('intern_id', $intern->id)->get();
@@ -210,6 +217,7 @@ class AttendanceController extends Controller
             'date',
             'todayAttendance',
             'isHoliday',
+            'recentAttendances',
             'totalDays',
             'presentCount',
             'absentCount',
@@ -218,62 +226,89 @@ class AttendanceController extends Controller
         ));
     }
 
-    /**
-     * EMPLOYEE / INTERN – Store attendance (Punch IN/OUT)
-     */
-    public function publicStoreByToken(Request $request)
-    {
-        $request->validate([
-            'intern_id' => 'required|exists:interns,id',
-            'location' => 'required|string|max:255',
-            'date' => 'required|date',
+   /**
+ * EMPLOYEE / INTERN – Store attendance (Punch IN/OUT)
+ */
+public function publicStoreByToken(Request $request)
+{
+    $request->validate([
+        'intern_id' => 'required|exists:interns,id',
+        'location' => 'required|string|max:255',
+        'date' => 'required|date',
+    ]);
+
+    $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+    $currentTime = now()->format('H:i:s');
+
+    $intern = Intern::findOrFail($request->intern_id);
+
+    // Holiday check
+    if ($this->isHolidayOrSunday($attendanceDate)) {
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Today is holiday. Attendance closed.']);
+        }
+        return redirect()->route('attendance.publicFormByToken', [
+            'date' => $attendanceDate,
+            'token' => $intern->intern_code,
+        ])->with('error', 'Today is holiday. Attendance closed.');
+    }
+
+    $attendance = Attendance::where('intern_id', $intern->id)
+        ->whereDate('date', $attendanceDate)
+        ->first();
+
+    // Punch IN
+    if (!$attendance) {
+        $attendance = Attendance::create([
+            'intern_id' => $intern->id,
+            'date' => $attendanceDate,
+            'status' => 'present',
+            'location' => $request->location,
+            'in_time' => $currentTime,
         ]);
 
-        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
-        $currentTime = now()->format('H:i:s');
-
-        $intern = Intern::findOrFail($request->intern_id);
-
-        if ($this->isHolidayOrSunday($attendanceDate)) {
-            return redirect()->route('attendance.publicFormByToken', [
-                'date' => $attendanceDate,
-                'token' => $intern->intern_code,
-            ])->with('error', 'Today is holiday. Attendance closed.');
-        }
-
-        $attendance = Attendance::where('intern_id', $intern->id)
-            ->whereDate('date', $attendanceDate)
-            ->first();
-
-        if (!$attendance) {
-            Attendance::create([
-                'intern_id' => $intern->id,
-                'date' => $attendanceDate,
-                'status' => 'present',
-                'location' => $request->location,
-                'in_time' => $currentTime,
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'action' => 'in',
+                'time' => \Carbon\Carbon::parse($attendance->in_time)->format('h:i:s a')
             ]);
-
-            return redirect()->route('attendance.publicFormByToken', [
-                'date' => $attendanceDate,
-                'token' => $intern->intern_code,
-            ])->with('success', 'Punch IN recorded');
-        }
-
-        if ($attendance->in_time && !$attendance->out_time) {
-            $attendance->update(['out_time' => $currentTime]);
-
-            return redirect()->route('attendance.publicFormByToken', [
-                'date' => $attendanceDate,
-                'token' => $intern->intern_code,
-            ])->with('success', 'Punch OUT recorded');
         }
 
         return redirect()->route('attendance.publicFormByToken', [
             'date' => $attendanceDate,
             'token' => $intern->intern_code,
-        ])->with('error', 'Attendance already completed for today.');
+        ])->with('success', 'Punch IN recorded');
     }
+
+    // Punch OUT
+    if ($attendance->in_time && !$attendance->out_time) {
+        $attendance->update(['out_time' => $currentTime]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'action' => 'out',
+                'time' => \Carbon\Carbon::parse($attendance->out_time)->format('h:i:s a')
+            ]);
+        }
+
+        return redirect()->route('attendance.publicFormByToken', [
+            'date' => $attendanceDate,
+            'token' => $intern->intern_code,
+        ])->with('success', 'Punch OUT recorded');
+    }
+
+    // Already done
+    if ($request->expectsJson()) {
+        return response()->json(['error' => 'Attendance already completed for today.']);
+    }
+
+    return redirect()->route('attendance.publicFormByToken', [
+        'date' => $attendanceDate,
+        'token' => $intern->intern_code,
+    ])->with('error', 'Attendance already completed for today.');
+}
 
     /**
      * EMPLOYEE / INTERN – Dashboard shortcut
@@ -315,5 +350,6 @@ class AttendanceController extends Controller
         if ($checkDate->isSunday()) return true;
 
         return Holiday::whereDate('holiday_date', $checkDate)->exists();
-    }
+    }  
+
 }

@@ -30,28 +30,34 @@ Route::get('/', function () {
 | EMPLOYEE / INTERN DASHBOARD PAGES (PROTECTED)
 |--------------------------------------------------------------------------
 */
+Route::middleware('auth:intern')->group(function () {
+    
+    // EMP DASHBOARD – provides stats
+    Route::get('/empdashboard', [AttendanceController::class, 'empDashboard'])
+        ->name('empdashboard');
 
-// EMP DASHBOARD – using controller to provide stats
-Route::get('/empdashboard', [AttendanceController::class, 'empDashboard'])
-    ->name('empdashboard')->middleware('auth:intern');
+    // EMP ATTENDANCE – shows attendance page and allows punch in/out
+    Route::get('/empattendance', [AttendanceController::class, 'empAttendance'])
+        ->name('empattendance');
 
-// EMP ATTENDANCE – using controller
-Route::get('/empattendance', [AttendanceController::class, 'empAttendance'])
-    ->name('empattendance')->middleware('auth:intern');
+    // Punch IN / OUT action (AJAX)
+    Route::post('/empattendance/store', [AttendanceController::class, 'publicStoreByToken'])
+        ->name('attendance.publicStoreByToken');
 
-// EMP REPORT
-Route::get('/empreport', function () {
-    return view('attendance.empReport', [
-        'intern' => Auth::guard('intern')->user()
-    ]);
-})->name('empreport')->middleware('auth:intern');
+    // EMP REPORT
+    Route::get('/empreport', function () {
+        return view('attendance.empReport', [
+            'intern' => Auth::guard('intern')->user()
+        ]);
+    })->name('empreport');
 
-// EMP PROFILE
-Route::get('/empprofile', function () {
-    return view('attendance.empProfile', [
-        'intern' => Auth::guard('intern')->user()
-    ]);
-})->name('empprofile')->middleware('auth:intern');
+    // EMP PROFILE
+    Route::get('/empprofile', function () {
+        return view('attendance.empProfile', [
+            'intern' => Auth::guard('intern')->user()
+        ]);
+    })->name('empprofile');
+});
 
 /*
 |--------------------------------------------------------------------------

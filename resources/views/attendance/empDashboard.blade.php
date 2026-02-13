@@ -71,7 +71,7 @@
                     <div class="row">
 
                         {{-- TOTAL DAYS --}}
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="myCard total">
                                 <div class="perentCardFlex align-items-center">
                                     <div>
@@ -86,7 +86,7 @@
                         </div>
 
                         {{-- PRESENT --}}
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="myCard present">
                                 <div class="perentCardFlex align-items-center">
                                     <div>
@@ -101,7 +101,7 @@
                         </div>
 
                         {{-- ABSENT --}}
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="myCard absent">
                                 <div class="perentCardFlex align-items-center">
                                     <div>
@@ -116,7 +116,7 @@
                         </div>
 
                         {{-- HALF DAY --}}
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="myCard half_day">
                                 <div class="perentCardFlex align-items-center">
                                     <div>
@@ -131,7 +131,7 @@
                         </div>
 
                         {{-- PAID LEAVE --}}
-                        <div class="col-md-3 mt-3">
+                        <div class="col-md-2">
                             <div class="myCard paid_leave">
                                 <div class="perentCardFlex align-items-center">
                                     <div>
