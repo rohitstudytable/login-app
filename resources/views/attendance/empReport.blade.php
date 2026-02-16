@@ -1,14 +1,14 @@
 @include('body.headerlink')
 
-
-
 <body>
 
     <div class="">
-        <!-- <div class="sidebar">sidebar</div> -->
         <div>
             @include('body.empHeader')
+
             <section class="myBodySection">
+
+                {{-- ================= PAGE HEADER ================= --}}
                 <div class="conWrepper mb-4">
                     <div class="myConSm">
                         <div class="d-flex mb-0 align-items-center">
@@ -17,61 +17,63 @@
                             <p class="mb-0">Attendance Report</p>
                         </div>
                         <h2 class="text-dark fw-bold">Attendance Report</h2>
-                        <p class="mb-0">View and analyze your comprehensive attendance records with advanced filtering
-                            options</p>
+                        <p class="mb-0">View and analyze your comprehensive attendance records with advanced filtering options</p>
                     </div>
                 </div>
-
 
                 <div class="conWrepper">
                     <div class="myConSm">
 
-
+                        {{-- ================= FILTER FORM ================= --}}
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="whiteBigCard">
                                     <h4 class="mb-3"><ion-icon name="filter-outline"></ion-icon> Filter Records</h4>
-                                    <form action="" class="myForm">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <label for="">From Date</label>
-                                                <input type="date">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="">To Date</label>
-                                                <input type="date">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="">Attendance Status</label>
-                                                <select name="" id="">
-                                                    <option value="All Status">All Status</option>
-                                                    <option value="All Status">Present</option>
-                                                    <option value="All Status">Absent</option>
-                                                    <option value="All Status">Leave Taken</option>
-                                                </select>
-                                            </div>
+
+                                    <form method="GET" action="{{ route('empreport') }}" class="myForm d-flex flex-wrap align-items-end g-3">
+                                        <div class="col-md-3">
+                                            <label>From Date</label>
+                                            <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label>To Date</label>
+                                            <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label>Attendance Status</label>
+                                            <select name="status" class="form-control">
+                                                <option value="all">All Status</option>
+                                                <option value="present" {{ request('status')=='present'?'selected':'' }}>Present</option>
+                                                <option value="absent" {{ request('status')=='absent'?'selected':'' }}>Absent</option>
+                                                <option value="half_day" {{ request('status')=='half_day'?'selected':'' }}>Half Day</option>
+                                                <option value="paid_leave" {{ request('status')=='paid_leave'?'selected':'' }}>Leave Taken</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-3 d-flex gap-2">
+                                            <button type="submit" class="myBtn myBtnPrimary">Search</button>
+                                            <a href="{{ route('empreport') }}" class="myBtn btn-secondary">Reset</a>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
 
-
+                        {{-- ================= ATTENDANCE CARDS ================= --}}
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="myCard">
                                     <div class="perentCardFlex align-items-center">
                                         <div>
                                             <p class="mb-2">Present Days</p>
-                                            <h2 class="text-black mb-0 fw-bold">0</h2>
+                                            <h2 class="text-black mb-0 fw-bold">{{ $presentCount ?? 0 }}</h2>
                                         </div>
                                         <div class="cardIcon">
                                             <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </div>
 
@@ -80,71 +82,68 @@
                                     <div class="perentCardFlex align-items-center">
                                         <div>
                                             <p class="mb-2">Absent Days</p>
-                                            <h2 class="text-black mb-0 fw-bold">0</h2>
+                                            <h2 class="text-black mb-0 fw-bold">{{ $absentCount ?? 0 }}</h2>
                                         </div>
                                         <div class="cardIcon">
                                             <ion-icon name="close-circle" class="text-danger"></ion-icon>
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </div>
+
                             <div class="col-md-3">
                                 <div class="myCard">
                                     <div class="perentCardFlex align-items-center">
                                         <div>
                                             <p class="mb-2">Half Days</p>
-                                            <h2 class="text-black mb-0 fw-bold">0</h2>
+                                            <h2 class="text-black mb-0 fw-bold">{{ $halfDayCount ?? 0 }}</h2>
                                         </div>
                                         <div class="cardIcon">
                                             <ion-icon name="hourglass" class="text-warning"></ion-icon>
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </div>
+
                             <div class="col-md-3">
                                 <div class="myCard">
                                     <div class="perentCardFlex align-items-center">
                                         <div>
                                             <p class="mb-2">Leave Taken</p>
-                                            <h2 class="text-black mb-0 fw-bold">0</h2>
+                                            <h2 class="text-black mb-0 fw-bold">{{ $paidLeaveCount ?? 0 }}</h2>
                                         </div>
                                         <div class="cardIcon">
                                             <ion-icon name="calendar" class="text-info"></ion-icon>
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </div>
                         </div>
 
-
+                        {{-- ================= ATTENDANCE TABLE ================= --}}
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="whiteBigCard">
+
                                     <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h4 class="mb-0"><ion-icon name="list-outline"></ion-icon> Attendance Records
+                                        <h4 class="mb-0">
+                                            <ion-icon name="list-outline"></ion-icon> Attendance Records
                                         </h4>
-                                        <div class="d-flex">
-                                            <form class="myForm">
-                                                <input type="text" placeholder="🔍 Search here...">
-                                            </form>
-                                            <button class="myBtn myBtnPrimary mx-2"><ion-icon
-                                                    name="download-outline"></ion-icon>Export</button>
-                                            <button class="myBtn"><ion-icon
-                                                    name="print-outline"></ion-icon>Print</button>
+
+                                        <div class="d-flex gap-2">                          
+
+                                            <button class="myBtn myBtnPrimary mx-2">
+                                                <ion-icon name="download-outline"></ion-icon> Export
+                                            </button>
+
+                                            <button class="myBtn">
+                                                <ion-icon name="print-outline"></ion-icon> Print
+                                            </button>
                                         </div>
                                     </div>
 
                                     <div class="mytableCon">
-                                        <table>
+                                        <table class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>Date</th>
@@ -154,51 +153,81 @@
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
-                                                <tr>
-                                                    <td>29/12/2025</td>
-                                                    <td>10:00 AM</td>
-                                                    <td>06:20 PM</td>
-                                                    <td>8h 20m</td>
-                                                    <td>
-                                                        <!-- <p class="text-success mb-0">Present</p> -->
-                                                        <p class="text-warning sm mb-0">Half day</p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>29/12/2025</td>
-                                                    <td>10:00 AM</td>
-                                                    <td>06:20 PM</td>
-                                                    <td>8h 20m</td>
-                                                    <td>
+                                                @php
+                                                    $attendanceData = $attendances ?? collect();
+                                                @endphp
 
-                                                        <p class="text-warning sm mb-0">Half day</p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>30/12/2025</td>
-                                                    <td>10:00 AM</td>
-                                                    <td>06:20 PM</td>
-                                                    <td>8h 20m</td>
-                                                    <td>
-                                                        <p class="text-success sm mb-0">Present</p>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>31/12/2025</td>
-                                                    <td>10:00 AM</td>
-                                                    <td>06:20 PM</td>
-                                                    <td>8h 20m</td>
-                                                    <td>
+                                                @forelse($attendanceData as $att)
+                                                   @php
+                                                        $in = $att->in_time ? \Carbon\Carbon::parse($att->in_time) : null;
+                                                        $out = $att->out_time ? \Carbon\Carbon::parse($att->out_time) : null;
 
-                                                        <p class="text-danger sm mb-0">Absent</p>
-                                                    </td>
-                                                </tr>
+                                                        if($in && $out){
+                                                            $totalMinutes = $in->diffInMinutes($out);
+                                                            $hours = intdiv($totalMinutes, 60);
+                                                            $minutes = $totalMinutes % 60;
+
+                                                            $duration = '';
+                                                            if($hours > 0){
+                                                                $duration .= $hours . ' hr' . ($hours > 1 ? 's' : '');
+                                                            }
+                                                            if($minutes > 0){
+                                                                $duration .= ($hours > 0 ? ' ' : '') . $minutes . ' min';
+                                                            }
+                                                            if($duration === ''){
+                                                                $duration = '0 min';
+                                                            }
+                                                        } else {
+                                                            $duration = '-';
+                                                        }
+                                                    @endphp
+
+                                                    <tr>
+                                                        <td>{{ \Carbon\Carbon::parse($att->date)->format('d/m/Y') }}</td>
+                                                        <td>{{ $in ? $in->format('h:i A') : '-' }}</td>
+                                                        <td>{{ $out ? $out->format('h:i A') : '-' }}</td>
+                                                        <td>{{ $duration }}</td>
+                                                        <td>
+                                                            @switch($att->status)
+                                                                @case('present')
+                                                                    <span class="badge bg-success">Present</span>
+                                                                @break
+
+                                                                @case('absent')
+                                                                    <span class="badge bg-danger">Absent</span>
+                                                                @break
+
+                                                                @case('half_day')
+                                                                    <span class="badge bg-warning text-dark">Half Day</span>
+                                                                @break
+
+                                                                @case('paid_leave')
+                                                                    <span class="badge bg-info">Leave</span>
+                                                                @break
+
+                                                                @default
+                                                                    <span class="badge bg-secondary">
+                                                                        {{ ucfirst($att->status) }}
+                                                                    </span>
+                                                            @endswitch
+                                                        </td>
+                                                    </tr>
+
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="5" class="text-center py-4">
+                                                            No attendance records found
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
 
+                                </div>
                             </div>
                         </div>
 
@@ -206,12 +235,11 @@
                 </div>
 
             </section>
+
             @include('body.empFooter')
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

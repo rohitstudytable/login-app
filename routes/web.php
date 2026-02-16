@@ -16,14 +16,13 @@ use App\Http\Controllers\Auth\InternLoginController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    // ✅ INTERN logged in → EMP DASHBOARD
     if (Auth::guard('intern')->check()) {
         return redirect()->route('empdashboard');
     }
 
-    // ❌ Not logged in → EMP CODE PAGE
     return redirect()->route('empcode');
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,24 +31,25 @@ Route::get('/', function () {
 */
 Route::middleware('auth:intern')->group(function () {
     
-    // EMP DASHBOARD – provides stats
+    // EMP DASHBOARD
     Route::get('/empdashboard', [AttendanceController::class, 'empDashboard'])
         ->name('empdashboard');
 
-    // EMP ATTENDANCE – shows attendance page and allows punch in/out
+    // EMP ATTENDANCE
     Route::get('/empattendance', [AttendanceController::class, 'empAttendance'])
         ->name('empattendance');
 
-    // Punch IN / OUT action (AJAX)
+    // Punch IN / OUT
     Route::post('/empattendance/store', [AttendanceController::class, 'publicStoreByToken'])
         ->name('attendance.publicStoreByToken');
 
-    // EMP REPORT
-    Route::get('/empreport', function () {
-        return view('attendance.empReport', [
-            'intern' => Auth::guard('intern')->user()
-        ]);
-    })->name('empreport');
+    /*
+    |--------------------------------------------------------------------------
+    | EMP REPORT  ✅ FIXED (NOW CONNECTED TO CONTROLLER)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/empreport', [AttendanceController::class, 'empReport'])
+        ->name('empreport');
 
     // EMP PROFILE
     Route::get('/empprofile', function () {
@@ -58,6 +58,7 @@ Route::middleware('auth:intern')->group(function () {
         ]);
     })->name('empprofile');
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -70,13 +71,15 @@ Route::get('/enter-empcode', [AttendanceController::class, 'searchEmpCode'])
 Route::post('/search-empcode', [AttendanceController::class, 'searchByEmployeeId'])
     ->name('submit.empcode');
 
+
 /*
 |--------------------------------------------------------------------------
-| PUBLIC ATTENDANCE SEARCH (NO LOGIN REQUIRED)
+| PUBLIC ATTENDANCE SEARCH
 |--------------------------------------------------------------------------
 */
 Route::get('/attendance/search', [AttendanceController::class, 'searchEmpCode'])
     ->name('attendance.search');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +95,7 @@ Route::post('/login-intern', [InternLoginController::class, 'login'])
 Route::post('/logout-intern', [InternLoginController::class, 'logout'])
     ->name('intern.logout');
 
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN ROUTES (WEB GUARD ONLY)
@@ -99,37 +103,32 @@ Route::post('/logout-intern', [InternLoginController::class, 'logout'])
 */
 Route::middleware(['auth:web'])->group(function () {
 
-    // ADMIN DASHBOARD
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])
         ->name('dashboard');
 
-    // PROFILE
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // INTERN MANAGEMENT
     Route::resource('interns', InternController::class);
 
-    // ATTENDANCE (ADMIN)
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
     Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 
     Route::get('/attendance/intern/{intern}', [AttendanceController::class, 'show'])
         ->name('attendance.show');
 
-    // REPORTS
     Route::get('/report', [ReportController::class, 'index'])->name('report');
     Route::get('/report/intern/{intern}', [ReportController::class, 'show'])
         ->name('report.intern');
 
-    // HOLIDAYS
     Route::prefix('admin')
         ->name('admin.')
         ->group(function () {
             Route::resource('holidays', \App\Http\Controllers\Admin\HolidayController::class);
         });
 });
+
 
 /*
 |--------------------------------------------------------------------------

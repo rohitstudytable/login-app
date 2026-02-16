@@ -2,57 +2,96 @@
 
 <style>
     body {
-        background: #0f172a; /* deep black/blue */
-        font-family: 'Segoe UI', sans-serif;
-        min-height: 100vh;
-    }
+    background: #567cd6; /* deep navy background */
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+}
 
-    .auth-card {
-        background: #ffffff;
-        border-radius: 14px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-    }
+/* ------------------ Card ------------------ */
+.auth-card {
+    background: #1e293b; /* dark card background for contrast */
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6); /* stronger shadow for depth */
+}
 
-    .auth-header {
-        background: #000000;
-        color: #ffffff;
-        border-radius: 14px 14px 0 0;
-        padding: 15px;
-    }
+/* ------------------ Card Header ------------------ */
+.auth-header {
+    background: #111827; /* slightly darker than card for separation */
+    color: #f8fafc; /* light text for readability */
+    border-radius: 14px 14px 0 0;
+    padding: 15px;
+}
 
-    .auth-header h5 {
-        margin: 0;
-        font-weight: 600;
-    }
+.auth-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
 
-    .form-control {
-        border-radius: 10px;
-        padding: 12px;
-    }
+/* ------------------ Form Inputs ------------------ */
+.form-control {
+    border-radius: 10px;
+    padding: 12px;
+    border: none;
+    background-color: #e2e8f0; /* light background for inputs */
+    color: #111827; /* dark text inside inputs */
+    transition: all 0.2s ease-in-out;
+}
 
-    .btn-primary {
-        background: #000000;
-        border: none;
-        border-radius: 10px;
-        padding: 12px;
-        font-weight: 600;
-        transition: 0.3s;
-    }
+.form-control:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30,64,175,0.3); /* primary color focus ring */
+    background-color: #ffffff;
+}
 
-    .btn-primary:hover {
-        background: #1f2937;
-    }
+/* ------------------ Buttons ------------------ */
+.btn-primary {
+    background: #1e40af; /* deep blue button */
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    transition: all 0.3s ease-in-out;
+}
 
-    .logo-box img {
-        filter: drop-shadow(0 6px 15px rgba(255,255,255,0.25));
-        max-width: 180px;
-        width: 100%;
-        height: auto;
-    }
+.btn-primary:hover {
+    background: #1e3aa8; /* slightly darker blue on hover */
+    transform: translateY(-1px);
+}
 
-    .alert {
-        border-radius: 8px;
-    }
+/* ------------------ Logo ------------------ */
+.logo-box img {
+    filter: drop-shadow(0 6px 15px rgba(255,255,255,0.25));
+    max-width: 180px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* ------------------ Alerts ------------------ */
+.alert {
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #10b9811a; /* subtle green background */
+    color: #047857; /* dark green text */
+    border: 1px solid #10b981;
+}
+
+.alert-danger {
+    background-color: #f871711a; /* subtle red background */
+    color: #b91c1c; /* dark red text */
+    border: 1px solid #dc2626;
+}
+
+/* ------------------ Form Labels ------------------ */
+.form-label {
+    color: #f1f5f9; /* light label text for readability */
+    font-weight: 600;
+}
+
 </style>
 
 <body>

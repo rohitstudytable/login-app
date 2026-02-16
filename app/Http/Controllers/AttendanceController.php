@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
-    /**
-     * ADMIN – Daily attendance page
-     */
+
+    /*
+    |--------------------------------------------------------------------------  
+    | ADMIN – DAILY ATTENDANCE PAGE
+    |--------------------------------------------------------------------------  
+    */
     public function index(Request $request)
     {
         $attendanceDate = $request->filter_date
@@ -49,17 +52,41 @@ class AttendanceController extends Controller
 
         $allRecords = $allRecordsQuery->get();
 
+        $internIds = $interns->pluck('id');
+
+        $presentCount = Attendance::whereIn('intern_id', $internIds)
+            ->where('status', 'present')
+            ->count();
+
+        $absentCount = Attendance::whereIn('intern_id', $internIds)
+            ->where('status', 'absent')
+            ->count();
+
+        $halfDayCount = Attendance::whereIn('intern_id', $internIds)
+            ->where('status', 'half_day')
+            ->count();
+
+        $paidLeaveCount = Attendance::whereIn('intern_id', $internIds)
+            ->where('status', 'paid_leave')
+            ->count();
+
         return view('attendance.index', compact(
             'interns',
             'recordsForDate',
             'allRecords',
-            'attendanceDate'
+            'attendanceDate',
+            'presentCount',
+            'absentCount',
+            'halfDayCount',
+            'paidLeaveCount'
         ));
     }
 
-    /**
-     * ADMIN – Save / Update attendance
-     */
+    /*
+    |--------------------------------------------------------------------------  
+    | ADMIN – SAVE / UPDATE ATTENDANCE
+    |--------------------------------------------------------------------------  
+    */
     public function store(Request $request)
     {
         $request->validate([
@@ -78,7 +105,9 @@ class AttendanceController extends Controller
         }
 
         DB::transaction(function () use ($request, $attendanceDate) {
+
             foreach ($request->interns as $internId => $data) {
+
                 if ($data['status'] === 'unmark') {
                     Attendance::where('intern_id', $internId)
                         ->whereDate('date', $attendanceDate)
@@ -121,9 +150,11 @@ class AttendanceController extends Controller
         ])->with('success', 'Attendance updated for ' . $attendanceDate);
     }
 
-    /**
-     * ADMIN – Single intern history
-     */
+    /*
+    |--------------------------------------------------------------------------  
+    | ADMIN – SINGLE INTERN ATTENDANCE HISTORY
+    |--------------------------------------------------------------------------  
+    */
     public function show(Request $request, $id)
     {
         $intern = Intern::findOrFail($id);
@@ -155,17 +186,11 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * PUBLIC – Search employee code page
-     */
     public function searchEmpCode()
     {
         return view('attendance.empcode');
     }
 
-    /**
-     * PUBLIC – Submit employee code
-     */
     public function searchByEmployeeId(Request $request)
     {
         $request->validate(['employee_id' => 'required']);
@@ -182,9 +207,11 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * EMPLOYEE / INTERN – Attendance page
-     */
+    /*
+    |--------------------------------------------------------------------------  
+    | EMPLOYEE – ATTENDANCE PAGE
+    |--------------------------------------------------------------------------  
+    */
     public function publicFormByToken($date, $token)
     {
         $intern = Intern::where('intern_code', $token)->firstOrFail();
@@ -192,142 +219,119 @@ class AttendanceController extends Controller
 
         $isHoliday = $this->isHolidayOrSunday($date);
 
-        // Today's attendance
         $todayAttendance = Attendance::where('intern_id', $intern->id)
             ->whereDate('date', $date)
             ->first();
 
-        // Recent 7-day history
         $recentAttendances = Attendance::where('intern_id', $intern->id)
             ->orderBy('date', 'desc')
             ->limit(7)
             ->get();
 
-        // ALL-TIME attendance stats
         $allAttendances = Attendance::where('intern_id', $intern->id)->get();
 
-        $totalDays      = $allAttendances->count();
-        $presentCount   = $allAttendances->where('status', 'present')->count();
-        $absentCount    = $allAttendances->where('status', 'absent')->count();
-        $halfDayCount   = $allAttendances->where('status', 'half_day')->count();
-        $paidLeaveCount = $allAttendances->where('status', 'paid_leave')->count();
-
-        return view('attendance.empAttendance', compact(
-            'intern',
-            'date',
-            'todayAttendance',
-            'isHoliday',
-            'recentAttendances',
-            'totalDays',
-            'presentCount',
-            'absentCount',
-            'halfDayCount',
-            'paidLeaveCount'
-        ));
+        return view('attendance.empAttendance', [
+            'intern' => $intern,
+            'date' => $date,
+            'attendance' => $todayAttendance,
+            'todayAttendance' => $todayAttendance,
+            'isHoliday' => $isHoliday,
+            'recentAttendances' => $recentAttendances,
+            'totalDays' => $allAttendances->count(),
+            'presentCount' => $allAttendances->where('status', 'present')->count(),
+            'absentCount' => $allAttendances->where('status', 'absent')->count(),
+            'halfDayCount' => $allAttendances->where('status', 'half_day')->count(),
+            'paidLeaveCount' => $allAttendances->where('status', 'paid_leave')->count()
+        ]);
     }
 
-   /**
- * EMPLOYEE / INTERN – Store attendance (Punch IN/OUT)
- */
-public function publicStoreByToken(Request $request)
-{
-    $request->validate([
-        'intern_id' => 'required|exists:interns,id',
-        'location' => 'required|string|max:255',
-        'date' => 'required|date',
-    ]);
-
-    $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
-    $currentTime = now()->format('H:i:s');
-
-    $intern = Intern::findOrFail($request->intern_id);
-
-    // Holiday check
-    if ($this->isHolidayOrSunday($attendanceDate)) {
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'Today is holiday. Attendance closed.']);
-        }
-        return redirect()->route('attendance.publicFormByToken', [
-            'date' => $attendanceDate,
-            'token' => $intern->intern_code,
-        ])->with('error', 'Today is holiday. Attendance closed.');
-    }
-
-    $attendance = Attendance::where('intern_id', $intern->id)
-        ->whereDate('date', $attendanceDate)
-        ->first();
-
-    // Punch IN
-    if (!$attendance) {
-        $attendance = Attendance::create([
-            'intern_id' => $intern->id,
-            'date' => $attendanceDate,
-            'status' => 'present',
-            'location' => $request->location,
-            'in_time' => $currentTime,
+    /*
+    |--------------------------------------------------------------------------  
+    | EMPLOYEE – CLOCK IN / OUT (AJAX)
+    |--------------------------------------------------------------------------  
+    */
+    public function publicStoreByToken(Request $request)
+    {
+        $request->validate([
+            'intern_id' => 'required|exists:interns,id',
+            'location' => 'required|string|max:255',
+            'date' => 'required|date',
+            'action' => 'required|in:in,out',
         ]);
 
-        if ($request->expectsJson()) {
+        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+        $currentTime = now()->format('H:i:s');
+
+        $intern = Intern::findOrFail($request->intern_id);
+
+        if ($this->isHolidayOrSunday($attendanceDate)) {
             return response()->json([
-                'success' => true,
-                'action' => 'in',
-                'time' => \Carbon\Carbon::parse($attendance->in_time)->format('h:i:s a')
+                'success' => false,
+                'error' => 'Today is holiday. Attendance closed.'
             ]);
         }
 
-        return redirect()->route('attendance.publicFormByToken', [
-            'date' => $attendanceDate,
-            'token' => $intern->intern_code,
-        ])->with('success', 'Punch IN recorded');
-    }
+        $attendance = Attendance::where('intern_id', $intern->id)
+            ->whereDate('date', $attendanceDate)
+            ->first();
 
-    // Punch OUT
-    if ($attendance->in_time && !$attendance->out_time) {
-        $attendance->update(['out_time' => $currentTime]);
+        // CLOCK IN
+        if ($request->action === 'in') {
+            if (!$attendance) {
+                Attendance::create([
+                    'intern_id' => $intern->id,
+                    'date' => $attendanceDate,
+                    'status' => 'present',
+                    'location' => $request->location,
+                    'in_time' => $currentTime,
+                ]);
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'action' => 'out',
-                'time' => \Carbon\Carbon::parse($attendance->out_time)->format('h:i:s a')
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'action' => 'in',
+                    'time' => $currentTime,
+                ]);
+            } elseif ($attendance->in_time) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Already clocked in today.'
+                ]);
+            }
         }
 
-        return redirect()->route('attendance.publicFormByToken', [
-            'date' => $attendanceDate,
-            'token' => $intern->intern_code,
-        ])->with('success', 'Punch OUT recorded');
+        // CLOCK OUT
+        if ($request->action === 'out') {
+            if ($attendance && $attendance->in_time && !$attendance->out_time) {
+                $attendance->update(['out_time' => $currentTime]);
+
+                return response()->json([
+                    'success' => true,
+                    'action' => 'out',
+                    'time' => $currentTime,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'You need to clock in first or already clocked out.'
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => 'Attendance already completed for today.'
+        ]);
     }
 
-    // Already done
-    if ($request->expectsJson()) {
-        return response()->json(['error' => 'Attendance already completed for today.']);
-    }
-
-    return redirect()->route('attendance.publicFormByToken', [
-        'date' => $attendanceDate,
-        'token' => $intern->intern_code,
-    ])->with('error', 'Attendance already completed for today.');
-}
-
-    /**
-     * EMPLOYEE / INTERN – Dashboard shortcut
-     */
     public function empAttendance()
     {
         $intern = Auth::guard('intern')->user();
-        $date = now()->format('Y-m-d');
-
-        return $this->publicFormByToken($date, $intern->intern_code);
+        return $this->publicFormByToken(now()->format('Y-m-d'), $intern->intern_code);
     }
 
-    /**
-     * EMPLOYEE / INTERN – Dashboard stats for empDashboard.blade.php
-     */
     public function empDashboard()
     {
         $intern = Auth::guard('intern')->user();
-
         $allAttendances = Attendance::where('intern_id', $intern->id)->get();
 
         return view('attendance.empDashboard', [
@@ -340,16 +344,48 @@ public function publicStoreByToken(Request $request)
         ]);
     }
 
-    /**
-     * CHECK HOLIDAY OR SUNDAY
-     */
     private function isHolidayOrSunday($date)
     {
         $checkDate = Carbon::parse($date);
-
         if ($checkDate->isSunday()) return true;
-
         return Holiday::whereDate('holiday_date', $checkDate)->exists();
-    }  
+    }
 
+    /*
+    |--------------------------------------------------------------------------  
+    | EMPLOYEE – ATTENDANCE REPORT PAGE
+    |--------------------------------------------------------------------------  
+    */
+    public function empReport(Request $request)
+    {
+        $intern = Auth::guard('intern')->user();
+
+        if (!$intern) {
+            return redirect()->route('login');
+        }
+
+        $query = Attendance::where('intern_id', $intern->id);
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('date', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('date', '<=', $request->to_date);
+        }
+
+        if ($request->filled('status') && $request->status != 'all') {
+            $query->where('status', $request->status);
+        }
+
+        $attendances = $query->orderBy('date', 'desc')->get();
+
+        return view('attendance.empReport', [
+            'attendances' => $attendances,
+            'presentCount' => $attendances->where('status','present')->count(),
+            'absentCount' => $attendances->where('status','absent')->count(),
+            'halfDayCount' => $attendances->where('status','half_day')->count(),
+            'paidLeaveCount' => $attendances->where('status','paid_leave')->count(),
+        ]);
+    }
 }
