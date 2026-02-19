@@ -34,13 +34,14 @@
                 </a>
 
                 
-                 {{-- Show ONLY if intern exists --}}
+                {{-- thi spart --}}
                 @if(isset($intern))
                     <span class="menuItem" style="cursor: default;">
                         <ion-icon name="person-outline"></ion-icon>
                         {{ $intern->name }}
                     </span>
                 @endif
+          
 
             </div>
         </div>
