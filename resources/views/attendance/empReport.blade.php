@@ -30,7 +30,10 @@
                                 <div class="whiteBigCard">
                                     <h4 class="mb-3"><ion-icon name="filter-outline"></ion-icon> Filter Records</h4>
 
-                                    <form method="GET" action="{{ route('empreport') }}" class="myForm d-flex flex-wrap align-items-end g-3">
+                                    <form method="GET" action="{{ route('empreport') }}" class="myForm">
+                                        <div class="row">
+
+                                        
                                         <div class="col-md-3">
                                             <label>From Date</label>
                                             <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
@@ -52,9 +55,10 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-3 d-flex gap-2">
-                                            <button type="submit" class="myBtn myBtnPrimary">Search</button>
-                                            <a href="{{ route('empreport') }}" class="myBtn btn-secondary">Reset</a>
+                                        <div class="col-md-3 d-flex gap-2 align-items-end">
+                                            <button type="submit" class="myBtn myBtnPrimary" style="height: fit-content;">Search</button>
+                                            <a href="{{ route('empreport') }}" class="myBtn btn-secondary" style="height: fit-content;">Reset</a>
+                                        </div>
                                         </div>
                                     </form>
                                 </div>
