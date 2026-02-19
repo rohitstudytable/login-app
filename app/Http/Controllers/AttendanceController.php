@@ -144,6 +144,8 @@ class AttendanceController extends Controller
             }
         });
 
+        
+
         return redirect()->route('attendance.index', [
             'filter_date' => $attendanceDate,
             'role' => $request->role
@@ -381,6 +383,7 @@ class AttendanceController extends Controller
         $attendances = $query->orderBy('date', 'desc')->get();
 
         return view('attendance.empReport', [
+            'intern' => $intern, 
             'attendances' => $attendances,
             'presentCount' => $attendances->where('status','present')->count(),
             'absentCount' => $attendances->where('status','absent')->count(),
@@ -388,4 +391,5 @@ class AttendanceController extends Controller
             'paidLeaveCount' => $attendances->where('status','paid_leave')->count(),
         ]);
     }
+
 }

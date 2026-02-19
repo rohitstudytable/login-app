@@ -4,7 +4,7 @@
 
     <div class="">
         <div>
-            @include('body.empHeader')
+            @include('body.empHeader');
 
             <section class="myBodySection">
 
