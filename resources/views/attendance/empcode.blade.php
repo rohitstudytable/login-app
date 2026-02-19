@@ -2,170 +2,190 @@
 
 <style>
     body {
-    background: #567cd6; /* deep navy background */
-    font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh;
-}
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-/* ------------------ Card ------------------ */
-.auth-card {
-    background: #1e293b; /* dark card background for contrast */
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6); /* stronger shadow for depth */
-}
+    /* Main Card */
+    .auth-card {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(18px);
+        border-radius: 18px;
+        padding: 35px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        width: 100%;
+        max-width: 420px;
+    }
 
-/* ------------------ Card Header ------------------ */
-.auth-header {
-    background: #111827; /* slightly darker than card for separation */
-    color: #f8fafc; /* light text for readability */
-    border-radius: 14px 14px 0 0;
-    padding: 15px;
-}
+    /* Logo */
+    .logo-box img {
+        max-width: 140px;
+        margin-bottom: 15px;
+    }
 
-.auth-header h5 {
-    margin: 0;
-    font-weight: 600;
-}
+    /* Heading */
+    .auth-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 8px;
+    }
 
-/* ------------------ Form Inputs ------------------ */
-.form-control {
-    border-radius: 10px;
-    padding: 12px;
-    border: none;
-    background-color: #e2e8f0; /* light background for inputs */
-    color: #111827; /* dark text inside inputs */
-    transition: all 0.2s ease-in-out;
-}
+    .auth-subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
 
-.form-control:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(30,64,175,0.3); /* primary color focus ring */
-    background-color: #ffffff;
-}
+    /* Input Wrapper */
+    .input-group {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 18px;
+        transition: 0.3s;
+        border: 1px solid transparent;
+    }
 
-/* ------------------ Buttons ------------------ */
-.btn-primary {
-    background: #1e40af; /* deep blue button */
-    border: none;
-    border-radius: 10px;
-    padding: 12px;
-    font-weight: 600;
-    color: #ffffff;
-    transition: all 0.3s ease-in-out;
-}
+    .input-group:hover {
+        border: 1px solid rgba(255, 255, 255, 0.35);
+    }
 
-.btn-primary:hover {
-    background: #1e3aa8; /* slightly darker blue on hover */
-    transform: translateY(-1px);
-}
+    .input-group ion-icon {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-right: 10px;
+    }
 
-/* ------------------ Logo ------------------ */
-.logo-box img {
-    filter: drop-shadow(0 6px 15px rgba(255,255,255,0.25));
-    max-width: 180px;
-    width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-}
+    .input-group input {
+        border: none;
+        outline: none;
+        background: transparent;
+        width: 90%;
+        font-size: 15px;
+        color: #fff;
+    }
 
-/* ------------------ Alerts ------------------ */
-.alert {
-    border-radius: 8px;
-    font-size: 14px;
-}
+    .input-group input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
 
-.alert-success {
-    background-color: #10b9811a; /* subtle green background */
-    color: #047857; /* dark green text */
-    border: 1px solid #10b981;
-}
+    /* Button */
+    .auth-btn {
+        width: 100%;
+        border: none;
+        padding: 13px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        background: #fff;
+        color: #2563eb;
+        transition: 0.3s;
+    }
 
-.alert-danger {
-    background-color: #f871711a; /* subtle red background */
-    color: #b91c1c; /* dark red text */
-    border: 1px solid #dc2626;
-}
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    }
 
-/* ------------------ Form Labels ------------------ */
-.form-label {
-    color: #f1f5f9; /* light label text for readability */
-    font-weight: 600;
-}
+    /* Alerts */
+    .alert {
+        border-radius: 12px;
+        font-size: 14px;
 
+    }
 </style>
 
 <body>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
-<div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
-    <div class="col-md-6 col-lg-4">
 
-        {{-- ===== COMPANY LOGO ===== --}}
-        <div class="text-center mb-4 logo-box">
+    <div class="auth-card">
+
+        {{-- Logo --}}
+        <div class="text-center logo-box">
             <img src="{{ asset('images/dd.png') }}" alt="Company Logo">
         </div>
 
-        {{-- ===== LOGIN CARD ===== --}}
-        <div class="card auth-card w-100">
-            <div class="card-header auth-header text-center">
-                <h5>Employee / Intern Login</h5>
+        {{-- Title --}}
+        <h2 class="auth-title">Employee / Intern Login</h2>
+        <p class="auth-subtitle">
+            Welcome back! Please login to continue.
+        </p>
+
+        {{-- Login Form --}}
+        <form method="POST" action="{{ route('intern.login.submit') }}">
+            @csrf
+
+            {{-- Intern Code --}}
+            <div class="input-group">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" name="intern_code" value="{{ old('intern_code') }}"
+                    placeholder="Employee / Intern Code" required>
             </div>
+            @error('intern_code')
+                <small class="text-warning d-block mb-2">{{ $message }}</small>
+            @enderror
 
-            <div class="card-body p-4">
-                <form method="POST" action="{{ route('intern.login.submit') }}">
-                    @csrf
 
-                    {{-- Employee/Intern Code --}}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Employee / Intern Code</label>
-                        <input type="text" 
-                               class="form-control @error('intern_code') is-invalid @enderror" 
-                               name="intern_code" 
-                               value="{{ old('intern_code') }}" 
-                               placeholder="Enter your ID" 
-                               required>
-                        @error('intern_code')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- Password --}}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Password</label>
-                        <input type="password" 
-                               class="form-control @error('password') is-invalid @enderror" 
-                               name="password" 
-                               placeholder="Enter your password" 
-                               required>
-                        @error('password')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- Submit Button --}}
-                    <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
-                </form>
+            {{-- Password --}}
+            <div class="input-group">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="password" placeholder="Enter Password" required>
             </div>
-        </div>
+            @error('password')
+                <small class="text-warning d-block mb-2">{{ $message }}</small>
+            @enderror
+
+            {{-- Alerts --}}
+            @if(session('success'))
+                <div class="alert alert-success text-center mb-3">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger text-center mb-3">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            {{-- Button --}}
+            <button type="submit" class="auth-btn mt-2">
+                Login
+            </button>
+
+        </form>
 
     </div>
-</div>
+    <script>
+        setTimeout(() => {
+            let alerts = document.querySelectorAll(".alert");
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+            alerts.forEach(alert => {
+                alert.style.transition = "0.5s";
+                alert.style.opacity = "0";
+
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            });
+
+        }, 5000); // 5 seconds
+    </script>
+
+    {{-- Ionicons --}}
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons.js"></script>
 
 </body>

@@ -22,26 +22,26 @@
 
                 {{-- Attendance (Public Safe) --}}
                 <a href="{{ route('empattendance') }}"
-                class="menuItem {{ Request::is('empattendance') ? 'active' : '' }}">
+                    class="menuItem {{ Request::is('empattendance') ? 'active' : '' }}">
                     <ion-icon name="timer-outline"></ion-icon>
                     Attendance
                 </a>
 
-               
+
                 <a href="/empreport" class="menuItem {{ Request::is('empreport') ? 'active' : '' }}">
                     <ion-icon name="calendar-clear-outline"></ion-icon>
                     Report
                 </a>
 
-                
+
                 {{-- thi spart --}}
                 @if(isset($intern))
-                    <span class="menuItem" style="cursor: default;">
+                    <a href="/empprofile" class="menuItem {{ Request::is('empprofile') ? 'active' : '' }}">
                         <ion-icon name="person-outline"></ion-icon>
                         {{ $intern->name }}
-                    </span>
+                    </a>
                 @endif
-          
+
 
             </div>
         </div>
