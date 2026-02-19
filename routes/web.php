@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InternController;
@@ -13,43 +12,78 @@ use App\Http\Controllers\Auth\InternLoginController;
 
 /*
 |--------------------------------------------------------------------------
-| Root Route
+| ROOT ROUTE
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-
     if (Auth::guard('intern')->check()) {
-        $intern = Auth::guard('intern')->user();
-
-        return redirect()->route('attendance.publicFormByToken', [
-            'date' => Carbon::now()->format('Y-m-d'),
-            'token' => $intern->intern_code,
-        ]);
+        return redirect()->route('empdashboard');
     }
 
     return redirect()->route('empcode');
 });
 
+
 /*
 |--------------------------------------------------------------------------
-| Public Attendance Routes (Interns)
+| EMPLOYEE / INTERN DASHBOARD PAGES (PROTECTED)
 |--------------------------------------------------------------------------
 */
-Route::get('/enter-empcode', [AttendanceController::class, 'searchEMpCode'])
+Route::middleware('auth:intern')->group(function () {
+    
+    // EMP DASHBOARD
+    Route::get('/empdashboard', [AttendanceController::class, 'empDashboard'])
+        ->name('empdashboard');
+
+    // EMP ATTENDANCE
+    Route::get('/empattendance', [AttendanceController::class, 'empAttendance'])
+        ->name('empattendance');
+
+    // Punch IN / OUT
+    Route::post('/empattendance/store', [AttendanceController::class, 'publicStoreByToken'])
+        ->name('attendance.publicStoreByToken');
+
+    /*
+    |--------------------------------------------------------------------------
+    | EMP REPORT  ✅ FIXED (NOW CONNECTED TO CONTROLLER)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/empreport', [AttendanceController::class, 'empReport'])
+        ->name('empreport');
+
+    // EMP PROFILE
+    Route::get('/empprofile', function () {
+        return view('attendance.empProfile', [
+            'intern' => Auth::guard('intern')->user()
+        ]);
+    })->name('empprofile');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| EMP CODE (PUBLIC – BEFORE LOGIN)
+|--------------------------------------------------------------------------
+*/
+Route::get('/enter-empcode', [AttendanceController::class, 'searchEmpCode'])
     ->name('empcode');
 
 Route::post('/search-empcode', [AttendanceController::class, 'searchByEmployeeId'])
     ->name('submit.empcode');
 
-Route::get('/attendance/public/{date}/{token}', [AttendanceController::class, 'publicFormByToken'])
-    ->name('attendance.publicFormByToken');
-
-Route::post('/attendance/public', [AttendanceController::class, 'publicStoreByToken'])
-    ->name('attendance.publicStoreByToken');
 
 /*
 |--------------------------------------------------------------------------
-| Intern Login Routes
+| PUBLIC ATTENDANCE SEARCH
+|--------------------------------------------------------------------------
+*/
+Route::get('/attendance/search', [AttendanceController::class, 'searchEmpCode'])
+    ->name('attendance.search');
+
+
+/*
+|--------------------------------------------------------------------------
+| INTERN LOGIN ROUTES
 |--------------------------------------------------------------------------
 */
 Route::get('/login-intern', [InternLoginController::class, 'showLoginForm'])
@@ -61,9 +95,10 @@ Route::post('/login-intern', [InternLoginController::class, 'login'])
 Route::post('/logout-intern', [InternLoginController::class, 'logout'])
     ->name('intern.logout');
 
+
 /*
 |--------------------------------------------------------------------------
-| ADMIN ROUTES (web guard ONLY)
+| ADMIN ROUTES (WEB GUARD ONLY)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:web'])->group(function () {
@@ -75,7 +110,6 @@ Route::middleware(['auth:web'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ✅ INTERN MANAGEMENT (ADMIN ONLY)
     Route::resource('interns', InternController::class);
 
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
@@ -87,27 +121,18 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/report', [ReportController::class, 'index'])->name('report');
     Route::get('/report/intern/{intern}', [ReportController::class, 'show'])
         ->name('report.intern');
+
+    Route::prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::resource('holidays', \App\Http\Controllers\Admin\HolidayController::class);
+        });
 });
+
 
 /*
 |--------------------------------------------------------------------------
-| Laravel Default Auth (Admin Login)
+| DEFAULT ADMIN AUTH
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';
-
-
-
-
-Route::get('/', function () {
-    return view('attendance.empDashboard');
-});
-Route::get('/empattendance', function () {
-    return view('attendance.empAttendance');
-});
-Route::get('/empreport', function () {
-    return view('attendance.empReport');
-});
-Route::get('/empprofile', function () {
-    return view('attendance.empProfile');
-});

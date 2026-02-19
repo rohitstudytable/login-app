@@ -7,7 +7,6 @@ use App\Models\Intern;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class InternLoginController extends Controller
 {
@@ -16,20 +15,14 @@ class InternLoginController extends Controller
      */
     public function showLoginForm()
     {
-        // If already logged in as intern
+        // ✅ If already logged in → go to emp dashboard
         if (Auth::guard('intern')->check()) {
-
-            $intern = Auth::guard('intern')->user();
-
-            return redirect()->route('attendance.publicFormByToken', [
-                'date'  => Carbon::now()->format('Y-m-d'),
-                'token' => $intern->intern_code,
-            ]);
+            return redirect()->route('empdashboard');
         }
 
+        // ✅ Otherwise show login page
         return view('auth.intern-login');
     }
-
 
     /**
      * Handle intern login
@@ -41,27 +34,26 @@ class InternLoginController extends Controller
             'password'    => 'required|string',
         ]);
 
-        // Find intern
+        // 🔍 Find intern
         $intern = Intern::where('intern_code', $request->intern_code)->first();
 
-        if (!$intern) {
-            return back()->withInput()->with('error', 'Invalid Employee/Intern code.');
+        if (!$intern || !Hash::check($request->password, $intern->password)) {
+            return back()
+                ->withInput()
+                ->with('error', 'Invalid Employee / Intern Code or Password');
         }
 
-        // Check password
-        if (!Hash::check($request->password, $intern->password)) {
-            return back()->withInput()->with('error', 'Invalid password.');
-        }
+        // 🔒 Secure session
+        $request->session()->regenerate();
 
-        // LOGIN using INTERN GUARD (IMPORTANT)
+        // ✅ Login via INTERN guard
         Auth::guard('intern')->login($intern);
 
-        return redirect()->route('attendance.publicFormByToken', [
-            'date'  => Carbon::now()->format('Y-m-d'),
-            'token' => $intern->intern_code,
-        ])->with('success', 'Logged in successfully.');
+        // 🚀 Redirect to EMP DASHBOARD
+        return redirect()
+            ->route('empdashboard')
+            ->with('success', 'Logged in successfully');
     }
-
 
     /**
      * Logout intern
@@ -73,6 +65,8 @@ class InternLoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('empcode')->with('success', 'Logged out successfully.');
+        return redirect()
+            ->route('empcode')
+            ->with('success', 'Logged out successfully');
     }
 }

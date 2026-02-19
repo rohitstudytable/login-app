@@ -22,24 +22,34 @@ class Attendance extends Model
         'photo',
     ];
 
+    /**
+     * Correct casting
+     * ⚠️ in_time & out_time are TIME fields, not DATETIME
+     */
     protected $casts = [
-        'date' => 'date',
-        'in_time'  => 'datetime:H:i',
-        'out_time' => 'datetime:H:i',
+        'date' => 'date:Y-m-d',
+        'in_time'  => 'string',
+        'out_time' => 'string',
     ];
 
+    /**
+     * Append virtual attribute
+     */
     protected $appends = ['working_hours'];
 
     /**
-     * Relation: Attendance belongs to Intern
+     * Attendance belongs to Intern
      */
     public function intern()
     {
-        return $this->belongsTo(Intern::class);
+        return $this->belongsTo(Intern::class)->withDefault([
+            'name' => 'Deleted Intern',
+            'intern_code' => 'N/A',
+        ]);
     }
 
     /**
-     * Helper: get current working date
+     * Helper: today date
      */
     public static function currentDate()
     {
@@ -52,11 +62,11 @@ class Attendance extends Model
     public function getWorkingHoursAttribute()
     {
         if ($this->in_time && $this->out_time) {
-            return Carbon::parse($this->in_time)
-                ->diff(Carbon::parse($this->out_time))
+            return Carbon::createFromFormat('H:i:s', $this->in_time)
+                ->diff(Carbon::createFromFormat('H:i:s', $this->out_time))
                 ->format('%H:%I');
         }
 
-        return null;
+        return '--:--';
     }
 }
