@@ -21,28 +21,23 @@
     .form-group { margin-bottom:18px; }
     .form-group label { display:block; margin-bottom:6px; font-weight:600; }
     .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group textarea {
         width:100%;
         padding:10px;
         border-radius:6px;
         border:1px solid #d1d5db;
         font-size:14px;
     }
+    .form-group textarea { resize:vertical; }
     .form-group input:focus,
-    .form-group select:focus {
+    .form-group select:focus,
+    .form-group textarea:focus {
         outline:none;
         border-color:#2563eb;
     }
-    .helper-text {
-        font-size:12px;
-        color:#6b7280;
-        margin-top:4px;
-    }
-    .error {
-        font-size:12px;
-        color:#dc2626;
-        margin-top:4px;
-    }
+    .helper-text { font-size:12px; color:#6b7280; margin-top:4px; }
+    .error { font-size:12px; color:#dc2626; margin-top:4px; }
     .btn { padding:10px 16px; border-radius:6px; border:none; cursor:pointer; font-size:14px; color:white; background:#2563eb; transition:0.3s; }
     .btn:hover { background:#1d4ed8; }
 
@@ -72,57 +67,142 @@
 
     <!-- CONTENT -->
     <div class="content">
-
         <div class="form-card">
-            <form method="POST" action="{{ route('interns.store') }}">
+
+            <form method="POST" action="{{ route('interns.store') }}" enctype="multipart/form-data">
                 @csrf
 
-                <!-- NAME -->
+                <!-- BASIC DETAILS -->
                 <div class="form-group">
                     <label>Name</label>
                     <input type="text" name="name" value="{{ old('name') }}" required>
                     @error('name') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
-                <!-- EMAIL -->
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" name="email" value="{{ old('email') }}" required>
                     @error('email') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
-                <!-- CONTACT -->
+             <div class="form-group">
+                <label>Contact</label>
+                <input type="text"
+                    name="contact"
+                    value="{{ old('contact') }}"
+                    maxlength="10"
+                    pattern="[0-9]{1,13}"
+                    inputmode="numeric"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                @error('contact') <div class="error">{{ $message }}</div> @enderror
+            </div>
+
+
+                <!-- PERSONAL DETAILS -->
                 <div class="form-group">
-                    <label>Contact</label>
-                    <input type="text" name="contact" value="{{ old('contact') }}" placeholder="Enter phone number">
-                    @error('contact') <div class="error">{{ $message }}</div> @enderror
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="">Select</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
                 </div>
 
-                <!-- INTERN / EMPLOYEE CODE -->
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" value="{{ old('dob') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Blood Group</label>
+                    <select name="blood_group">
+                        <option value="">Select Blood Group</option>
+                        <option value="A+" {{ old('blood_group') == 'A+' ? 'selected' : '' }}>A+</option>
+                        <option value="A-" {{ old('blood_group') == 'A-' ? 'selected' : '' }}>A-</option>
+                        <option value="B+" {{ old('blood_group') == 'B+' ? 'selected' : '' }}>B+</option>
+                        <option value="B-" {{ old('blood_group') == 'B-' ? 'selected' : '' }}>B-</option>
+                        <option value="AB+" {{ old('blood_group') == 'AB+' ? 'selected' : '' }}>AB+</option>
+                        <option value="AB-" {{ old('blood_group') == 'AB-' ? 'selected' : '' }}>AB-</option>
+                        <option value="O+" {{ old('blood_group') == 'O+' ? 'selected' : '' }}>O+</option>
+                        <option value="O-" {{ old('blood_group') == 'O-' ? 'selected' : '' }}>O-</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Marital Status</label>
+                    <select name="marital_status">
+                        <option value="">Select</option>
+                        <option value="single">Single</option>
+                        <option value="married">Married</option>
+                        <option value="divorced">Divorced</option>
+                        <option value="widowed">Widowed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Nationality</label>
+                    <input type="text" name="nationality" value="{{ old('nationality') }}">
+                </div>
+
+                <!-- ADDRESS -->
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea name="address" rows="3">{{ old('address') }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" value="{{ old('city') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state" value="{{ old('state') }}">
+                </div>
+
+                <div class="form-group">
+                    <label>PIN Code</label>
+                    <input type="text" name="pin" value="{{ old('pin') }}">
+                </div>
+
+                <!-- WORK DETAILS -->
+                <div class="form-group">
+                    <label>Designation</label>
+                    <input type="text" name="designation" value="{{ old('designation') }}">
+                </div>
+
                 <div class="form-group">
                     <label>Intern / Employee Code</label>
-                    <input type="text" name="intern_code" value="{{ old('intern_code') }}" placeholder="e.g. INT26A001" required>
+                    <input type="text" name="intern_code" value="{{ old('intern_code') }}" required>
                     <div class="helper-text">
-                        Code is entered by admin.  
-                        🔐 An 8-character password will be auto-generated.
+                        🔐 Password will be auto-generated
                     </div>
-                    @error('intern_code') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
-                <!-- ROLE -->
                 <div class="form-group">
                     <label>Role</label>
                     <select name="role" required>
-                        <option value="intern" {{ old('role') == 'intern' ? 'selected' : '' }}>Intern</option>
-                        <option value="employee" {{ old('role') == 'employee' ? 'selected' : '' }}>Employee</option>
+                        <option value="intern">Intern</option>
+                        <option value="employee">Employee</option>
                     </select>
-                    @error('role') <div class="error">{{ $message }}</div> @enderror
                 </div>
 
+             <!-- PROFILE IMAGE -->
+            <div class="form-group">
+                <label>Profile Image</label>
+                <input type="file" name="img" accept="image/*">
+                <small style="color:#6b7280;">
+                    Max file size: 5 MB (JPG, JPEG, PNG, WEBP)
+                </small>
+            </div>
+
+
                 <button class="btn">Save</button>
+
             </form>
         </div>
-
     </div>
 </div>
 

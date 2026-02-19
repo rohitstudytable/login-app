@@ -127,6 +127,15 @@ Route::middleware(['auth:web'])->group(function () {
         ->group(function () {
             Route::resource('holidays', \App\Http\Controllers\Admin\HolidayController::class);
         });
+
+            Route::post('/admin/logout', function () {
+            Auth::guard('web')->logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect()->route('login'); // auth/login.blade.php
+        })->name('admin.logout');
+
 });
 
 
