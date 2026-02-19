@@ -71,7 +71,7 @@
                             <div class="row">
 
                                 {{-- TOTAL DAYS --}}
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="myCard total">
                                         <div class="perentCardFlex align-items-center">
                                             <div>
@@ -86,7 +86,7 @@
                                 </div>
 
                                 {{-- PRESENT --}}
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="myCard present">
                                         <div class="perentCardFlex align-items-center">
                                             <div>

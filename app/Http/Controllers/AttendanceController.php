@@ -144,7 +144,7 @@ class AttendanceController extends Controller
             }
         });
 
-        
+
 
         return redirect()->route('attendance.index', [
             'filter_date' => $attendanceDate,
@@ -349,7 +349,8 @@ class AttendanceController extends Controller
     private function isHolidayOrSunday($date)
     {
         $checkDate = Carbon::parse($date);
-        if ($checkDate->isSunday()) return true;
+        if ($checkDate->isSunday())
+            return true;
         return Holiday::whereDate('holiday_date', $checkDate)->exists();
     }
 
@@ -383,12 +384,12 @@ class AttendanceController extends Controller
         $attendances = $query->orderBy('date', 'desc')->get();
 
         return view('attendance.empReport', [
-            'intern' => $intern, 
+            'intern' => $intern,
             'attendances' => $attendances,
-            'presentCount' => $attendances->where('status','present')->count(),
-            'absentCount' => $attendances->where('status','absent')->count(),
-            'halfDayCount' => $attendances->where('status','half_day')->count(),
-            'paidLeaveCount' => $attendances->where('status','paid_leave')->count(),
+            'presentCount' => $attendances->where('status', 'present')->count(),
+            'absentCount' => $attendances->where('status', 'absent')->count(),
+            'halfDayCount' => $attendances->where('status', 'half_day')->count(),
+            'paidLeaveCount' => $attendances->where('status', 'paid_leave')->count(),
         ]);
     }
 
