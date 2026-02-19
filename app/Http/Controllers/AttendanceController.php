@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 
 class AttendanceController extends Controller
 {
@@ -202,7 +204,7 @@ class AttendanceController extends Controller
         if (!$intern) {
             return back()->with('error', 'Employee not found');
         }
-
+        
         return redirect()->route('attendance.publicFormByToken', [
             'date' => now()->format('Y-m-d'),
             'token' => $intern->intern_code,

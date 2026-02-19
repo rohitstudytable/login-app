@@ -463,25 +463,29 @@
                                             </p>
 
                                             <h5 class="mb-0 text-dark fw-semibold">
-                                                <!-- {{ $isPresent ? 'Present (Regular Day Shift)' : 'Absent (Regular Day Shift)' }} -->
+                                                @if($isPresent)
+                                                 
                                                  @if($workingHours >= 7.75 && $workingHours <= 8.10)
-    Present (Regular Day Shift)
+                                                        Present (Regular Day Shift)
 
-@elseif($workingHours >= 7 && $workingHours < 7.75)
-    Present (Early Checkout / Late Check-in)
+                                                    @elseif($workingHours >= 7 && $workingHours < 7.75)
+                                                        Present (Early Checkout / Late Check-in)
 
-@elseif($workingHours >= 4 && $workingHours < 7)
-    Half Day
+                                                    @elseif($workingHours >= 4 && $workingHours < 7)
+                                                        Half Day
 
-@elseif($workingHours < 4)
-    Below Half Day
+                                                    @elseif($workingHours < 4)
+                                                        Below Half Day
 
-@elseif($workingHours > 8.10)
+                                                    @elseif($workingHours > 8.10)
 
-   Present (Overtime)
-    
+                                                    Present (Overtime)
+                                                        
 
-@endif
+                                                    @endif
+
+                                                    @endif
+                                                    --
 
 
                                             </h5>

@@ -9,6 +9,8 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\InternLoginController;
+use App\Http\Controllers\Intern\ProfileController as InternProfileController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +97,28 @@ Route::post('/login-intern', [InternLoginController::class, 'login'])
 Route::post('/logout-intern', [InternLoginController::class, 'logout'])
     ->name('intern.logout');
 
+
+Route::middleware(['auth:intern'])->group(function () {
+
+    // 🔹 Update profile image
+    Route::post(
+        '/intern/profile/image',
+        [InternProfileController::class, 'updateImage']
+    )->name('intern.profile.image');
+
+    // 🔹 Update personal information
+    Route::post(
+        '/intern/profile/personal',
+        [InternProfileController::class, 'updatePersonal']
+    )->name('intern.profile.personal');
+
+    // 🔹 Update contact & address
+    Route::post(
+        '/intern/profile/contact',
+        [InternProfileController::class, 'updateContact']
+    )->name('intern.profile.contact');
+
+});
 
 /*
 |--------------------------------------------------------------------------
