@@ -3,15 +3,12 @@
 
 <head>
     @include('body.adminHeadLink')
-
-
 </head>
 
 <body>
 
     @include('layouts.sidebar')
 
-    <!-- MAIN -->
     <div class="main">
 
         <!-- TOPBAR -->
@@ -25,55 +22,96 @@
             </div>
         </div>
 
-        <!-- CONTENT -->
+        <!-- ================== Dashboard Content ================== -->
         <div class="content">
 
-            <!-- CARDS -->
-            <div class="card-grid">
-                <div class="card">
-                    <h3>Manage Interns</h3>
-                    <p>Add, edit or delete interns.</p>
-                    <a href="{{ route('interns.index') }}">Go</a>
+            <!-- ====== Stats Row ====== -->
+            <div class="stats-row">
+
+                <div class="stats-item bg-light-green">
+                    <div class="stats-icon">
+                        <ion-icon name="checkmark-done-outline"></ion-icon>
+                    </div>
+                    <div class="stats-info">
+                        <h3>{{ $presentCount }}</h3>
+                        <p>Present</p>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <h3>Mark Attendance</h3>
-                    <p>Record daily attendance.</p>
-                    <a href="{{ route('attendance.index') }}">Go</a>
+                <div class="stats-item bg-light-red">
+                    <div class="stats-icon">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <div class="stats-info">
+                        <h3>{{ $absentCount }}</h3>
+                        <p>Absent</p>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <h3>Attendance History</h3>
-                    <p>View past records.</p>
-                    <a href="{{ route('attendance.index') }}">Go</a>
+                <div class="stats-item bg-light-yellow">
+                    <div class="stats-icon">
+                        <ion-icon name="time-outline"></ion-icon>
+                    </div>
+                    <div class="stats-info">
+                        <h3>{{ $halfDayCount }}</h3>
+                        <p>Half Day</p>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- CHARTS -->
-            <div class="chart-grid">
+            <!-- ====== Action Cards ====== -->
+            <div class="actions-row">
+
+                <div class="action-card">
+                    <h4>Manage Interns</h4>
+                    <p>Add, edit or delete interns</p>
+                    <a href="{{ route('interns.index') }}" class="btn-action">Go</a>
+                </div>
+
+                <div class="action-card">
+                    <h4>Mark Attendance</h4>
+                    <p>Record daily attendance</p>
+                    <a href="{{ route('attendance.index') }}" class="btn-action">Go</a>
+                </div>
+
+                <div class="action-card">
+                    <h4>Attendance History</h4>
+                    <p>View past records</p>
+                    <a href="{{ route('attendance.index') }}" class="btn-action">Go</a>
+                </div>
+
+            </div>
+
+
+            <!-- ====== Chart Section ====== -->
+            <div class="charts-section">
+
                 <div class="chart-card">
-                    <h3>Today's Attendance</h3>
+                    <h5>Today's Attendance</h5>
                     <canvas id="attendanceChart"></canvas>
                 </div>
 
                 <div class="chart-card">
-                    <h3>Monthly Attendance</h3>
+                    <h5>Monthly Attendance</h5>
                     <canvas id="monthlyChart"></canvas>
                 </div>
 
                 <div class="chart-card">
-                    <h3>Attendance Trend</h3>
+                    <h5>Attendance Trend</h5>
                     <canvas id="otherChart"></canvas>
                 </div>
+
             </div>
 
         </div>
     </div>
 
+
+    <!-- Chart Script (no change) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            /* TODAY */
             new Chart(document.getElementById('attendanceChart'), {
                 type: 'doughnut',
                 data: {
@@ -84,12 +122,11 @@
                     {{ $absentCount }},
                             {{ $halfDayCount }}
                         ],
-                        backgroundColor: ['#16a34a', '#dc2626', '#f59e0b']
+                        backgroundColor: ['#22c55e', '#ef4444', '#f59e0b']
                     }]
                 }
             });
 
-            /* MONTHLY */
             const monthlyLabels = @json($monthlyData->pluck('day'));
             const monthlyTotals = @json($monthlyData->pluck('total'));
 
@@ -101,13 +138,12 @@
                         datasets: [{
                             label: 'Present Count',
                             data: monthlyTotals,
-                            backgroundColor: '#2563eb'
+                            backgroundColor: '#3b82f6'
                         }]
                     }
                 });
             }
 
-            /* TREND */
             const trendLabels = @json($trendData->pluck('date'));
             const trendTotals = @json($trendData->pluck('total'));
 
@@ -119,7 +155,7 @@
                         datasets: [{
                             label: 'Attendance Trend',
                             data: trendTotals,
-                            borderColor: '#16a34a',
+                            borderColor: '#22c55e',
                             tension: 0.4,
                             fill: false
                         }]
@@ -129,10 +165,6 @@
 
         });
     </script>
-
-
-
-
 
 </body>
 

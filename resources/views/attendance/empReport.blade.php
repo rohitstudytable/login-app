@@ -194,28 +194,59 @@
                                                         <td>{{ $out ? $out->format('h:i A') : '-' }}</td>
                                                         <td>{{ $duration }}</td>
                                                         <td>
-                                                            @switch($att->status)
-                                                                @case('present')
-                                                                    <span class="badge bg-success">Present</span>
-                                                                @break
+                                                            @php
+                                                                $in = $att->in_time ? \Carbon\Carbon::parse($att->in_time) : null;
+                                                                $out = $att->out_time ? \Carbon\Carbon::parse($att->out_time) : null;
 
-                                                                @case('absent')
-                                                                    <span class="badge bg-danger">Absent</span>
-                                                                @break
+                                                                $totalMinutes = 0;
+                                                                $statusText = 'Absent';
+                                                                $badgeClass = 'bg-danger';
 
-                                                                @case('half_day')
-                                                                    <span class="badge bg-warning text-dark">Half Day</span>
-                                                                @break
+                                                                if($in && $out){
 
-                                                                @case('paid_leave')
-                                                                    <span class="badge bg-info">Leave</span>
-                                                                @break
+                                                                    $totalMinutes = $in->diffInMinutes($out);
 
-                                                                @default
-                                                                    <span class="badge bg-secondary">
-                                                                        {{ ucfirst($att->status) }}
-                                                                    </span>
-                                                            @endswitch
+                                                                    // 7h45m to 8h15m
+                                                                    if ($totalMinutes >= 465 && $totalMinutes <= 495) {
+                                                                        $statusText = 'Present';
+                                                                        $badgeClass = 'bg-success';
+                                                                    }
+
+                                                                   // 7 hr to 7 hr 45 m
+                                                                    elseif ($totalMinutes >=420  && $totalMinutes <=465) {
+                                                                        $statusText = 'Present(Early Checkin / Early Checkout)';
+                                                                        $statusClass = 'text-warning';
+                                            }
+
+                                                                    // 4h to <7h
+                                                                    elseif ($totalMinutes >= 240 && $totalMinutes < 420) {
+                                                                        $statusText = 'Half Day';
+                                                                        $badgeClass = 'bg-warning text-dark';
+                                                                    }
+
+                                                                    // Less than 4h
+                                                                    elseif ($totalMinutes < 240) {
+                                                                        $statusText = 'Below Half Day';
+                                                                        $badgeClass = 'bg-danger';
+                                                                    }
+
+                                                                    // More than 8h15m
+                                                                    elseif ($totalMinutes > 495) {
+                                                                        $statusText = 'Overtime';
+                                                                        $badgeClass = 'bg-primary';
+                                                                    }
+
+                                                                    // Remaining (7h to 7h45m)
+                                                                    else {
+                                                                        $statusText = 'Present';
+                                                                        $badgeClass = 'bg-success';
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            <span class="badge {{ $badgeClass }}">
+                                                                {{ $statusText }}
+                                                            </span>
                                                         </td>
                                                     </tr>
 
