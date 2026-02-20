@@ -303,30 +303,65 @@ class AttendanceController extends Controller
             }
         }
 
-        // CLOCK OUT
-        if ($request->action === 'out') {
-            if ($attendance && $attendance->in_time && !$attendance->out_time) {
-                $attendance->update(['out_time' => $currentTime]);
+       // CLOCK OUT
+            if ($request->action === 'out') {
+                if ($attendance && $attendance->in_time && !$attendance->out_time) {
 
-                return response()->json([
-                    'success' => true,
-                    'action' => 'out',
-                    'time' => $currentTime,
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'You need to clock in first or already clocked out.'
+                    $attendance->update([
+                        'out_time' => $currentTime
+                    ]);
+
+                    $this->calculateWorkAndStatus($attendance);
+
+                    return response()->json([
+                        'success' => true,
+                        'action' => 'out',
+                        'time' => $currentTime,
+                    ]);
+
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'You need to clock in first or already clocked out.'
+                    ]);
+                }
+            }
+
+            /* ✅ ADD THIS FINAL RETURN */
+            return response()->json([
+                'success' => false,
+                'error' => 'Attendance already completed for today.'
+            ]);
+
+            } // ✅ CLOSE publicStoreByToken()
+
+            private function calculateWorkAndStatus($attendance)
+            {
+                if (!$attendance->in_time || !$attendance->out_time) {
+                    return;
+                }
+
+                $in = Carbon::parse($attendance->in_time);
+                $out = Carbon::parse($attendance->out_time);
+
+                $workedMinutes = $in->diffInMinutes($out);
+
+                if ($workedMinutes >= 480) {
+                    $status = 'present';
+                } elseif ($workedMinutes >= 240) {
+                    $status = 'half_day';
+                } else {
+                    $status = 'absent';
+                }
+
+                $attendance->update([
+                    'worked_minutes' => $workedMinutes,
+                    'status' => $status,
                 ]);
             }
-        }
-
-        return response()->json([
-            'success' => false,
-            'error' => 'Attendance already completed for today.'
-        ]);
-    }
-
+    
+        // ANOTHER
+        
     public function empAttendance()
     {
         $intern = Auth::guard('intern')->user();
