@@ -9,6 +9,8 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\InternLoginController;
+use App\Http\Controllers\Intern\ProfileController as InternProfileController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +98,28 @@ Route::post('/logout-intern', [InternLoginController::class, 'logout'])
     ->name('intern.logout');
 
 
+Route::middleware(['auth:intern'])->group(function () {
+
+    // 🔹 Update profile image
+    Route::post(
+        '/intern/profile/image',
+        [InternProfileController::class, 'updateImage']
+    )->name('intern.profile.image');
+
+    // 🔹 Update personal information
+    Route::post(
+        '/intern/profile/personal',
+        [InternProfileController::class, 'updatePersonal']
+    )->name('intern.profile.personal');
+
+    // 🔹 Update contact & address
+    Route::post(
+        '/intern/profile/contact',
+        [InternProfileController::class, 'updateContact']
+    )->name('intern.profile.contact');
+
+});
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN ROUTES (WEB GUARD ONLY)
@@ -127,6 +151,15 @@ Route::middleware(['auth:web'])->group(function () {
         ->group(function () {
             Route::resource('holidays', \App\Http\Controllers\Admin\HolidayController::class);
         });
+
+            Route::post('/admin/logout', function () {
+            Auth::guard('web')->logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect()->route('login'); // auth/login.blade.php
+        })->name('admin.logout');
+
 });
 
 

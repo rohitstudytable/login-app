@@ -19,35 +19,63 @@ return new class extends Migration
             // Attendance date
             $table->date('date')->index();
 
-            // Status
+            /*
+            |--------------------------------------------------------------------------
+            | STATUS
+            |--------------------------------------------------------------------------
+            | Calculated after clock-out
+            */
             $table->enum('status', [
                 'present',
-                'absent',
                 'half_day',
+                'absent',
+                'overtime',
                 'paid_leave'
-            ]);
+            ])->nullable();
 
-            // Location
-            $table->string('location');
+            /*
+            |--------------------------------------------------------------------------
+            | LOCATION
+            |--------------------------------------------------------------------------
+            */
+            $table->string('location')->nullable();       // general location (optional)
+            $table->string('in_location')->nullable();    // clock-in GPS
+            $table->string('out_location')->nullable();   // clock-out GPS
 
-            // Time tracking
+            /*
+            |--------------------------------------------------------------------------
+            | TIME TRACKING
+            |--------------------------------------------------------------------------
+            */
             $table->time('in_time')->nullable();
             $table->time('out_time')->nullable();
+            $table->integer('worked_minutes')->nullable();
 
-            // Optional photo
+            /*
+            |--------------------------------------------------------------------------
+            | OPTIONAL PHOTO
+            |--------------------------------------------------------------------------
+            */
             $table->string('photo')->nullable();
 
-            // Timestamps
+            /*
+            |--------------------------------------------------------------------------
+            | TIMESTAMPS
+            |--------------------------------------------------------------------------
+            */
             $table->timestamps();
 
-            // One intern → one attendance per day
+            /*
+            |--------------------------------------------------------------------------
+            | CONSTRAINTS
+            |--------------------------------------------------------------------------
+            */
             $table->unique(['intern_id', 'date']);
 
-            // Foreign key
             $table->foreign('intern_id')
-                  ->references('id')
-                  ->on('interns')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('interns')
+                ->onDelete('cascade');
         });
     }
 

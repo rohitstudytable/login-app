@@ -67,68 +67,76 @@
                 </div>
             </div>
 
-        </div>
-    </div>
+            <!-- TOPBAR -->
+            <div class="topbar">
+                <h2>Dashboard</h2>
+                <div class="profile">
+                    <form method="POST" action="{{ route('admin.logout') }}">
+                        @csrf
+                        <button class="logout-btn">Logout</button>
+                    </form>
+                </div>
+            </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
 
-            /* TODAY */
-            new Chart(document.getElementById('attendanceChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Present', 'Absent', 'Half Day'],
-                    datasets: [{
-                        data: [
+                    /* TODAY */
+                    new Chart(document.getElementById('attendanceChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Present', 'Absent', 'Half Day'],
+                            datasets: [{
+                                data: [
                     {{ $presentCount }},
                     {{ $absentCount }},
-                            {{ $halfDayCount }}
-                        ],
-                        backgroundColor: ['#16a34a', '#dc2626', '#f59e0b']
-                    }]
-                }
-            });
+                                    {{ $halfDayCount }}
+                                ],
+                                backgroundColor: ['#16a34a', '#dc2626', '#f59e0b']
+                            }]
+                        }
+                    });
 
-            /* MONTHLY */
-            const monthlyLabels = @json($monthlyData->pluck('day'));
-            const monthlyTotals = @json($monthlyData->pluck('total'));
+                    /* MONTHLY */
+                    const monthlyLabels = @json($monthlyData->pluck('day'));
+                    const monthlyTotals = @json($monthlyData->pluck('total'));
 
-            if (monthlyLabels.length > 0) {
-                new Chart(document.getElementById('monthlyChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: monthlyLabels,
-                        datasets: [{
-                            label: 'Present Count',
-                            data: monthlyTotals,
-                            backgroundColor: '#2563eb'
-                        }]
+                    if (monthlyLabels.length > 0) {
+                        new Chart(document.getElementById('monthlyChart'), {
+                            type: 'bar',
+                            data: {
+                                labels: monthlyLabels,
+                                datasets: [{
+                                    label: 'Present Count',
+                                    data: monthlyTotals,
+                                    backgroundColor: '#2563eb'
+                                }]
+                            }
+                        });
                     }
-                });
-            }
 
-            /* TREND */
-            const trendLabels = @json($trendData->pluck('date'));
-            const trendTotals = @json($trendData->pluck('total'));
+                    /* TREND */
+                    const trendLabels = @json($trendData->pluck('date'));
+                    const trendTotals = @json($trendData->pluck('total'));
 
-            if (trendLabels.length > 0) {
-                new Chart(document.getElementById('otherChart'), {
-                    type: 'line',
-                    data: {
-                        labels: trendLabels,
-                        datasets: [{
-                            label: 'Attendance Trend',
-                            data: trendTotals,
-                            borderColor: '#16a34a',
-                            tension: 0.4,
-                            fill: false
-                        }]
+                    if (trendLabels.length > 0) {
+                        new Chart(document.getElementById('otherChart'), {
+                            type: 'line',
+                            data: {
+                                labels: trendLabels,
+                                datasets: [{
+                                    label: 'Attendance Trend',
+                                    data: trendTotals,
+                                    borderColor: '#16a34a',
+                                    tension: 0.4,
+                                    fill: false
+                                }]
+                            }
+                        });
                     }
-                });
-            }
 
-        });
-    </script>
+                });
+            </script>
 
 
 
