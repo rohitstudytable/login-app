@@ -79,6 +79,22 @@
         color: rgba(255, 255, 255, 0.7);
     }
 
+    .input-group input:focus {
+        background-color: transparent;
+    }
+
+    /* Remove Chrome autofill background */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 0% rgba(255, 255, 255, 0.1) inset !important;
+        box-shadow: 0 0 0 0% rgba(255, 255, 255, 0.1) inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        /* text color */
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
     /* Button */
     .auth-btn {
         width: 100%;
