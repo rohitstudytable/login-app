@@ -39,7 +39,7 @@
             </div>
 
             <!-- KPI -->
-            <div class="kpi-grid">
+           <div class="kpi-grid">
                 <div class="kpi kpi-blue">
                     <div class="kpi-icon"><ion-icon name="trending-up-outline"></ion-icon></div>
                     <div>
@@ -47,6 +47,7 @@
                         <strong>{{ $totalDays ? round(($presentCount / $totalDays) * 100) : 0 }}%</strong>
                     </div>
                 </div>
+
                 <div class="kpi kpi-green">
                     <div class="kpi-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
                     <div>
@@ -54,6 +55,7 @@
                         <strong>{{ $presentCount }}</strong>
                     </div>
                 </div>
+
                 <div class="kpi kpi-yellow">
                     <div class="kpi-icon"><ion-icon name="remove-circle-outline"></ion-icon></div>
                     <div>
@@ -61,6 +63,23 @@
                         <strong>{{ $halfDayCount }}</strong>
                     </div>
                 </div>
+
+                <div class="kpi kpi-orange">
+                    <div class="kpi-icon"><ion-icon name="alert-circle-outline"></ion-icon></div>
+                    <div>
+                        <h3>Below Half Day</h3>
+                        <strong>{{ $belowHalfDayCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-purple">
+                    <div class="kpi-icon"><ion-icon name="rocket-outline"></ion-icon></div>
+                    <div>
+                        <h3>Overtime</h3>
+                        <strong>{{ $overtimeCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
                 <div class="kpi kpi-red">
                     <div class="kpi-icon"><ion-icon name="close-circle-outline"></ion-icon></div>
                     <div>
@@ -68,7 +87,24 @@
                         <strong>{{ $absentCount }}</strong>
                     </div>
                 </div>
-                <div class="kpi kpi-purple">
+
+                <div class="kpi kpi-teal">
+                    <div class="kpi-icon"><ion-icon name="gift-outline"></ion-icon></div>
+                    <div>
+                        <h3>Paid Leave</h3>
+                        <strong>{{ $paidLeaveCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-gray">
+                    <div class="kpi-icon"><ion-icon name="time-outline"></ion-icon></div>
+                    <div>
+                        <h3>Late Check-in/Check-out</h3>
+                        <strong>{{ $lateCheckinCheckoutCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-dark">
                     <div class="kpi-icon"><ion-icon name="layers-outline"></ion-icon></div>
                     <div>
                         <h3>Total Days</h3>
@@ -112,26 +148,39 @@
                         <th>#</th>
                         <th><ion-icon name="person-outline"></ion-icon> Intern</th>
                         <th><ion-icon name="checkmark-outline"></ion-icon> Present</th>
-                        <th><ion-icon name="remove-outline"></ion-icon> Half Day</th>
+                        <th><ion-icon name="layers-outline"></ion-icon> Half Day</th>
+                        <th><ion-icon name="remove-outline"></ion-icon> Below Half Day</th>
+                        <th><ion-icon name="arrow-up-outline"></ion-icon> Overtime</th>
                         <th><ion-icon name="close-outline"></ion-icon> Absent</th>
+                        <th><ion-icon name="ribbon-outline"></ion-icon> Paid Leave</th>
+                        <th><ion-icon name="time-outline"></ion-icon> Late CheckIn/Out</th>
                         <th><ion-icon name="layers-outline"></ion-icon> Total</th>
                         <th><ion-icon name="eye-outline"></ion-icon> Action</th>
                     </tr>
+
                     @foreach($internSummaries as $i => $intern)
                         <tr>
                             <td>{{ $i + 1 }}</td>
                             <td>{{ $intern['name'] }}</td>
-                            <td><span class="badge present">{{ $intern['present'] }}</span></td>
-                            <td><span class="badge half_day">{{ $intern['half_day'] }}</span></td>
-                            <td><span class="badge absent">{{ $intern['absent'] }}</span></td>
-                            <td><strong>{{ $intern['total'] }}</strong></td>
-                            <td><a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn"><ion-icon name="eye-outline"></ion-icon> View</a></td>
+                            <td class="text-center"><span class="badge present">{{ $intern['present'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge half_day">{{ $intern['half_day'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge below_half_day">{{ $intern['below_half_day'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge overtime">{{ $intern['overtime'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge absent">{{ $intern['absent'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge paid_leave">{{ $intern['paid_leave'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge late_checkin_checkout">{{ $intern['late_checkin_checkout'] ?? 0 }}</span></td>
+                            <td class="text-center"><strong>{{ $intern['total'] ?? 0 }}</strong></td>
+                            <td>
+                                <a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn">
+                                    <ion-icon name="eye-outline"></ion-icon> View
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 </table>
             </div>
 
-        </div>
+           </div>
     </div>
 
     <!-- CHART JS -->
