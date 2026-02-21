@@ -131,7 +131,7 @@
                                 </div>
 
                                 {{-- OVERTIME --}}
-                                <div class="col-md-2">
+                                <div>
                                     <div class="myCard overtime">
                                         <div class="perentCardFlex align-items-center">
                                             <div>
@@ -146,7 +146,7 @@
                                 </div>
 
                                 {{-- ABSENT --}}
-                                <div class="col-md-2 mt-3">
+                                <div>
                                     <div class="myCard absent">
                                         <div class="perentCardFlex align-items-center">
                                             <div>
@@ -161,7 +161,7 @@
                                 </div>
 
                                 {{-- PAID LEAVE --}}
-                                <div class="col-md-2 mt-3">
+                                <div>
                                     <div class="myCard paid_leave">
                                         <div class="perentCardFlex align-items-center">
                                             <div>
@@ -176,11 +176,11 @@
                                 </div>
 
                                 {{-- LATE CHECK-IN / CHECK-OUT --}}
-                                <div class="col-md-2 mt-3">
+                                <div>
                                     <div class="myCard late_checkin_checkout">
                                         <div class="perentCardFlex align-items-center">
                                             <div>
-                                                <p class="mb-2">Late Check-in/Out</p>
+                                                <p class="mb-2">Late Check-in/ early Check-out</p>
                                                 <h2 class="fw-bold mb-0">{{ $lateCheckinCheckoutCount ?? 0 }}</h2>
                                             </div>
                                             <div class="cardIcon">
