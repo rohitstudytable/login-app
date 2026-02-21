@@ -84,75 +84,72 @@ class AttendanceController extends Controller
         ));
     }
 
-    /*
-    |--------------------------------------------------------------------------  
-    | ADMIN – SAVE / UPDATE ATTENDANCE
-    |--------------------------------------------------------------------------  
-    */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'date' => 'required|date',
-            'interns' => 'required|array',
-            'interns.*.status' => 'required|in:present,absent,half_day,paid_leave,unmark',
-            'interns.*.location' => 'nullable|string|max:255',
-            'interns.*.in_time' => 'nullable|date_format:H:i',
-            'interns.*.out_time' => 'nullable|date_format:H:i',
-        ]);
+    // ------------------- ADMIN ATTENDCE UPDTED SAVE-------------------------
 
-        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+   public function store(Request $request)
+{
+    // ✅ VALIDATION (INCLUDING STATUS)
+    $request->validate([
+        'date' => 'required|date',
+        'interns' => 'required|array',
+        'interns.*.location' => 'nullable|string|max:255',
+        'interns.*.in_time' => 'nullable|date_format:H:i',
+        'interns.*.out_time' => 'nullable|date_format:H:i',
+        'interns.*.status' => 'nullable|in:present,half_day,below_half_day,overtime,absent,paid_leave,late_checkin_checkout',
+    ]);
 
-        if ($this->isHolidayOrSunday($attendanceDate)) {
-            return back()->with('error', 'Attendance cannot be marked on holidays or Sundays');
-        }
+    $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
 
-        DB::transaction(function () use ($request, $attendanceDate) {
-
-            foreach ($request->interns as $internId => $data) {
-
-                if ($data['status'] === 'unmark') {
-                    Attendance::where('intern_id', $internId)
-                        ->whereDate('date', $attendanceDate)
-                        ->delete();
-                    continue;
-                }
-
-                $existingAttendance = Attendance::where('intern_id', $internId)
-                    ->whereDate('date', $attendanceDate)
-                    ->first();
-
-                if (in_array($data['status'], ['paid_leave', 'absent'])) {
-                    Attendance::updateOrCreate(
-                        ['intern_id' => $internId, 'date' => $attendanceDate],
-                        [
-                            'status' => $data['status'],
-                            'location' => $data['location'] ?? 'Admin Marked',
-                            'in_time' => null,
-                            'out_time' => null
-                        ]
-                    );
-                    continue;
-                }
-
-                Attendance::updateOrCreate(
-                    ['intern_id' => $internId, 'date' => $attendanceDate],
-                    [
-                        'status' => $data['status'],
-                        'location' => $data['location'] ?? ($existingAttendance->location ?? 'Admin Marked'),
-                        'in_time' => $data['in_time'] ?? ($existingAttendance->in_time ?? null),
-                        'out_time' => $data['out_time'] ?? ($existingAttendance->out_time ?? null),
-                    ]
-                );
-            }
-        });
-
-
-
-        return redirect()->route('attendance.index', [
-            'filter_date' => $attendanceDate,
-            'role' => $request->role
-        ])->with('success', 'Attendance updated for ' . $attendanceDate);
+    if ($this->isHolidayOrSunday($attendanceDate)) {
+        return back()->with('error', 'Attendance cannot be marked on holidays or Sundays');
     }
+
+    DB::transaction(function () use ($request, $attendanceDate) {
+
+        foreach ($request->interns as $internId => $data) {
+
+            // Save / update attendance
+            $attendance = Attendance::updateOrCreate(
+                [
+                    'intern_id' => $internId,
+                    'date' => $attendanceDate,
+                ],
+                [
+                    'location' => $data['location'] ?? 'Admin Marked',
+                    'in_time'  => $data['in_time'] ?? null,
+                    'out_time' => $data['out_time'] ?? null,
+                ]
+            );
+
+            // ✅ If admin manually selected status, use it
+            if (!empty($data['status'])) {
+                $attendance->update([
+                    'status' => $data['status'],
+                    'worked_minutes' => $attendance->in_time && $attendance->out_time
+                        ? \Carbon\Carbon::parse($attendance->in_time)
+                            ->diffInMinutes(\Carbon\Carbon::parse($attendance->out_time))
+                        : null,
+                ]);
+            } else {
+                // 🔥 AUTO-CALCULATE STATUS FROM TIME if no manual status
+                if ($attendance->in_time && $attendance->out_time) {
+                    $this->calculateWorkAndStatus($attendance);
+                } else {
+                    // If no time, mark absent safely
+                    $attendance->update([
+                        'status' => 'absent',
+                        'worked_minutes' => null,
+                    ]);
+                }
+            }
+        }
+    });
+
+    return redirect()->route('attendance.index', [
+        'filter_date' => $attendanceDate,
+        'role' => $request->role
+    ])->with('success', 'Attendance updated for ' . $attendanceDate);
+}
 
     /*
     |--------------------------------------------------------------------------  
@@ -285,7 +282,7 @@ class AttendanceController extends Controller
                 Attendance::create([
                     'intern_id' => $intern->id,
                     'date' => $attendanceDate,
-                    'status' => 'present',
+                    'status' => null,
                     'location' => $request->location,
                     'in_time' => $currentTime,
                 ]);
@@ -304,62 +301,69 @@ class AttendanceController extends Controller
         }
 
        // CLOCK OUT
-            if ($request->action === 'out') {
-                if ($attendance && $attendance->in_time && !$attendance->out_time) {
-
-                    $attendance->update([
-                        'out_time' => $currentTime
-                    ]);
-
-                    $this->calculateWorkAndStatus($attendance);
-
-                    return response()->json([
-                        'success' => true,
-                        'action' => 'out',
-                        'time' => $currentTime,
-                    ]);
-
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'error' => 'You need to clock in first or already clocked out.'
-                    ]);
-                }
-            }
-
-            /* ✅ ADD THIS FINAL RETURN */
-            return response()->json([
-                'success' => false,
-                'error' => 'Attendance already completed for today.'
-            ]);
-
-            } // ✅ CLOSE publicStoreByToken()
-
-            private function calculateWorkAndStatus($attendance)
-            {
-                if (!$attendance->in_time || !$attendance->out_time) {
-                    return;
-                }
-
-                $in = Carbon::parse($attendance->in_time);
-                $out = Carbon::parse($attendance->out_time);
-
-                $workedMinutes = $in->diffInMinutes($out);
-
-                if ($workedMinutes >= 480) {
-                    $status = 'present';
-                } elseif ($workedMinutes >= 240) {
-                    $status = 'half_day';
-                } else {
-                    $status = 'absent';
-                }
+        if ($request->action === 'out') {
+            if ($attendance && $attendance->in_time && !$attendance->out_time) {
 
                 $attendance->update([
-                    'worked_minutes' => $workedMinutes,
-                    'status' => $status,
+                    'out_time' => $currentTime
+                ]);
+
+                // 🔥 Updated status calculation
+                $this->calculateWorkAndStatus($attendance);
+
+                return response()->json([
+                    'success' => true,
+                    'action' => 'out',
+                    'time' => $currentTime,
+                ]);
+
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'You need to clock in first or already clocked out.'
                 ]);
             }
-    
+        }
+
+        /* ✅ ADD THIS FINAL RETURN */
+        return response()->json([
+            'success' => false,
+            'error' => 'Attendance already completed for today.'
+        ]);
+
+        } // ✅ CLOSE publicStoreByToken()
+
+        private function calculateWorkAndStatus($attendance)
+        {
+            if (!$attendance->in_time || !$attendance->out_time) {
+                return;
+            }
+
+            $in = Carbon::parse($attendance->in_time);
+            $out = Carbon::parse($attendance->out_time);
+
+            $workedMinutes = $in->diffInMinutes($out);
+
+            // ✅ Map worked minutes to enum values
+            if ($workedMinutes >= 540) {
+                $status = 'overtime';
+            } elseif ($workedMinutes >= 465) {
+                $status = 'present';
+            } elseif ($workedMinutes >= 420) {
+                $status = 'late_checkin_checkout'; // Early Checkout / Late Check-in
+            } elseif ($workedMinutes >= 240) {
+                $status = 'half_day';
+            } elseif ($workedMinutes >= 120) {
+                $status = 'below_half_day';
+            } else {
+                $status = 'absent';
+            }
+
+            $attendance->update([
+                'worked_minutes' => $workedMinutes,
+                'status' => $status,
+            ]);
+        }
         // ANOTHER
         
     public function empAttendance()

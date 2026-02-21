@@ -10,9 +10,11 @@
                     <p>D&D Learning PVT LTD</p>
                 </div>
             </a>
-
+            <span onclick="toggleMenu()" class="mobileMenu">
+                <ion-icon id="menuIcon" name="menu-outline"></ion-icon>
+            </span>
             {{-- MENU --}}
-            <div class="topMenu">
+            <div class="topMenu" id="topManu">
 
                 {{-- Home --}}
                 <a href="/" class="menuItem {{ Request::is('empdashboard') ? 'active' : '' }}">
@@ -44,6 +46,23 @@
 
 
             </div>
+
+
+
+            <script>
+                function toggleMenu() {
+                    const menu = document.getElementById("topManu");
+                    const icon = document.getElementById("menuIcon");
+
+                    if (menu.style.top === "65px") {
+                        menu.style.top = "-100%";
+                        icon.setAttribute("name", "menu-outline");
+                    } else {
+                        menu.style.top = "65px";
+                        icon.setAttribute("name", "close-outline");
+                    }
+                }
+            </script>
         </div>
     </div>
 </header>

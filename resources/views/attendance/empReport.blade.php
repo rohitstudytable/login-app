@@ -66,63 +66,112 @@
                         </div>
 
                         {{-- ================= ATTENDANCE CARDS ================= --}}
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <div class="myCard">
-                                    <div class="perentCardFlex align-items-center">
-                                        <div>
-                                            <p class="mb-2">Present Days</p>
-                                            <h2 class="text-black mb-0 fw-bold">{{ $presentCount ?? 0 }}</h2>
-                                        </div>
-                                        <div class="cardIcon">
-                                            <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                       <div class="row mb-3">
+    {{-- PRESENT --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard present">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Present Days</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $presentCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                            <div class="col-md-3">
-                                <div class="myCard">
-                                    <div class="perentCardFlex align-items-center">
-                                        <div>
-                                            <p class="mb-2">Absent Days</p>
-                                            <h2 class="text-black mb-0 fw-bold">{{ $absentCount ?? 0 }}</h2>
-                                        </div>
-                                        <div class="cardIcon">
-                                            <ion-icon name="close-circle" class="text-danger"></ion-icon>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    {{-- HALF DAY --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard half_day">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Half Days</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $halfDayCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="hourglass" class="text-warning"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                            <div class="col-md-3">
-                                <div class="myCard">
-                                    <div class="perentCardFlex align-items-center">
-                                        <div>
-                                            <p class="mb-2">Half Days</p>
-                                            <h2 class="text-black mb-0 fw-bold">{{ $halfDayCount ?? 0 }}</h2>
-                                        </div>
-                                        <div class="cardIcon">
-                                            <ion-icon name="hourglass" class="text-warning"></ion-icon>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    {{-- BELOW HALF DAY --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard below_half_day">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Below Half Day</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $belowHalfDayCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="alert-circle-outline" class="text-orange"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                            <div class="col-md-3">
-                                <div class="myCard">
-                                    <div class="perentCardFlex align-items-center">
-                                        <div>
-                                            <p class="mb-2">Leave Taken</p>
-                                            <h2 class="text-black mb-0 fw-bold">{{ $paidLeaveCount ?? 0 }}</h2>
-                                        </div>
-                                        <div class="cardIcon">
-                                            <ion-icon name="calendar" class="text-info"></ion-icon>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    {{-- OVERTIME --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard overtime">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Overtime</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $overtimeCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="rocket-outline" class="text-purple"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ABSENT --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard absent">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Absent</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $absentCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="close-circle" class="text-danger"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- PAID LEAVE --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard paid_leave">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Paid Leave</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $paidLeaveCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="gift-outline" class="text-info"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- LATE CHECK-IN / CHECK-OUT --}}
+    <div class="col-md-3 mb-3">
+        <div class="myCard late_checkin_checkout">
+            <div class="perentCardFlex align-items-center">
+                <div>
+                    <p class="mb-2">Late Check-in/Out</p>
+                    <h2 class="text-black mb-0 fw-bold">{{ $lateCheckinCheckoutCount ?? 0 }}</h2>
+                </div>
+                <div class="cardIcon">
+                    <ion-icon name="time-outline" class="text-secondary"></ion-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                         {{-- ================= ATTENDANCE TABLE ================= --}}
                         <div class="row mb-3">

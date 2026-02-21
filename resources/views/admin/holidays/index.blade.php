@@ -22,21 +22,33 @@
         <div class="content">
 
             @if(session('success'))
-                <div class="alert">{{ session('success') }}</div>
+                <div class="custom-alert">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <span>{{ session('success') }}</span>
+                </div>
             @endif
 
-            <div class="card">
+            <div class="card card-holidays">
 
-                <a href="{{ route('admin.holidays.create') }}" class="btn btn-add">
-                    + Add Holiday
-                </a>
+                <div class="card-header-flex">
+                    <div class="card-title">
+                        <div class="card-icon bg-amber">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                        </div>
+                        <h3>All Holidays</h3>
+                    </div>
+                    <a href="{{ route('admin.holidays.create') }}" class="btn-add">
+                        <ion-icon name="add-outline"></ion-icon>
+                        Add Holiday
+                    </a>
+                </div>
 
                 <table>
                     <tr>
                         <th>#</th>
-                        <th>Title</th>
-                        <th>Date</th>
-                        <th>Action</th>
+                        <th><ion-icon name="bookmark-outline"></ion-icon> Title</th>
+                        <th><ion-icon name="calendar-number-outline"></ion-icon> Date</th>
+                        <th><ion-icon name="settings-outline"></ion-icon> Action</th>
                     </tr>
 
                     @forelse($holidays as $i => $holiday)
@@ -48,15 +60,18 @@
                                 <form method="POST" action="{{ route('admin.holidays.destroy', $holiday->id) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-delete" onclick="return confirm('Delete holiday?')">
-                                        Delete
+                                    <button class="icon-btn delete-btn" onclick="return confirm('Delete holiday?')">
+                                        <ion-icon name="trash-outline"></ion-icon>
                                     </button>
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4">No holidays found</td>
+                            <td colspan="4" class="empty-state">
+                                <ion-icon name="file-tray-outline"></ion-icon>
+                                <p>No holidays found</p>
+                            </td>
                         </tr>
                     @endforelse
 

@@ -3,9 +3,6 @@
 
 <head>
     @include('body.adminHeadLink')
-
-
-
 </head>
 
 <body>
@@ -17,74 +14,172 @@
         <!-- TOPBAR -->
         <div class="topbar">
             <h2>Attendance Report</h2>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="logout-btn">Logout</button>
+            </form>
         </div>
 
         <div class="content">
 
             <!-- FILTER -->
-            <div class="card">
+            <div class="card card-filter">
+                <div class="card-title">
+                    <div class="card-icon bg-indigo">
+                        <ion-icon name="funnel-outline"></ion-icon>
+                    </div>
+                    <h3>Filter Report</h3>
+                </div>
                 <form method="GET" class="filter-form">
                     <input type="date" name="start_date" value="{{ request('start_date') }}">
                     <input type="date" name="end_date" value="{{ request('end_date') }}">
-                    <button class="btn-primary">Search</button>
-                    <a href="{{ route('report') }}" class="btn-reset">Reset</a>
+                    <button class="btn btn-primary"><ion-icon name="search-outline"></ion-icon> Search</button>
+                    <a href="{{ route('report') }}" class="btn btn-reset"><ion-icon name="refresh-outline"></ion-icon>
+                        Reset</a>
                 </form>
             </div>
 
             <!-- KPI -->
             <div class="kpi-grid">
-                <div class="kpi">
-                    <h3>Attendance Rate</h3>
-                    <strong>{{ $totalDays ? round(($presentCount / $totalDays) * 100) : 0 }}%</strong>
+                <div class="kpi kpi-blue">
+                    <div class="kpi-icon"><ion-icon name="trending-up-outline"></ion-icon></div>
+                    <div>
+                        <h3>Attendance Rate</h3>
+                        <strong>{{ $totalDays ? round(($presentCount / $totalDays) * 100) : 0 }}%</strong>
+                    </div>
                 </div>
-                <div class="kpi">
-                    <h3>Present</h3><strong>{{ $presentCount }}</strong>
+
+                <div class="kpi kpi-green">
+                    <div class="kpi-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+                    <div>
+                        <h3>Present</h3>
+                        <strong>{{ $presentCount }}</strong>
+                    </div>
                 </div>
-                <div class="kpi">
-                    <h3>Half Day</h3><strong>{{ $halfDayCount }}</strong>
+
+                <div class="kpi kpi-yellow">
+                    <div class="kpi-icon"><ion-icon name="remove-circle-outline"></ion-icon></div>
+                    <div>
+                        <h3>Half Day</h3>
+                        <strong>{{ $halfDayCount }}</strong>
+                    </div>
                 </div>
-                <div class="kpi">
-                    <h3>Absent</h3><strong>{{ $absentCount }}</strong>
+
+                <div class="kpi kpi-orange">
+                    <div class="kpi-icon"><ion-icon name="alert-circle-outline"></ion-icon></div>
+                    <div>
+                        <h3>Below Half Day</h3>
+                        <strong>{{ $belowHalfDayCount ?? 0 }}</strong>
+                    </div>
                 </div>
-                <div class="kpi">
-                    <h3>Total Days</h3><strong>{{ $totalDays }}</strong>
+
+                <div class="kpi kpi-purple">
+                    <div class="kpi-icon"><ion-icon name="rocket-outline"></ion-icon></div>
+                    <div>
+                        <h3>Overtime</h3>
+                        <strong>{{ $overtimeCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-red">
+                    <div class="kpi-icon"><ion-icon name="close-circle-outline"></ion-icon></div>
+                    <div>
+                        <h3>Absent</h3>
+                        <strong>{{ $absentCount }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-teal">
+                    <div class="kpi-icon"><ion-icon name="gift-outline"></ion-icon></div>
+                    <div>
+                        <h3>Paid Leave</h3>
+                        <strong>{{ $paidLeaveCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-gray">
+                    <div class="kpi-icon"><ion-icon name="time-outline"></ion-icon></div>
+                    <div>
+                        <h3>Late Check-in/Check-out</h3>
+                        <strong>{{ $lateCheckinCheckoutCount ?? 0 }}</strong>
+                    </div>
+                </div>
+
+                <div class="kpi kpi-dark">
+                    <div class="kpi-icon"><ion-icon name="layers-outline"></ion-icon></div>
+                    <div>
+                        <h3>Total Days</h3>
+                        <strong>{{ $totalDays }}</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- CHARTS -->
             <div class="dashboard-grid">
-                <div class="card">
-                    <h3>Overall Distribution</h3>
+                <div class="card card-chart-donut">
+                    <div class="card-title">
+                        <div class="card-icon bg-green">
+                            <ion-icon name="pie-chart-outline"></ion-icon>
+                        </div>
+                        <h3>Overall Distribution</h3>
+                    </div>
                     <canvas id="donutChart" height="220"></canvas>
                 </div>
-                <div class="card">
-                    <h3>Daily Trend (Last 7 Days)</h3>
+                <div class="card card-chart-bar">
+                    <div class="card-title">
+                        <div class="card-icon bg-indigo">
+                            <ion-icon name="bar-chart-outline"></ion-icon>
+                        </div>
+                        <h3>Daily Trend (Last 7 Days)</h3>
+                    </div>
                     <canvas id="barChart" height="220"></canvas>
                 </div>
             </div>
 
             <!-- INTERN TABLE -->
-            <div class="card">
-                <h3>Intern Attendance Summary</h3>
+            <div class="card card-summary">
+                <div class="card-title">
+                    <div class="card-icon bg-amber">
+                        <ion-icon name="people-outline"></ion-icon>
+                    </div>
+                    <h3>Intern Attendance Summary</h3>
+                </div>
                 <table>
                     <tr>
                         <th>#</th>
-                        <th>Intern</th>
-                        <th>Present</th>
-                        <th>Half Day</th>
-                        <th>Absent</th>
-                        <th>Total</th>
-                        <th>Action</th>
+                        <th><ion-icon name="person-outline"></ion-icon> Intern</th>
+                        <th><ion-icon name="checkmark-outline"></ion-icon> Present</th>
+                        <th><ion-icon name="layers-outline"></ion-icon> Half Day</th>
+                        <th><ion-icon name="remove-outline"></ion-icon> Below Half Day</th>
+                        <th><ion-icon name="arrow-up-outline"></ion-icon> Overtime</th>
+                        <th><ion-icon name="close-outline"></ion-icon> Absent</th>
+                        <th><ion-icon name="ribbon-outline"></ion-icon> Paid Leave</th>
+                        <th><ion-icon name="time-outline"></ion-icon> Late CheckIn/Out</th>
+                        <th><ion-icon name="layers-outline"></ion-icon> Total</th>
+                        <th><ion-icon name="eye-outline"></ion-icon> Action</th>
                     </tr>
+
                     @foreach($internSummaries as $i => $intern)
                         <tr>
                             <td>{{ $i + 1 }}</td>
                             <td>{{ $intern['name'] }}</td>
-                            <td>{{ $intern['present'] }}</td>
-                            <td>{{ $intern['half_day'] }}</td>
-                            <td>{{ $intern['absent'] }}</td>
-                            <td>{{ $intern['total'] }}</td>
-                            <td><a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn">View</a></td>
+                            <td class="text-center"><span class="badge present">{{ $intern['present'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge half_day">{{ $intern['half_day'] ?? 0 }}</span></td>
+                            <td class="text-center"><span
+                                    class="badge below_half_day">{{ $intern['below_half_day'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge overtime">{{ $intern['overtime'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge absent">{{ $intern['absent'] ?? 0 }}</span></td>
+                            <td class="text-center"><span class="badge paid_leave">{{ $intern['paid_leave'] ?? 0 }}</span>
+                            </td>
+                            <td class="text-center"><span
+                                    class="badge late_checkin_checkout">{{ $intern['late_checkin_checkout'] ?? 0 }}</span>
+                            </td>
+                            <td class="text-center"><strong>{{ $intern['total'] ?? 0 }}</strong></td>
+                            <td>
+                                <a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn">
+                                    <ion-icon name="eye-outline"></ion-icon> View
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 </table>

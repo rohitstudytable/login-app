@@ -118,6 +118,7 @@ Route::middleware(['auth:intern'])->group(function () {
         [InternProfileController::class, 'updateContact']
     )->name('intern.profile.contact');
 
+
 });
 
 /*
@@ -145,6 +146,9 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/report', [ReportController::class, 'index'])->name('report');
     Route::get('/report/intern/{intern}', [ReportController::class, 'show'])
         ->name('report.intern');
+
+        Route::get('/interns/{id}', [InternController::class, 'show'])
+     ->name('interns.show');
 
     Route::prefix('admin')
         ->name('admin.')
