@@ -34,7 +34,8 @@
                     <input type="date" name="start_date" value="{{ request('start_date') }}">
                     <input type="date" name="end_date" value="{{ request('end_date') }}">
                     <button class="btn btn-primary"><ion-icon name="search-outline"></ion-icon> Search</button>
-                    <a href="{{ route('report') }}" class="btn btn-reset"><ion-icon name="refresh-outline"></ion-icon> Reset</a>
+                    <a href="{{ route('report') }}" class="btn btn-reset"><ion-icon name="refresh-outline"></ion-icon>
+                        Reset</a>
                 </form>
             </div>
 
@@ -125,7 +126,11 @@
                             <td><span class="badge half_day">{{ $intern['half_day'] }}</span></td>
                             <td><span class="badge absent">{{ $intern['absent'] }}</span></td>
                             <td><strong>{{ $intern['total'] }}</strong></td>
-                            <td><a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn"><ion-icon name="eye-outline"></ion-icon> View</a></td>
+                            <td>
+                                <a href="{{ route('attendance.show', $intern['id']) }}" class="icon-btn view-btn"><ion-icon
+                                        name="eye-outline"></ion-icon></a>
+
+                            </td>
                         </tr>
                     @endforeach
                 </table>

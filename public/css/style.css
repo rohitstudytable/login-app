@@ -157,6 +157,10 @@ header {
     margin-bottom: 0;
 }
 
+.mobileMenu {
+    display: none;
+}
+
 .topMenu {
     display: flex;
     align-items: center;
@@ -223,6 +227,12 @@ header {
     font-weight: 700;
     margin-bottom: 0;
     font-family: "Inter", sans-serif;
+}
+
+.myGrid5 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 20px;
 }
 
 .myCard h2 {
@@ -621,4 +631,92 @@ header {
     object-fit: cover;
     border: 3px solid var(--primary-color);
     cursor: pointer;
+}
+
+
+/* For Tabs */
+@media (max-width: 992px) {
+    .myConSm {
+        width: 90vw;
+    }
+
+    .myGrid5 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+}
+
+/* For Phone */
+@media (max-width: 500px) {
+    .myConSm {
+        width: 92vw;
+    }
+
+    .myCon {
+        width: 92vw;
+    }
+
+    .mobileMenu {
+        display: block;
+        color: var(--black-one);
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    .topMenu {
+        position: fixed;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--white);
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        gap: 0;
+        transition: all 0.3s ease-in-out;
+        z-index: 2;
+    }
+
+    .topMenu .menuItem {
+        width: 100%;
+        border-top: 1px solid var(--white-three);
+        padding: 1rem;
+
+    }
+
+    .myGrid5 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .welcomeFlex h3 {
+        font-size: 17px;
+    }
+
+    .quickActionGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .weatherCard {
+        margin-top: 20px;
+    }
+
+    .whiteBigCard {
+        padding: 24px 16px;
+    }
+
+    .myCard {
+        padding: 1.5rem 1rem;
+    }
+
+    .clockCard h2 {
+        font-size: 50px;
+        font-weight: 500;
+    }
+
+    .mytableCon {
+        overflow: auto;
+    }
 }

@@ -582,8 +582,8 @@ a.myBtnDanger {
 }
 
 .profile-img {
-    width: 45px;
-    height: 45px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -667,6 +667,17 @@ a.myBtnDanger {
     color: #2563eb;
 }
 
+.view-btn {
+    background: rgba(255, 192, 1, 0.15);
+    color: #ebac25;
+}
+
+.view-btn:hover {
+    background: #ebac25;
+    color: #ffffff;
+}
+
+
 .edit-btn:hover {
     background: #2563eb;
     color: #fff;
@@ -741,6 +752,12 @@ a.myBtnDanger {
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
@@ -1047,7 +1064,7 @@ a.myBtnDanger {
 
 .card table td {
     padding: 12px 14px;
-    font-size: 14px;
+    font-size: 12px;
     color: #334155;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
@@ -1064,10 +1081,10 @@ a.myBtnDanger {
 .card table select,
 .card table input[type="text"],
 .card table input[type="time"] {
-    padding: 7px 10px;
+    padding: 4px 7px;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12px;
     background: #f9fafb;
     transition: 0.3s ease;
     color: #334155;
@@ -1463,27 +1480,7 @@ a.myBtnDanger {
 }
 
 /* -------- View Button -------- */
-.view-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    background: rgba(37, 99, 235, 0.1);
-    color: #2563eb;
-    transition: 0.3s ease;
-}
 
-.view-btn ion-icon {
-    font-size: 15px;
-}
-
-.view-btn:hover {
-    background: #2563eb;
-    color: #fff;
-}
 
 /* -------- Responsive -------- */
 @media (max-width: 768px) {
@@ -1521,4 +1518,95 @@ a.myBtnDanger {
         height: 38px;
         font-size: 19px;
     }
+}
+
+
+
+
+
+
+
+
+.page-title {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.page-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.profile-card {
+    padding: 28px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+
+.profile-header .profile-img {
+    width: 100px;
+    height: 100px;
+}
+
+
+.profile-meta h4 {
+    margin-bottom: 4px;
+}
+
+.designation {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.badge-group {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.badge.role {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge.code {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.section-title {
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.info-group label {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.info-group p {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+.space-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

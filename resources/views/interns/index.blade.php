@@ -60,7 +60,8 @@
                         </div>
                         <h3>Members List</h3>
                     </div>
-                    <span class="count-badge"><ion-icon name="stats-chart-outline"></ion-icon> {{ $interns->count() }} Total</span>
+                    <span class="count-badge"><ion-icon name="stats-chart-outline"></ion-icon> {{ $interns->count() }}
+                        Total</span>
                 </div>
 
                 <div class="table-responsive">
@@ -106,37 +107,34 @@
                                         </span>
                                     </td>
 
-                                   <td>
-                                    <div class="action-buttons">
+                                    <td>
+                                        <div class="action-buttons">
 
-                                        <!-- VIEW -->
-                                        <a href="{{ route('interns.show', $intern->id) }}" 
-                                        class="icon-btn edit-btn" 
-                                        title="View Details">
-                                            <ion-icon name="eye-outline"></ion-icon>
-                                        </a>
+                                            <!-- VIEW -->
+                                            <a href="{{ route('interns.show', $intern->id) }}" class="icon-btn view-btn"
+                                                title="View Details">
+                                                <ion-icon name="eye-outline"></ion-icon>
+                                            </a>
 
-                                        <!-- EDIT -->
-                                        <a href="{{ route('interns.edit', $intern) }}" 
-                                        class="icon-btn edit-btn" 
-                                        title="Edit">
-                                            <ion-icon name="create-outline"></ion-icon>
-                                        </a>
+                                            <!-- EDIT -->
+                                            <a href="{{ route('interns.edit', $intern) }}" class="icon-btn edit-btn"
+                                                title="Edit">
+                                                <ion-icon name="create-outline"></ion-icon>
+                                            </a>
 
-                                        <!-- DELETE -->
-                                        <form action="{{ route('interns.destroy', $intern) }}" 
-                                            method="POST"
-                                            onsubmit="return confirm('Delete this record?')">
-                                            @csrf
-                                            @method('DELETE')
+                                            <!-- DELETE -->
+                                            <form action="{{ route('interns.destroy', $intern) }}" method="POST"
+                                                onsubmit="return confirm('Delete this record?')">
+                                                @csrf
+                                                @method('DELETE')
 
-                                            <button class="icon-btn delete-btn" type="submit">
-                                                <ion-icon name="trash-outline"></ion-icon>
-                                            </button>
-                                        </form>
+                                                <button class="icon-btn delete-btn" type="submit">
+                                                    <ion-icon name="trash-outline"></ion-icon>
+                                                </button>
+                                            </form>
 
-                                    </div>
-                                </td>
+                                        </div>
+                                    </td>
 
                                 </tr>
                             @empty
