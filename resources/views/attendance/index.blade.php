@@ -22,7 +22,10 @@
         <div class="content">
 
             @if(session('success'))
-                <div class="custom-alert">{{ session('success') }}</div>
+                <div class="custom-alert">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <span>{{ session('success') }}</span>
+                </div>
             @endif
 
             {{-- ===============================
@@ -42,41 +45,59 @@
 
             @if($isBlocked)
                 <div class="holiday-alert">
-                    🚫 Attendance cannot be marked.
-                    {{ $isSunday ? 'Today is Sunday.' : '' }}
-                    {{ $isHoliday ? 'Today is an Admin Holiday.' : '' }}
+                    <ion-icon name="alert-circle-outline"></ion-icon>
+                    <span>
+                        Attendance cannot be marked.
+                        {{ $isSunday ? 'Today is Sunday.' : '' }}
+                        {{ $isHoliday ? 'Today is an Holiday.' : '' }}
+                    </span>
                 </div>
             @endif
 
             {{-- ROLE TABS --}}
             <div class="tabs">
-                <a href="{{ route('attendance.index') }}"
-                    class="tab {{ request('role') == null ? 'active' : '' }}">All</a>
+                <a href="{{ route('attendance.index') }}" class="tab {{ request('role') == null ? 'active' : '' }}">
+                    <ion-icon name="people-outline"></ion-icon> All
+                </a>
                 <a href="{{ route('attendance.index', ['role' => 'intern']) }}"
-                    class="tab {{ request('role') == 'intern' ? 'active' : '' }}">Interns</a>
+                    class="tab {{ request('role') == 'intern' ? 'active' : '' }}">
+                    <ion-icon name="school-outline"></ion-icon> Interns
+                </a>
                 <a href="{{ route('attendance.index', ['role' => 'employee']) }}"
-                    class="tab {{ request('role') == 'employee' ? 'active' : '' }}">Employees</a>
+                    class="tab {{ request('role') == 'employee' ? 'active' : '' }}">
+                    <ion-icon name="briefcase-outline"></ion-icon> Employees
+                </a>
             </div>
 
             {{-- FILTER --}}
-            <div class="card">
-                <h3>Filter Attendance</h3>
+            <div class="card card-filter">
+                <div class="card-title">
+                    <div class="card-icon bg-indigo">
+                        <ion-icon name="funnel-outline"></ion-icon>
+                    </div>
+                    <h3>Filter Attendance</h3>
+                </div>
                 <form method="GET" class="filter-form">
                     <input type="hidden" name="role" value="{{ request('role') }}">
                     <input type="date" name="filter_date" value="{{ $markDate }}">
-                    <input type="text" name="filter_name" value="{{ request('filter_name') }}" placeholder="Name">
-                    <button class="btn btn-primary">Search</button>
+                    <input type="text" name="filter_name" value="{{ request('filter_name') }}"
+                        placeholder="Search by name...">
+                    <button class="btn btn-primary"><ion-icon name="search-outline"></ion-icon> Search</button>
                     <a href="{{ route('attendance.index', ['role' => request('role')]) }}"
-                        class="btn btn-reset">Reset</a>
+                        class="btn btn-reset"><ion-icon name="refresh-outline"></ion-icon> Reset</a>
                 </form>
             </div>
 
             {{-- ===============================
             MARK ATTENDANCE
             ================================ --}}
-            <div class="card">
-
-                <h3>Mark Attendance for {{ $markDate }}</h3>
+            <div class="card card-mark">
+                <div class="card-title">
+                    <div class="card-icon bg-green">
+                        <ion-icon name="checkmark-done-outline"></ion-icon>
+                    </div>
+                    <h3>Mark Attendance for {{ $markDate }}</h3>
+                </div>
 
                 <form method="POST" action="{{ route('attendance.store') }}">
                     @csrf
@@ -84,12 +105,12 @@
 
                     <table>
                         <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Location</th>
-                            <th>In Time</th>
-                            <th>Out Time</th>
+                            <th><ion-icon name="person-outline"></ion-icon> Name</th>
+                            <th><ion-icon name="calendar-outline"></ion-icon> Date</th>
+                            <th><ion-icon name="flag-outline"></ion-icon> Status</th>
+                            <th><ion-icon name="location-outline"></ion-icon> Location</th>
+                            <th><ion-icon name="enter-outline"></ion-icon> In Time</th>
+                            <th><ion-icon name="exit-outline"></ion-icon> Out Time</th>
                         </tr>
 
                         @foreach($interns as $intern)
@@ -128,7 +149,8 @@
                     </table>
 
                     @if(!$isBlocked)
-                        <button class="btn btn-primary" style="margin-top:20px">Save Attendance</button>
+                        <button class="btn btn-primary save-attendance-btn"><ion-icon name="save-outline"></ion-icon> Save
+                            Attendance</button>
                     @endif
 
                 </form>
@@ -137,18 +159,23 @@
             {{-- ===============================
             HISTORY
             ================================ --}}
-            <div class="card">
-                <h3>Attendance History</h3>
+            <div class="card card-history">
+                <div class="card-title">
+                    <div class="card-icon bg-amber">
+                        <ion-icon name="time-outline"></ion-icon>
+                    </div>
+                    <h3>Attendance History</h3>
+                </div>
 
                 <table>
                     <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Location</th>
-                        <th>In Time</th>
-                        <th>Out Time</th>
+                        <th><ion-icon name="person-outline"></ion-icon> Name</th>
+                        <th><ion-icon name="calendar-outline"></ion-icon> Date</th>
+                        <th><ion-icon name="flag-outline"></ion-icon> Status</th>
+                        <th><ion-icon name="location-outline"></ion-icon> Location</th>
+                        <th><ion-icon name="enter-outline"></ion-icon> In Time</th>
+                        <th><ion-icon name="exit-outline"></ion-icon> Out Time</th>
                     </tr>
 
                     @forelse($allRecords as $i => $att)

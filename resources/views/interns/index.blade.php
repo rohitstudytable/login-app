@@ -35,38 +35,43 @@
             <!-- ================= Role Tabs ================= -->
             <div class="tabs">
                 <a href="{{ route('interns.index') }}" class="tab {{ request('role') == null ? 'active' : '' }}">
-                    All
+                    <ion-icon name="people-outline"></ion-icon> All
                 </a>
 
                 <a href="{{ route('interns.index', ['role' => 'intern']) }}"
                     class="tab {{ request('role') == 'intern' ? 'active' : '' }}">
-                    Interns
+                    <ion-icon name="school-outline"></ion-icon> Interns
                 </a>
 
                 <a href="{{ route('interns.index', ['role' => 'employee']) }}"
                     class="tab {{ request('role') == 'employee' ? 'active' : '' }}">
-                    Employees
+                    <ion-icon name="briefcase-outline"></ion-icon> Employees
                 </a>
             </div>
 
 
             <!-- ================= Table Card ================= -->
-            <div class="card table-card">
+            <div class="card card-members table-card">
 
                 <div class="card-header-flex">
-                    <h3>Members List</h3>
-                    <span class="count-badge">{{ $interns->count() }} Total</span>
+                    <div class="card-title">
+                        <div class="card-icon bg-indigo">
+                            <ion-icon name="people-circle-outline"></ion-icon>
+                        </div>
+                        <h3>Members List</h3>
+                    </div>
+                    <span class="count-badge"><ion-icon name="stats-chart-outline"></ion-icon> {{ $interns->count() }} Total</span>
                 </div>
 
                 <div class="table-responsive">
                     <table class="custom-table">
                         <thead>
                             <tr>
-                                <th>Member</th>
-                                <th>Contact</th>
-                                <th>Role</th>
-                                <th>Password</th>
-                                <th width="120">Action</th>
+                                <th><ion-icon name="person-outline"></ion-icon> Member</th>
+                                <th><ion-icon name="call-outline"></ion-icon> Contact</th>
+                                <th><ion-icon name="shield-outline"></ion-icon> Role</th>
+                                <th><ion-icon name="lock-closed-outline"></ion-icon> Password</th>
+                                <th width="120"><ion-icon name="settings-outline"></ion-icon> Action</th>
                             </tr>
                         </thead>
 
@@ -124,8 +129,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" style="text-align:center;padding:25px">
-                                        No records found
+                                    <td colspan="5" class="empty-state">
+                                        <ion-icon name="file-tray-outline"></ion-icon>
+                                        <p>No records found</p>
                                     </td>
                                 </tr>
                             @endforelse
