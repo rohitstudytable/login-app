@@ -106,25 +106,37 @@
                                         </span>
                                     </td>
 
-                                    <td>
-                                        <div class="action-buttons">
+                                   <td>
+                                    <div class="action-buttons">
 
-                                            <a href="{{ route('interns.edit', $intern) }}" class="icon-btn edit-btn">
-                                                <ion-icon name="create-outline"></ion-icon>
-                                            </a>
+                                        <!-- VIEW -->
+                                        <a href="{{ route('interns.show', $intern->id) }}" 
+                                        class="icon-btn edit-btn" 
+                                        title="View Details">
+                                            <ion-icon name="eye-outline"></ion-icon>
+                                        </a>
 
-                                            <form action="{{ route('interns.destroy', $intern) }}" method="POST"
-                                                onsubmit="return confirm('Delete this record?')">
-                                                @csrf
-                                                @method('DELETE')
+                                        <!-- EDIT -->
+                                        <a href="{{ route('interns.edit', $intern) }}" 
+                                        class="icon-btn edit-btn" 
+                                        title="Edit">
+                                            <ion-icon name="create-outline"></ion-icon>
+                                        </a>
 
-                                                <button class="icon-btn delete-btn">
-                                                    <ion-icon name="trash-outline"></ion-icon>
-                                                </button>
-                                            </form>
+                                        <!-- DELETE -->
+                                        <form action="{{ route('interns.destroy', $intern) }}" 
+                                            method="POST"
+                                            onsubmit="return confirm('Delete this record?')">
+                                            @csrf
+                                            @method('DELETE')
 
-                                        </div>
-                                    </td>
+                                            <button class="icon-btn delete-btn" type="submit">
+                                                <ion-icon name="trash-outline"></ion-icon>
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
 
                                 </tr>
                             @empty

@@ -285,7 +285,7 @@ class AttendanceController extends Controller
                 Attendance::create([
                     'intern_id' => $intern->id,
                     'date' => $attendanceDate,
-                    'status' => 'present',
+                    'status' => null,
                     'location' => $request->location,
                     'in_time' => $currentTime,
                 ]);

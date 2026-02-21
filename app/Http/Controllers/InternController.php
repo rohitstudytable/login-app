@@ -189,4 +189,12 @@ class InternController extends Controller
             ->route('interns.index')
             ->with('success', 'Record deleted successfully');
     }
+
+    /**
+ * Show intern / employee details
+ */
+public function show(Intern $intern)
+{
+    return view('interns.view', compact('intern'));
+}
 }
