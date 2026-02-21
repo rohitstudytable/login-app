@@ -93,7 +93,6 @@ a.myBtnDanger {
     width: fit-content;
 }
 
-
 /* Main Layout Adjustment */
 .main {
     margin-left: 260px;
@@ -131,8 +130,6 @@ a.myBtnDanger {
     border-bottom: 1px solid var(--white-three);
     margin-bottom: 20px;
 }
-
-
 
 .sidebar-header img {
     height: 36px;
@@ -202,7 +199,6 @@ a.myBtnDanger {
     color: var(--primary-color);
 }
 
-
 /* Responsive */
 @media (max-width: 992px) {
     .sidebar {
@@ -218,9 +214,6 @@ a.myBtnDanger {
         margin-left: 75px;
     }
 }
-
-
-
 
 /* =====================================================
    PREMIUM TOPBAR (Modern Admin Style)
@@ -270,7 +263,6 @@ a.myBtnDanger {
 .logout-btn:hover {
     background: #9d0909;
     border-color: #9d0909;
-
 }
 
 .topbar-right {
@@ -295,10 +287,6 @@ a.myBtnDanger {
         font-size: 18px;
     }
 }
-
-
-
-
 
 /* -------- STATS ROW -------- */
 
@@ -440,19 +428,14 @@ a.myBtnDanger {
 /* -------- RESPONSIVE -------- */
 
 @media (max-width: 992px) {
-
-
     .chart-card.full-width {
         grid-column: span 1;
     }
 }
 
-
-
 /* =====================================================
    INTERNS PAGE PREMIUM STYLE
 ===================================================== */
-
 
 /* ================= Role Tabs ================= */
 
@@ -693,7 +676,6 @@ a.myBtnDanger {
     color: #fff;
 }
 
-
 /* BACK BUTTON */
 .back-btn {
     width: 38px;
@@ -823,7 +805,7 @@ a.myBtnDanger {
 }
 
 /* RESPONSIVE */
-@media(max-width: 900px) {
+@media (max-width: 900px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
@@ -832,7 +814,6 @@ a.myBtnDanger {
         margin-left: 0;
     }
 }
-
 
 /* =====================================================
    ATTENDANCE PAGE STYLES (Premium + Icons)
@@ -1131,6 +1112,16 @@ a.myBtnDanger {
 .badge.unmark {
     background: #f1f5f9;
     color: #64748b;
+}
+
+.badge.overtime {
+    background: #004b17;
+    color: #ffffff;
+}
+
+.badge.present_early_checkout {
+    background: #d213c5;
+    color: #ffffff;
 }
 
 /* -------- Save Attendance Button -------- */
