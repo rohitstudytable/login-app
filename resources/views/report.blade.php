@@ -136,14 +136,20 @@
 
             <!-- INTERN TABLE -->
             <div class="card card-summary">
-                <div class="card-title">
-                    <div class="card-icon bg-amber">
-                        <ion-icon name="people-outline"></ion-icon>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="card-title">
+                        <div class="card-icon bg-amber">
+                            <ion-icon name="people-outline"></ion-icon>
+                        </div>
+                        <h3>Intern Attendance Summary</h3>
                     </div>
-                    <h3>Intern Attendance Summary</h3>
+                    <button class="btn btn-primary excelBtn">
+                        <ion-icon name="download-outline"></ion-icon> Export
+                    </button>
                 </div>
 
-                <table>
+
+                <table class="excelTable">
                     <tr>
                         <th>#</th>
                         <th>Intern</th>
@@ -175,8 +181,8 @@
                             </td>
                             <td class="text-center"><strong>{{ $intern['total'] ?? 0 }}</strong></td>
                             <td>
-                                <a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn">
-                                    <ion-icon name="eye-outline"></ion-icon> View
+                                <a href="{{ route('attendance.show', $intern['id']) }}" class="icon-btn view-btn">
+                                    <ion-icon name="eye-outline"></ion-icon>
                                 </a>
                             </td>
                         </tr>
@@ -188,35 +194,8 @@
                 </table>
             </div>
 
-            <<<<<<< HEAD @foreach($internSummaries as $i => $intern) <tr>
-                <td>{{ $i + 1 }}</td>
-                <td>{{ $intern['name'] }}</td>
-                <td class="text-center"><span class="badge present">{{ $intern['present'] ?? 0 }}</span></td>
-                <td class="text-center"><span class="badge half_day">{{ $intern['half_day'] ?? 0 }}</span></td>
-                <td class="text-center"><span class="badge below_half_day">{{ $intern['below_half_day'] ?? 0 }}</span>
-                </td>
-                <td class="text-center"><span class="badge overtime">{{ $intern['overtime'] ?? 0 }}</span></td>
-                <td class="text-center"><span class="badge absent">{{ $intern['absent'] ?? 0 }}</span></td>
-                <td class="text-center"><span class="badge paid_leave">{{ $intern['paid_leave'] ?? 0 }}</span>
-                </td>
-                <td class="text-center"><span
-                        class="badge late_checkin_checkout">{{ $intern['late_checkin_checkout'] ?? 0 }}</span>
-                </td>
-                <td class="text-center"><strong>{{ $intern['total'] ?? 0 }}</strong></td>
-                <td>
-                    <a href="{{ route('attendance.show', $intern['id']) }}" class="view-btn">
-                        <ion-icon name="eye-outline"></ion-icon> View
-                    </a>
-                </td>
-                </tr>
-            @endforeach
-                </table>
-        </div>
 
-    </div>
-    =======
-    >>>>>>> rohit--new
-    </div>
+        </div>
     </div>
 
     <!-- CHART JS -->
@@ -261,6 +240,22 @@
         });
     </script>
 
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+        document.querySelector(".excelBtn").addEventListener("click", function () {
+
+            let table = document.querySelector(".excelTable");
+
+            // Convert table to worksheet
+            let workbook = XLSX.utils.table_to_book(table, { sheet: "Intern Attendance" });
+
+            // Download Excel file
+            XLSX.writeFile(workbook, "Intern_Attendance_Summary.xlsx");
+        });
+    </script>
 </body>
 
 </html>

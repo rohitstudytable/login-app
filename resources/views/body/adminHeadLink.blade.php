@@ -2,8 +2,11 @@
 <title>Admin Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<link rel="shortcut icon" href="{{ asset('images/dd.png') }}" type="image/x-icon">
+
 <!-- css -->
 <link rel="stylesheet" href="{{ asset('css/adminstyle.css') }}">
+
 
 <!-- bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
