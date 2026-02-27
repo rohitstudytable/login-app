@@ -19,12 +19,12 @@
             <span>Dashboard</span>
         </a>
 
-        <a href="{{ route('interns.index') }}" class="{{ request()->routeIs('interns.*') ? 'active' : '' }}">
+        <a href="{{ route('interns.index') }}" class="{{ request()->routeIs('interns.index') ? 'active' : '' }}">
             <ion-icon name="people-outline"></ion-icon>
             <span>Interns / Employee</span>
         </a>
 
-        <a href="{{ route('attendance.index') }}" class="{{ request()->routeIs('attendance.*') ? 'active' : '' }}">
+        <a href="{{ route('attendance.index') }}" class="{{ request()->routeIs('attendance.index') ? 'active' : '' }}">
             <ion-icon name="calendar-outline"></ion-icon>
             <span>Attendance</span>
         </a>
@@ -39,6 +39,13 @@
             <ion-icon name="bar-chart-outline"></ion-icon>
             <span>Report</span>
         </a>
+
+
+        {{-- <a href="{{ route('interns.holidays.page') }}">
+            <ion-icon name="gift-outline"></ion-icon>
+            <span>Intern Holidays</span>
+        </a>
+        --}}
 
     </div>
 </div>

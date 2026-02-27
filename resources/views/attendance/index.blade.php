@@ -116,8 +116,8 @@
             </tr>
 
             @php
-                // Enum values for the status dropdown
                 $statusOptions = [
+                    'unmark' => 'Unmark',   // ✅ ADD THIS FIRST
                     'present' => 'Present',
                     'half_day' => 'Half Day',
                     'below_half_day' => 'Below Half Day',
@@ -208,10 +208,10 @@
     </form>
 </div>
 
-        {{-- ===============================
+    {{-- ===============================
         HISTORY
-        ================================ --}}
-      <div class="card card-history">
+    =============================== --}}
+    <div class="card card-history">
         <div class="card-title">
             <div class="card-icon bg-amber">
                 <ion-icon name="time-outline"></ion-icon>
@@ -230,53 +230,34 @@
                 <th>Out Time</th>
             </tr>
 
-                    @forelse($allRecords as $i => $att)
-                        @php
-                            $status = 'absent'; // default
+            @forelse($allRecords as $i => $att)
+                <tr>
+                    <td>{{ $i + 1 }}</td>
+                    <td>{{ $att->intern->name }}</td>
+                    <td>{{ \Carbon\Carbon::parse($att->date)->format('Y-m-d') }}</td>
 
-                            if ($att->in_time && $att->out_time) {
-                                $workedMinutes = \Carbon\Carbon::parse($att->in_time)
-                                    ->diffInMinutes(\Carbon\Carbon::parse($att->out_time));
+                    {{-- STATUS FROM DB --}}
+                    <td>
+                        @if(!empty($att->status))
+                            <span class="badge {{ $att->status }}">
+                                {{ ucwords(str_replace('_', ' ', $att->status)) }}
+                            </span>
+                        @else
+                            
+                        @endif
+                    </td>
 
-                                if ($workedMinutes >= 540) {
-                                    $status = 'overtime';
-                                } elseif ($workedMinutes >= 465 && $workedMinutes < 540) {
-                                    $status = 'present';        // Regular Day Shift
-                                } elseif ($workedMinutes >= 420 && $workedMinutes < 465) {
-                                    $status = 'present_early_checkout'; // Early Checkout / Late Check-in
-                                } elseif ($workedMinutes >= 240 && $workedMinutes < 420) {
-                                    $status = 'half_day';
-                                } elseif ($workedMinutes >= 120 && $workedMinutes < 240) {
-                                    $status = 'below_half_day';
-                                } else {
-                                    $status = 'absent';
-                                }
-                            }
-                        @endphp
-
-                        <tr>
-                            <td>{{ $i + 1 }}</td>
-                            <td>{{ $att->intern->name }}</td>
-                            <td>{{ \Carbon\Carbon::parse($att->date)->format('Y-m-d') }}</td>
-                            <td>
-                                <span class="badge {{ $status }}">
-                                    {{ str_replace('_',' ', ucfirst($status)) }}
-                                </span>
-                            </td>
-                            <td>{{ $att->location ?? '-' }}</td>
-                            <td>{{ $att->in_time ? \Carbon\Carbon::parse($att->in_time)->format('H:i') : '-' }}</td>
-                            <td>{{ $att->out_time ? \Carbon\Carbon::parse($att->out_time)->format('H:i') : '-' }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7">No records found</td>
-                        </tr>
-                    @endforelse
-                </table>
-            </div>
-
-      </div>
-</div>
+                    <td>{{ $att->location ?? '-' }}</td>
+                    <td>{{ $att->in_time ? \Carbon\Carbon::parse($att->in_time)->format('H:i') : '-' }}</td>
+                    <td>{{ $att->out_time ? \Carbon\Carbon::parse($att->out_time)->format('H:i') : '-' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7">No records found</td>
+                </tr>
+            @endforelse
+        </table>
+    </div>
 
 </body>
 </html>

@@ -15,7 +15,7 @@
         <div class="topbar">
             <h2>Dashboard</h2>
             <div class="profile">
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
                     <button class="logout-btn">Logout</button>
                 </form>
