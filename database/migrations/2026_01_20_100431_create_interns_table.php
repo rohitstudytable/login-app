@@ -44,6 +44,9 @@ return new class extends Migration
             // Work profile
             $table->string('designation')->nullable();
 
+            // ✅ Leave / Holiday management
+            $table->integer('total_holidays')->default(10); // yearly leave balance
+
             // Profile image
             $table->string('img')->nullable(); // store image path
 

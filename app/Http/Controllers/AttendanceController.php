@@ -95,8 +95,7 @@ class AttendanceController extends Controller
         'interns.*.location' => 'nullable|string|max:255',
         'interns.*.in_time' => 'nullable|date_format:H:i',
         'interns.*.out_time' => 'nullable|date_format:H:i',
-        'interns.*.status' => 'nullable|in:present,half_day,below_half_day,overtime,absent,paid_leave,late_checkin_checkout',
-    ]);
+        'interns.*.status' => 'nullable|in:unmark,present,half_day,below_half_day,overtime,absent,paid_leave,late_checkin_checkout',    ]);
 
     $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
 
@@ -135,12 +134,11 @@ class AttendanceController extends Controller
                 if ($attendance->in_time && $attendance->out_time) {
                     $this->calculateWorkAndStatus($attendance);
                 } else {
-                    // If no time, mark absent safely
-                    $attendance->update([
-                        'status' => 'absent',
-                        'worked_minutes' => null,
-                    ]);
-                }
+                $attendance->update([
+                    'status' => 'unmark',
+                    'worked_minutes' => null,
+                ]);
+            }
             }
         }
     });
@@ -179,10 +177,17 @@ class AttendanceController extends Controller
         return view('attendance.show', [
             'intern' => $intern,
             'attendances' => $attendances,
+
             'totalDays' => $attendances->count(),
+
             'presentCount' => $attendances->where('status', 'present')->count(),
             'absentCount' => $attendances->where('status', 'absent')->count(),
             'halfDayCount' => $attendances->where('status', 'half_day')->count(),
+
+            'belowHalfDayCount' => $attendances->where('status', 'below_half_day')->count(),
+            'overtimeCount' => $attendances->where('status', 'overtime')->count(),
+            'lateCheckinCheckoutCount' => $attendances->where('status', 'late_checkin_checkout')->count(),
+
             'paidLeaveCount' => $attendances->where('status', 'paid_leave')->count(),
         ]);
     }
@@ -375,15 +380,17 @@ class AttendanceController extends Controller
     public function empDashboard()
     {
         $intern = Auth::guard('intern')->user();
-        $allAttendances = Attendance::where('intern_id', $intern->id)->get();
+
+        $attendances = Attendance::where('intern_id', $intern->id)->get();
 
         return view('attendance.empDashboard', [
             'intern' => $intern,
-            'totalDays' => $allAttendances->count(),
-            'presentCount' => $allAttendances->where('status', 'present')->count(),
-            'absentCount' => $allAttendances->where('status', 'absent')->count(),
-            'halfDayCount' => $allAttendances->where('status', 'half_day')->count(),
-            'paidLeaveCount' => $allAttendances->where('status', 'paid_leave')->count(),
+            'attendances' => $attendances, // ✅ REQUIRED FOR CARDS
+            'totalDays' => $attendances->count(),
+            'presentCount' => $attendances->where('status', 'present')->count(),
+            'absentCount' => $attendances->where('status', 'absent')->count(),
+            'halfDayCount' => $attendances->where('status', 'half_day')->count(),
+            'paidLeaveCount' => $attendances->where('status', 'paid_leave')->count(),
         ]);
     }
 

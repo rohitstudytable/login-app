@@ -39,6 +39,13 @@
             <ion-icon name="bar-chart-outline"></ion-icon>
             <span>Report</span>
         </a>
+     
+
+        {{-- <a href="{{ route('interns.holidays.page') }}">
+    <ion-icon name="gift-outline"></ion-icon>
+    <span>Intern Holidays</span>
+</a>
+        --}}
 
     </div>
 </div>
