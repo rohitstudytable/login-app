@@ -747,7 +747,7 @@ header {
 
     .myBodySection {
         margin-top: 84px;
-        padding: 0;
+        padding: 0 0 48px 0;
     }
 
     .myForm input,
