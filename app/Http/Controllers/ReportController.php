@@ -32,13 +32,18 @@ class ReportController extends Controller
 
         $attendances = $query->get();
 
-        // KPI counts
-        $totalDays    = $attendances->count();
-        $presentCount = $attendances->where('status', 'present')->count();
-        $absentCount  = $attendances->where('status', 'absent')->count();
-        $halfDayCount = $attendances->where('status', 'half_day')->count();
+        /* ================= KPI COUNTS ================= */
+        $totalDays = $attendances->count();
 
-        // Intern-wise summary
+        $presentCount = $attendances->where('status', 'present')->count();
+        $halfDayCount = $attendances->where('status', 'half_day')->count();
+        $belowHalfDayCount = $attendances->where('status', 'below_half_day')->count();
+        $overtimeCount = $attendances->where('status', 'overtime')->count();
+        $absentCount = $attendances->where('status', 'absent')->count();
+        $paidLeaveCount = $attendances->where('status', 'paid_leave')->count();
+        $lateCheckinCheckoutCount = $attendances->where('status', 'late_checkin_checkout')->count();
+
+        /* ================= INTERN SUMMARY ================= */
         $interns = Intern::orderBy('name')->get();
         $internSummaries = [];
 
@@ -46,18 +51,20 @@ class ReportController extends Controller
             $records = $attendances->where('intern_id', $intern->id);
 
             $internSummaries[] = [
-                'id'       => $intern->id,
-                'name'     => $intern->name,
-                'present'  => $records->where('status', 'present')->count(),
+                'id' => $intern->id,
+                'name' => $intern->name,
+                'present' => $records->where('status', 'present')->count(),
                 'half_day' => $records->where('status', 'half_day')->count(),
-                'absent'   => $records->where('status', 'absent')->count(),
-                'total'    => $records->count(),
+                'below_half_day' => $records->where('status', 'below_half_day')->count(),
+                'overtime' => $records->where('status', 'overtime')->count(),
+                'absent' => $records->where('status', 'absent')->count(),
+                'paid_leave' => $records->where('status', 'paid_leave')->count(),
+                'late_checkin_checkout' => $records->where('status', 'late_checkin_checkout')->count(),
+                'total' => $records->count(),
             ];
         }
 
-        /**
-         * BAR CHART DATA (LAST 7 DAYS)
-         */
+        /* ================= BAR CHART (LAST 7 DAYS) ================= */
         $last7Dates = [];
         $last7PresentCounts = [];
 
@@ -76,8 +83,12 @@ class ReportController extends Controller
             'attendances',
             'totalDays',
             'presentCount',
-            'absentCount',
             'halfDayCount',
+            'belowHalfDayCount',
+            'overtimeCount',
+            'absentCount',
+            'paidLeaveCount',
+            'lateCheckinCheckoutCount',
             'internSummaries',
             'last7Dates',
             'last7PresentCounts',
@@ -108,18 +119,26 @@ class ReportController extends Controller
 
         $attendances = $query->get();
 
-        $totalDays    = $attendances->count();
+        $totalDays = $attendances->count();
         $presentCount = $attendances->where('status', 'present')->count();
-        $absentCount  = $attendances->where('status', 'absent')->count();
         $halfDayCount = $attendances->where('status', 'half_day')->count();
+        $belowHalfDayCount = $attendances->where('status', 'below_half_day')->count();
+        $overtimeCount = $attendances->where('status', 'overtime')->count();
+        $absentCount = $attendances->where('status', 'absent')->count();
+        $paidLeaveCount = $attendances->where('status', 'paid_leave')->count();
+        $lateCheckinCheckoutCount = $attendances->where('status', 'late_checkin_checkout')->count();
 
         return view('report.single', compact(
             'intern',
             'attendances',
             'totalDays',
             'presentCount',
-            'absentCount',
             'halfDayCount',
+            'belowHalfDayCount',
+            'overtimeCount',
+            'absentCount',
+            'paidLeaveCount',
+            'lateCheckinCheckoutCount',
             'fromDate',
             'toDate'
         ));

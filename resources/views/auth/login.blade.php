@@ -1,183 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1d4ed8, #4f46e5);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont;
+            background: linear-gradient(135deg, #1e3a8a, #312e81);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .card {
-      width: 380px;
-      background: #fff;
-      border-radius: 22px;
-      padding: 30px;
-      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
-    }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(18px);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
 
-    .card h2 {
-      margin: 0;
-      font-size: 28px;
-      color: #111827;
-    }
+        .login-header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
 
-    .card p {
-      margin: 8px 0 20px;
-      color: #6b7280;
-    }
+        .login-header img {
+            width: 110px;
+            margin-bottom: 10px;
+        }
 
-    .input-group {
-      margin-bottom: 15px;
-    }
+        .login-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+        }
 
-    .input-group label {
-      display: block;
-      margin-bottom: 6px;
-      color: #374151;
-      font-size: 14px;
-    }
+        .login-header p {
+            margin-top: 6px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+        }
 
-    .input-group input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      font-size: 14px;
-      outline: none;
-      transition: 0.3s;
-    }
+        .input-group {
+            margin-bottom: 18px;
+        }
 
-    .input-group input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.9);
+        }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 14px 0 18px;
-    }
+        .input-group input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
 
-    .row a {
-      color: #2563eb;
-      text-decoration: none;
-      font-size: 13px;
-    }
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 14px;
-      background: #2563eb;
-      color: #fff;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+        .input-group input:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+        }
 
-    .btn:hover {
-      background: #1d4ed8;
-    }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 22px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+        }
 
-    .or {
-      text-align: center;
-      margin: 18px 0;
-      color: #9ca3af;
-    }
+        .row a {
+            color: #bfdbfe;
+            text-decoration: none;
+        }
 
-    /* Google button */
-    .google-btn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      cursor: pointer;
-      text-decoration: none;
-      color: #111827;
-      transition: 0.3s;
-    }
+        .row a:hover {
+            text-decoration: underline;
+        }
 
-    .google-btn:hover {
-      background: #f3f4f6;
-    }
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            background: #ffffff;
+            color: #1e3a8a;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-    .google-logo {
-      width: 22px;
-      height: 22px;
-    }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+        }
 
-    .footer {
-      text-align: center;
-      margin-top: 16px;
-      color: #6b7280;
-      font-size: 13px;
-    }
+        .divider {
+            text-align: center;
+            margin: 22px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
 
-    .footer a {
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .google-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .google-btn img {
+            width: 22px;
+            height: 22px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .footer a {
+            color: #bfdbfe;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Welcome Back</h2>
-  <p>Login to your account</p>
+<div class="login-card">
 
-  <form method="POST" action="{{ route('login') }}">
-    @csrf
-
-    <div class="input-group">
-      <label>Email</label>
-      <input type="email" name="email" required autofocus>
+    <div class="login-header">
+        <img src="{{ asset('images/dd.png') }}" alt="Admin Logo">
+        <h2>Admin Login</h2>
+        <p>Access the admin dashboard</p>
     </div>
 
-    <div class="input-group">
-      <label>Password</label>
-      <input type="password" name="password" required>
+    <form method="POST" action="{{ route('login') }}">
+        @csrf
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="admin@example.com" required autofocus>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <div class="row">
+            <label>
+                <input type="checkbox" name="remember">
+                Remember me
+            </label>
+
+            <a href="{{ route('password.request') }}">Forgot password?</a>
+        </div>
+
+        <button class="login-btn" type="submit">
+            Login to Dashboard
+        </button>
+    </form>
+
+    <div class="divider">OR</div>
+
+    <a href="{{ route('google.redirect') }}" class="google-btn">
+        <img src="{{ asset('images/google.jpg') }}" alt="Google">
+        <span>Continue with Google</span>
+    </a>
+
+    <div class="footer">
+        New admin?
+        <a href="{{ route('register') }}">Create account</a>
     </div>
 
-    <div class="row">
-      <label>
-        <input type="checkbox" name="remember">
-        Remember me
-      </label>
-
-      <a href="{{ route('password.request') }}">Forgot password?</a>
-    </div>
-
-    <button class="btn" type="submit">Login</button>
-  </form>
-
-  <div class="or">OR</div>
-
-  <!-- Google Button with center logo -->
-  <a href="{{ route('google.redirect') }}" class="google-btn">
-      <img src="{{ asset('images/google.jpg') }}" class="google-logo" alt="Google">
-      <span>Continue with Google</span>
-  </a>
-
-  <div class="footer">
-    Don't have an account?
-    <a href="{{ route('register') }}">Sign Up</a>
-  </div>
 </div>
 
 </body>

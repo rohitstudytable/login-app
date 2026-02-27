@@ -133,40 +133,17 @@
                 </a>
             </form>
 
-            <!-- TABLE -->
-            <table>
+            {{-- TABLE --}}
+                    <table>
                 <tr>
                     <th>#</th>
                     <th><ion-icon name="calendar-outline"></ion-icon> Date</th>
                     <th><ion-icon name="flag-outline"></ion-icon> Status</th>
                 </tr>
 
-             @forelse($attendances as $i => $attendance)
+                @forelse($attendances as $i => $attendance)
                     @php
-                        $workedMinutes = null;
-
-                        if ($attendance->in_time && $attendance->out_time) {
-                            $workedMinutes = \Carbon\Carbon::parse($attendance->in_time)
-                                ->diffInMinutes(\Carbon\Carbon::parse($attendance->out_time));
-                        }
-
-                        if ($workedMinutes !== null) {
-                            if ($workedMinutes >= 540) {
-                                $status = 'overtime';
-                            } elseif ($workedMinutes >= 465 && $workedMinutes < 540) {
-                                $status = 'present'; // Regular Day Shift
-                            } elseif ($workedMinutes >= 420 && $workedMinutes < 465) {
-                                $status = 'late_early'; // Early Checkout / Late Check-in
-                            } elseif ($workedMinutes >= 240 && $workedMinutes < 420) {
-                                $status = 'half_day';
-                            } elseif ($workedMinutes >= 120 && $workedMinutes < 240) {
-                                $status = 'below_half_day';
-                            } else {
-                                $status = 'absent';
-                            }
-                        } else {
-                            $status = 'absent';
-                        }
+                        $status = $attendance->status ?? 'absent';
                     @endphp
 
                     <tr>
@@ -174,7 +151,7 @@
                         <td>{{ \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') }}</td>
                         <td>
                             <span class="badge {{ $status }}">
-                                {{ ucfirst(str_replace('_',' ', $status)) }}
+                                {{ ucfirst(str_replace('_', ' ', $status)) }}
                             </span>
                         </td>
                     </tr>

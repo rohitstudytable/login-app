@@ -397,171 +397,120 @@
                             {{------------ TABLE CLOCK IN ----------}}
                                 </div>
                                 <div class="col-md-6">
-                                    @php
-                                    use Carbon\Carbon;
+                                @php
+                                use Carbon\Carbon;
 
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | REQUIRED VARIABLES (from controller)
-                                    |--------------------------------------------------------------------------
-                                    | $attendance  -> today's attendance record OR null
-                                    | $shift       -> shift details (start_time, end_time, break_minutes)
-                                    */
+                                /*
+                                |--------------------------------------------------------------------------
+                                | REQUIRED VARIABLES (from controller)
+                                |--------------------------------------------------------------------------
+                                | $attendance  -> today's attendance record OR null
+                                | $shift       -> shift details (start_time, end_time, break_minutes)
+                                */
 
-                                    /* ===== SAFETY FALLBACKS ===== */
-                                    $attendance = $attendance ?? null;
+                                /* ===== SAFETY FALLBACKS ===== */
+                                $attendance = $attendance ?? null;
 
-                                    $shift = $shift ?? (object)[
-                                        'start_time'    => '10:00',
-                                        'end_time'      => '18:00',
-                                        'break_minutes' => 45
-                                    ];
+                                $shift = $shift ?? (object)[
+                                    'start_time'    => '10:00',
+                                    'end_time'      => '18:00',
+                                    'break_minutes' => 45
+                                ];
 
-                                    /* ===== SHIFT STATUS ===== */
-                                    $isPresent = $attendance && $attendance->in_time;
+                                /* ===== START TIME ===== */
+                                $clockInTime = ($attendance && $attendance->in_time)
+                                    ? Carbon::parse($attendance->in_time)->format('h:i A')
+                                    : '— —';
 
-                                    /* ===== START TIME ===== */
-                                    $clockInTime = ($attendance && $attendance->in_time)
-                                        ? Carbon::parse($attendance->in_time)->format('h:i A')
-                                        : '— —';
+                                /* ===== END TIME ===== */
+                                $clockOutTime = ($attendance && $attendance->out_time)
+                                    ? Carbon::parse($attendance->out_time)->format('h:i A')
+                                    : '— —';
 
-                                    /* ===== END TIME ===== */
-                                    $clockOutTime = ($attendance && $attendance->out_time)
-                                        ? Carbon::parse($attendance->out_time)->format('h:i A')
-                                        : '— —';
+                                /* ===== EXPECTED HOURS ===== */
+                                $expectedHours = Carbon::parse($shift->start_time)
+                                    ->diffInHours(Carbon::parse($shift->end_time));
 
-                                    /* ===== EXPECTED HOURS ===== */
-                                    $expectedHours = Carbon::parse($shift->start_time)
-                                        ->diffInHours(Carbon::parse($shift->end_time));
+                                /* ===== WORKING HOURS (hrs + mins) ===== */
+                                $hours = 0;
+                                $minutes = 0;
 
-                                    /* ===== WORKING HOURS ===== */
-                                    if ($attendance && $attendance->in_time && $attendance->out_time) {
+                                if ($attendance && $attendance->in_time && $attendance->out_time) {
+                                    $workedMinutes = Carbon::parse($attendance->in_time)
+                                        ->diffInMinutes(Carbon::parse($attendance->out_time));
 
-                                        $workedMinutes = Carbon::parse($attendance->in_time)
-                                            ->diffInMinutes(Carbon::parse($attendance->out_time));
+                                    // subtract break safely
+                                    $workedMinutes = max(0, $workedMinutes - $shift->break_minutes);
 
-                                        // subtract break safely
-                                        $workedMinutes = max(0, $workedMinutes - $shift->break_minutes);
+                                    $hours   = floor($workedMinutes / 60);
+                                    $minutes = $workedMinutes % 60;
+                                }
+                                @endphp
 
-                                        $workingHours = round($workedMinutes / 60, 2) . ' hours';
+                                <div class="whiteBigCard">
+                                    <h4 class="mb-3">
+                                        <ion-icon name="calendar-outline"></ion-icon>
+                                        Today's Shift Schedule
+                                    </h4>
 
-                                    } else {
-                                        $workingHours = '— —';
-                                    }
-                                    @endphp
-
-
-                                    <div class="whiteBigCard">
-                                        <h4 class="mb-3">
-                                            <ion-icon name="calendar-outline"></ion-icon>
-                                            Today's Shift Schedule
-                                        </h4>
-
-                                        <div class="myCard2 myCard2Outline mb-3">
-                                            <p class="mb-2" style="color: #1E40AF">
-                                                Shift Type
-                                            </p>
-
-                                           <h5 class="mb-0 text-dark fw-semibold">
-
-                                                @php
-                                                    $totalMinutes = 0;
-                                                    $hours = 0;
-                                                    $minutes = 0;
-
-                                                    // Calculate working time safely from in/out time
-                                                    if(isset($attendance) && !empty($attendance->in_time) && !empty($attendance->out_time)) {
-
-                                                        $in = \Carbon\Carbon::parse($attendance->in_time);
-                                                        $out = \Carbon\Carbon::parse($attendance->out_time);
-
-                                                        $totalMinutes = $in->diffInMinutes($out);
-
-                                                        $hours = floor($totalMinutes / 60);
-                                                        $minutes = $totalMinutes % 60;
-                                                    }
-                                                @endphp
-
-
-                                                @if($isPresent)
-
-                                                    {{-- 7h 45m to 8h 15m --}}
-                                                    @if($totalMinutes >= 465 && $totalMinutes <= 495)
-                                                        Present (Regular Day Shift)
-
-                                                    {{-- 7 hrs to 7 hr 45m --}}
-                                                     @elseif($totalMinutes >= 420 && $totalMinutes <= 465)
-                                                        Present (Early Check in/ Check Out)
-
-                                                    {{-- 4h to <7h --}}
-                                                    @elseif($totalMinutes >= 240 && $totalMinutes < 420)
-                                                        Half Day
-
-                                                    {{-- Less than 4h --}}
-                                                    @elseif($totalMinutes < 240)
-                                                        Below Half Day
-
-                                                    {{-- More than 8h 15m --}}
-                                                    @elseif($totalMinutes > 495)
-                                                        Present (Overtime)
-
-                                                    @endif
-
-                                                    <br>
-                                                    {{-- <small class="text-muted">
-                                                        Worked: {{ $hours }} hrs {{ $minutes }} mins
-                                                    </small> --}}
-
-                                                @else
-                                                    Absent
-                                                @endif
-
-                                            </h5>
-                                        </div>
-
-                                        <div class="row mb-4">
-                                            <div class="col-md-6">
-                                                <div class="myCard2">
-                                                    <div class="card2Flex mb-2">
-                                                        <ion-icon name="arrow-forward-circle-outline" class="text-success"></ion-icon>
-                                                        <p class="mb-0">Start Time</p>
-                                                    </div>
-
-                                                    <h5 class="mb-0 text-dark fw-semibold">
-                                                        {{ $clockInTime }}
-                                                    </h5>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="myCard2">
-                                                    <div class="card2Flex mb-2">
-                                                        <ion-icon name="arrow-back-circle-outline" class="text-danger"></ion-icon>
-                                                        <p class="mb-0">End Time</p>
-                                                    </div>
-
-                                                    <h5 class="mb-0 text-dark fw-semibold">
-                                                        {{ $clockOutTime }}
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <p class="lineFlex">
-                                            <span>Expected Hours</span>
-                                            <span class="text-dark">{{ $expectedHours }} hours</span>
+                                    <div class="myCard2 myCard2Outline mb-3">
+                                        <p class="mb-2" style="color: #1E40AF">
+                                            Shift Type
                                         </p>
 
-                                        <p class="lineFlex">
-                                            <span>Break Time</span>
-                                            <span class="text-dark">{{ $shift->break_minutes }} minutes</span>
-                                        </p>
-
-                                        <p class="lineFlex">
-                                            <span>Working Hours</span>
-                                            <span class="text-dark">  {{ $hours }} hrs {{ $minutes }} mins</span>
-                                        </p>
+                                        {{-- STATUS FROM DB ONLY --}}
+                                        <h5 class="mb-0 text-dark fw-semibold">
+                                            @if(!empty($attendance?->out_time) && !empty($attendance?->status))
+                                                {{ ucwords(str_replace('_', ' ', $attendance->status)) }}
+                                            @endif
+                                        </h5>
                                     </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <div class="myCard2">
+                                                <div class="card2Flex mb-2">
+                                                    <ion-icon name="arrow-forward-circle-outline" class="text-success"></ion-icon>
+                                                    <p class="mb-0">Start Time</p>
+                                                </div>
+
+                                                <h5 class="mb-0 text-dark fw-semibold">
+                                                    {{ $clockInTime }}
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="myCard2">
+                                                <div class="card2Flex mb-2">
+                                                    <ion-icon name="arrow-back-circle-outline" class="text-danger"></ion-icon>
+                                                    <p class="mb-0">End Time</p>
+                                                </div>
+
+                                                <h5 class="mb-0 text-dark fw-semibold">
+                                                    {{ $clockOutTime }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p class="lineFlex">
+                                        <span>Expected Hours</span>
+                                        <span class="text-dark">{{ $expectedHours }} hours</span>
+                                    </p>
+
+                                    <p class="lineFlex">
+                                        <span>Break Time</span>
+                                        <span class="text-dark">{{ $shift->break_minutes }} minutes</span>
+                                    </p>
+
+                                    <p class="lineFlex">
+                                        <span>Working Hours</span>
+                                        <span class="text-dark">
+                                            {{ $attendance && $attendance->out_time ? "$hours hrs $minutes mins" : '— —' }}
+                                        </span>
+                                    </p>
+                                </div>
                             {{------------ END ----------------}}
 
 
@@ -570,131 +519,99 @@
 
                         <div class="row mb-4">
 
-                  {{-------------- ATTENDANCE HISTORY  ----------------------------}}
-                        <div class="col-md-12">
-                            <div class="whiteBigCard">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h4 class="mb-0">
-                                        <ion-icon name="time-outline"></ion-icon> Recent Clock History
-                                    </h4>
-                                    <p class="mb-0 sm">Last 7 days</p>
+                {{-------------- ATTENDANCE HISTORY  ----------------------------}}
+                    <div class="col-md-12">
+                        <div class="whiteBigCard">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h4 class="mb-0">
+                                    <ion-icon name="time-outline"></ion-icon> Recent Clock History
+                                </h4>
+                                <p class="mb-0 sm">Last 7 days</p>
+                            </div>
+
+                            @forelse($recentAttendances as $record)
+                                @php
+                                    // CLOCK IN
+                                    $clockIn = $record->in_time
+                                        ? \Carbon\Carbon::parse($record->in_time)->format('h:i a')
+                                        : '-- --';
+
+                                    // CLOCK OUT
+                                    $clockOut = $record->out_time
+                                        ? \Carbon\Carbon::parse($record->out_time)->format('h:i a')
+                                        : '-- --';
+
+                                    // DATE
+                                    $date = $record->date
+                                        ? \Carbon\Carbon::parse($record->date)->format('d M Y')
+                                        : \Carbon\Carbon::parse($record->created_at)->format('d M Y');
+
+                                    // DURATION
+                                    $duration = '-- --';
+                                    if ($record->in_time && $record->out_time) {
+                                        $minutes = \Carbon\Carbon::parse($record->in_time)
+                                            ->diffInMinutes(\Carbon\Carbon::parse($record->out_time));
+
+                                        $h = floor($minutes / 60);
+                                        $m = $minutes % 60;
+
+                                        $duration = $h . 'h ' . $m . ' m';
+                                    }
+
+                                    // STATUS FROM DB
+                                    $statusText  = '';
+                                    $statusClass = '';
+
+                                    if (!empty($record->status) && $record->out_time) {
+                                        $statusText = ucwords(str_replace('_', ' ', $record->status));
+
+                                        // optional color mapping (NO DESIGN CHANGE)
+                                        $statusClass = match ($record->status) {
+                                            'present'                => 'text-success',
+                                            'late_checkin_checkout'  => 'text-warning',
+                                            'half_day'               => 'text-warning',
+                                            'below_half_day'         => 'text-danger',
+                                            'overtime'               => 'text-primary',
+                                            'absent'                 => 'text-danger',
+                                            default                  => 'text-muted',
+                                        };
+                                    }
+                                @endphp
+
+                                <div class="myCard2 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <p class="mb-0">{{ $date }}</p>
+                                        <p class="{{ $statusClass }} mb-0">
+                                            {{ $statusText }}
+                                        </p>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <p class="mb-1 sm">Clock In</p>
+                                            <p class="mb-0 text-dark">{{ $clockIn }}</p>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <p class="mb-1 sm">Clock Out</p>
+                                            <p class="mb-0 text-dark">{{ $clockOut }}</p>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <p class="mb-1 sm">Duration</p>
+                                            <p class="mb-0 text-dark">{{ $duration }}</p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                @forelse($recentAttendances as $record)
-                                    @php
-                                        // CLOCK IN
-                                        $clockIn = $record->in_time
-                                            ? \Carbon\Carbon::parse($record->in_time)->format('h:i a')
-                                            : '-- --';
-
-                                        // CLOCK OUT
-                                        $clockOut = $record->out_time
-                                            ? \Carbon\Carbon::parse($record->out_time)->format('h:i a')
-                                            : '-- --';
-
-                                        // DATE
-                                        $date = $record->date
-                                            ? \Carbon\Carbon::parse($record->date)->format('d M Y')
-                                            : \Carbon\Carbon::parse($record->created_at)->format('d M Y');
-
-                                        // ===============================
-                                        // WORKING TIME + STATUS LOGIC
-                                        // ===============================
-                                        $totalMinutes = 0;
-                                        $hours = 0;
-                                        $mins = 0;
-                                        $duration = '-- --';
-
-                                        $statusText = 'Absent';
-                                        $statusClass = 'text-danger';
-
-                                        if ($record->in_time && $record->out_time) {
-
-                                            $in = \Carbon\Carbon::parse($record->in_time);
-                                            $out = \Carbon\Carbon::parse($record->out_time);
-
-                                            $totalMinutes = $in->diffInMinutes($out);
-
-                                            $hours = floor($totalMinutes / 60);
-                                            $mins = $totalMinutes % 60;
-
-                                            $duration = $hours . 'h ' . $mins . ' m';
-
-                                            // ===== STATUS RULES =====
-
-                                            // 7h 45m to 8h 15m
-                                            if ($totalMinutes >= 465 && $totalMinutes <= 495) {
-                                                $statusText = 'Present(Regular Shift)';
-                                                $statusClass = 'text-success';
-                                            }
-
-                                            // 7 hr to 7 hr 45 m
-                                             elseif ($totalMinutes >=420  && $totalMinutes <=465) {
-                                                $statusText = 'Present(Early Checkin / Early Checkout)';
-                                                $statusClass = 'text-warning';
-                                            }
-
-                                            // 4h to 7h
-                                            elseif ($totalMinutes >= 240 && $totalMinutes < 420) {
-                                                $statusText = 'Half Day';
-                                                $statusClass = 'text-warning';
-                                            }
-
-                                            // Less than 4h
-                                            elseif ($totalMinutes < 240) {
-                                                $statusText = 'Below Half Day';
-                                                $statusClass = 'text-danger';
-                                            }
-
-                                            // More than 8h 15m
-                                            elseif ($totalMinutes > 495) {
-                                                $statusText = 'Overtime';
-                                                $statusClass = 'text-primary';
-                                            }
-
-                                            // Remaining cases (7h to 7h45m)
-                                            else {
-                                                $statusText = 'Present';
-                                                $statusClass = 'text-success';
-                                            }
-                                        }
-                                    @endphp
-
-                                    <div class="myCard2 mb-3">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <p class="mb-0">{{ $date }}</p>
-                                            <p class="{{ $statusClass }} mb-0">
-                                                {{ $statusText }}
-                                            </p>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <p class="mb-1 sm">Clock In</p>
-                                                <p class="mb-0 text-dark">{{ $clockIn }}</p>
-                                            </div>
-
-                                            <div class="col-4">
-                                                <p class="mb-1 sm">Clock Out</p>
-                                                <p class="mb-0 text-dark">{{ $clockOut }}</p>
-                                            </div>
-
-                                            <div class="col-4">
-                                                <p class="mb-1 sm">Duration</p>
-                                                <p class="mb-0 text-dark">{{ $duration }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                @empty
-                                    <div class="text-center py-4">
-                                        <p class="mb-0 text-muted">No attendance records found</p>
-                                    </div>
-                                @endforelse
-
-                            </div>
+                            @empty
+                                <div class="text-center py-4">
+                                    <p class="mb-0 text-muted">No attendance records found</p>
+                                </div>
+                            @endforelse
                         </div>
-                  {{--------------- END  -----------------------------}}
+                    </div>
+                {{--------------- END  -----------------------------}}
                         </div>
                     </div>
 

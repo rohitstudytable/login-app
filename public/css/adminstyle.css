@@ -1072,6 +1072,11 @@ a.myBtnDanger {
     text-transform: capitalize;
 }
 
+.badge.below_half_day {
+    background: black;
+    color: #f5f5f5;
+}
+
 .badge.present {
     background: rgba(34, 197, 94, 0.15);
     color: #16a34a;
@@ -1101,7 +1106,7 @@ a.myBtnDanger {
     color: #ffffff;
 }
 
-.badge.present_early_checkout {
+.badge.late_checkin_checkout {
     background: #d213c5;
     color: #ffffff;
 }
@@ -1442,6 +1447,26 @@ a.myBtnDanger {
 .kpi-purple .kpi-icon {
     background: rgba(124, 58, 237, 0.12);
     color: #7c3aed;
+}
+
+.kpi-teal .kpi-icon {
+    background: rgb(119, 234, 223);
+    color: black;
+}
+
+.kpi-orange .kpi-icon {
+    background: orange;
+    color: black;
+}
+
+.kpi-dark .kpi-icon {
+    background: yellow;
+    color: black;
+}
+
+.kpi-gray .kpi-icon {
+    background: rgb(191, 191, 182);
+    color: black;
 }
 
 /* -------- Dashboard Grid (Charts) -------- */

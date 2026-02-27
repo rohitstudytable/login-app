@@ -65,256 +65,220 @@
                             </div>
                         </div>
 
-                        {{-- ================= ATTENDANCE CARDS ================= --}}
-                       <div class="row mb-3">
-    {{-- PRESENT --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard present">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Present Days</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $presentCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
+                {{-- ================= ATTENDANCE CARDS ================= --}}
+                    @php
+                        $records = $attendances ?? collect();
 
-    {{-- HALF DAY --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard half_day">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Half Days</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $halfDayCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="hourglass" class="text-warning"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
+                        $presentCount = $records->where('status', 'present')->count();
+                        $halfDayCount = $records->where('status', 'half_day')->count();
+                        $belowHalfDayCount = $records->where('status', 'below_half_day')->count();
+                        $overtimeCount = $records->where('status', 'overtime')->count();
+                        $absentCount = $records->where('status', 'absent')->count();
+                        $paidLeaveCount = $records->where('status', 'paid_leave')->count();
+                        $lateCheckinCheckoutCount = $records->where('status', 'late_checkin_checkout')->count();
+                    @endphp
 
-    {{-- BELOW HALF DAY --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard below_half_day">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Below Half Day</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $belowHalfDayCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="alert-circle-outline" class="text-orange"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <div class="row mb-3">
 
-    {{-- OVERTIME --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard overtime">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Overtime</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $overtimeCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="rocket-outline" class="text-purple"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ABSENT --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard absent">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Absent</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $absentCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="close-circle" class="text-danger"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- PAID LEAVE --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard paid_leave">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Paid Leave</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $paidLeaveCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="gift-outline" class="text-info"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- LATE CHECK-IN / CHECK-OUT --}}
-    <div class="col-md-3 mb-3">
-        <div class="myCard late_checkin_checkout">
-            <div class="perentCardFlex align-items-center">
-                <div>
-                    <p class="mb-2">Late Check-in/Out</p>
-                    <h2 class="text-black mb-0 fw-bold">{{ $lateCheckinCheckoutCount ?? 0 }}</h2>
-                </div>
-                <div class="cardIcon">
-                    <ion-icon name="time-outline" class="text-secondary"></ion-icon>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-                        {{-- ================= ATTENDANCE TABLE ================= --}}
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <div class="whiteBigCard">
-
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h4 class="mb-0">
-                                            <ion-icon name="list-outline"></ion-icon> Attendance Records
-                                        </h4>
-
-                                        <div class="d-flex gap-2">                          
-
-                                            <button class="myBtn myBtnPrimary mx-2">
-                                                <ion-icon name="download-outline"></ion-icon> Export
-                                            </button>
-
-                                            <button class="myBtn">
-                                                <ion-icon name="print-outline"></ion-icon> Print
-                                            </button>
-                                        </div>
+                        {{-- PRESENT --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard present">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Present Days</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $presentCount }}</h2>
                                     </div>
-
-                                    <div class="mytableCon">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Clock In</th>
-                                                    <th>Clock Out</th>
-                                                    <th>Duration</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                @php
-                                                    $attendanceData = $attendances ?? collect();
-                                                @endphp
-
-                                                @forelse($attendanceData as $att)
-                                                   @php
-                                                        $in = $att->in_time ? \Carbon\Carbon::parse($att->in_time) : null;
-                                                        $out = $att->out_time ? \Carbon\Carbon::parse($att->out_time) : null;
-
-                                                        if($in && $out){
-                                                            $totalMinutes = $in->diffInMinutes($out);
-                                                            $hours = intdiv($totalMinutes, 60);
-                                                            $minutes = $totalMinutes % 60;
-
-                                                            $duration = '';
-                                                            if($hours > 0){
-                                                                $duration .= $hours . ' hr' . ($hours > 1 ? 's' : '');
-                                                            }
-                                                            if($minutes > 0){
-                                                                $duration .= ($hours > 0 ? ' ' : '') . $minutes . ' min';
-                                                            }
-                                                            if($duration === ''){
-                                                                $duration = '0 min';
-                                                            }
-                                                        } else {
-                                                            $duration = '-';
-                                                        }
-                                                    @endphp
-
-                                                    <tr>
-                                                        <td>{{ \Carbon\Carbon::parse($att->date)->format('d/m/Y') }}</td>
-                                                        <td>{{ $in ? $in->format('h:i A') : '-' }}</td>
-                                                        <td>{{ $out ? $out->format('h:i A') : '-' }}</td>
-                                                        <td>{{ $duration }}</td>
-                                                        <td>
-                                                            @php
-                                                                $in = $att->in_time ? \Carbon\Carbon::parse($att->in_time) : null;
-                                                                $out = $att->out_time ? \Carbon\Carbon::parse($att->out_time) : null;
-
-                                                                $totalMinutes = 0;
-                                                                $statusText = 'Absent';
-                                                                $badgeClass = 'bg-danger';
-
-                                                                if($in && $out){
-
-                                                                    $totalMinutes = $in->diffInMinutes($out);
-
-                                                                    // 7h45m to 8h15m
-                                                                    if ($totalMinutes >= 465 && $totalMinutes <= 495) {
-                                                                        $statusText = 'Present';
-                                                                        $badgeClass = 'bg-success';
-                                                                    }
-
-                                                                   // 7 hr to 7 hr 45 m
-                                                                    elseif ($totalMinutes >=420  && $totalMinutes <=465) {
-                                                                        $statusText = 'Present(Early Checkin / Early Checkout)';
-                                                                        $statusClass = 'text-warning';
-                                            }
-
-                                                                    // 4h to <7h
-                                                                    elseif ($totalMinutes >= 240 && $totalMinutes < 420) {
-                                                                        $statusText = 'Half Day';
-                                                                        $badgeClass = 'bg-warning text-dark';
-                                                                    }
-
-                                                                    // Less than 4h
-                                                                    elseif ($totalMinutes < 240) {
-                                                                        $statusText = 'Below Half Day';
-                                                                        $badgeClass = 'bg-danger';
-                                                                    }
-
-                                                                    // More than 8h15m
-                                                                    elseif ($totalMinutes > 495) {
-                                                                        $statusText = 'Overtime';
-                                                                        $badgeClass = 'bg-primary';
-                                                                    }
-
-                                                                    // Remaining (7h to 7h45m)
-                                                                    else {
-                                                                        $statusText = 'Present';
-                                                                        $badgeClass = 'bg-success';
-                                                                    }
-                                                                }
-                                                            @endphp
-
-                                                            <span class="badge {{ $badgeClass }}">
-                                                                {{ $statusText }}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="5" class="text-center py-4">
-                                                            No attendance records found
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
-
-                                            </tbody>
-                                        </table>
+                                    <div class="cardIcon">
+                                        <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
 
+                        {{-- HALF DAY --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard half_day">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Half Days</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $halfDayCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="hourglass" class="text-warning"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- BELOW HALF DAY --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard below_half_day">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Below Half Day</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $belowHalfDayCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="alert-circle-outline" class="text-orange"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- OVERTIME --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard overtime">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Overtime</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $overtimeCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="rocket-outline" class="text-purple"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- ABSENT --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard absent">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Absent</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $absentCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="close-circle" class="text-danger"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- PAID LEAVE --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard paid_leave">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Paid Leave</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $paidLeaveCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="gift-outline" class="text-info"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- LATE CHECK-IN / CHECK-OUT --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard late_checkin_checkout">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Late Check-in/Out</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $lateCheckinCheckoutCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="time-outline" class="text-secondary"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                {{-- END --}}
+
+                {{-- ================= ATTENDANCE TABLE ================= --}}
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="whiteBigCard">
+
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h4 class="mb-0">
+                                        <ion-icon name="list-outline"></ion-icon> Attendance Records
+                                    </h4>
+
+                                    <div class="d-flex gap-2">
+                                        <button class="myBtn myBtnPrimary mx-2">
+                                            <ion-icon name="download-outline"></ion-icon> Export
+                                        </button>
+
+                                        <button class="myBtn">
+                                            <ion-icon name="print-outline"></ion-icon> Print
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mytableCon">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Clock In</th>
+                                                <th>Clock Out</th>
+                                                <th>Duration</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @forelse($attendances ?? [] as $att)
+                                                @php
+                                                    // CLOCK TIMES
+                                                    $in  = $att->in_time ? \Carbon\Carbon::parse($att->in_time) : null;
+                                                    $out = $att->out_time ? \Carbon\Carbon::parse($att->out_time) : null;
+
+                                                    // DURATION
+                                                    $duration = '-';
+                                                    if ($in && $out) {
+                                                        $totalMinutes = $in->diffInMinutes($out);
+                                                        $hours   = intdiv($totalMinutes, 60);
+                                                        $minutes = $totalMinutes % 60;
+
+                                                        $duration = ($hours ? $hours . ' hr ' : '') . $minutes . ' min';
+                                                    }
+
+                                                    // STATUS FROM DATABASE
+                                                    $statusKey  = $att->status ?? 'absent';
+                                                    $statusText = ucfirst(str_replace('_', ' ', $statusKey));
+
+                                                    $badgeClass = match ($statusKey) {
+                                                        'present'           => 'bg-success',
+                                                        'present_early_checkout' => 'bg-warning text-dark',
+                                                        'half_day'          => 'bg-warning text-dark',
+                                                        'below_half_day'    => 'bg-danger',
+                                                        'overtime'          => 'bg-primary',
+                                                        default             => 'bg-danger',
+                                                    };
+                                                @endphp
+
+                                                <tr>
+                                                    <td>{{ \Carbon\Carbon::parse($att->date)->format('d/m/Y') }}</td>
+                                                    <td>{{ $in ? $in->format('h:i A') : '-' }}</td>
+                                                    <td>{{ $out ? $out->format('h:i A') : '-' }}</td>
+                                                    <td>{{ $duration }}</td>
+                                                    <td>
+                                                        <span class="badge {{ $badgeClass }}">
+                                                            {{ $statusText }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center py-4">
+                                                        No attendance records found
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {{-- ================= END ================= --}}
                     </div>
                 </div>
 

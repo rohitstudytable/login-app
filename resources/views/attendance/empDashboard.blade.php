@@ -68,128 +68,128 @@
                     {{-- STATS CARDS --}}
                     <div class="conWrepper">
                         <div class="myConSm">
-                            <div class="row mb-4">
-                                {{-- TOTAL DAYS --}}
-                                <div class="col-md-2">
-                                    <div class="myCard total">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Total Days</p>
-                                                <h2 class="fw-bold mb-0">{{ $totalDays ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="calendar-outline" class="text-primary"></ion-icon>
-                                            </div>
-                                        </div>
+                                {{-- ================= ATTENDANCE CARDS ================= --}}
+                    @php
+                        $records = $attendances ?? collect();
+
+                        $presentCount = $records->where('status', 'present')->count();
+                        $halfDayCount = $records->where('status', 'half_day')->count();
+                        $belowHalfDayCount = $records->where('status', 'below_half_day')->count();
+                        $overtimeCount = $records->where('status', 'overtime')->count();
+                        $absentCount = $records->where('status', 'absent')->count();
+                        $paidLeaveCount = $records->where('status', 'paid_leave')->count();
+                        $lateCheckinCheckoutCount = $records->where('status', 'late_checkin_checkout')->count();
+                    @endphp
+
+                    <div class="row mb-3">
+
+                        {{-- PRESENT --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard present">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Present Days</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $presentCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
                                     </div>
                                 </div>
-
-                                {{-- PRESENT --}}
-                                <div class="col-md-2">
-                                    <div class="myCard present">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Present</p>
-                                                <h2 class="fw-bold mb-0">{{ $presentCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="checkmark-circle" class="text-success"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- HALF DAY --}}
-                                <div class="col-md-2">
-                                    <div class="myCard half_day">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Half Day</p>
-                                                <h2 class="fw-bold mb-0">{{ $halfDayCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="hourglass" class="text-warning"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- BELOW HALF DAY --}}
-                                <div class="col-md-2">
-                                    <div class="myCard below_half_day">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Below Half Day</p>
-                                                <h2 class="fw-bold mb-0">{{ $belowHalfDayCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="alert-circle-outline" class="text-orange"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- OVERTIME --}}
-                                <div class="col-md-2">
-                                    <div class="myCard overtime">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Overtime</p>
-                                                <h2 class="fw-bold mb-0">{{ $overtimeCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="rocket-outline" class="text-purple"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- ABSENT --}}
-                                <div class="col-md-2 mt-3">
-                                    <div class="myCard absent">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Absent</p>
-                                                <h2 class="fw-bold mb-0">{{ $absentCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="close-circle" class="text-danger"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- PAID LEAVE --}}
-                                <div class="col-md-2 mt-3">
-                                    <div class="myCard paid_leave">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Paid Leave</p>
-                                                <h2 class="fw-bold mb-0">{{ $paidLeaveCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="gift-outline" class="text-info"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- LATE CHECK-IN / CHECK-OUT --}}
-                                <div class="col-md-2 mt-3">
-                                    <div class="myCard late_checkin_checkout">
-                                        <div class="perentCardFlex align-items-center">
-                                            <div>
-                                                <p class="mb-2">Late Check-in/Out</p>
-                                                <h2 class="fw-bold mb-0">{{ $lateCheckinCheckoutCount ?? 0 }}</h2>
-                                            </div>
-                                            <div class="cardIcon">
-                                                <ion-icon name="time-outline" class="text-secondary"></ion-icon>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
+                        </div>
+
+                        {{-- HALF DAY --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard half_day">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Half Days</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $halfDayCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="hourglass" class="text-warning"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- BELOW HALF DAY --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard below_half_day">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Below Half Day</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $belowHalfDayCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="alert-circle-outline" class="text-orange"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- OVERTIME --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard overtime">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Overtime</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $overtimeCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="rocket-outline" class="text-purple"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- ABSENT --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard absent">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Absent</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $absentCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="close-circle" class="text-danger"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- PAID LEAVE --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard paid_leave">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Paid Leave</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $paidLeaveCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="gift-outline" class="text-info"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- LATE CHECK-IN / CHECK-OUT --}}
+                        <div class="col-md-3 mb-3">
+                            <div class="myCard late_checkin_checkout">
+                                <div class="perentCardFlex align-items-center">
+                                    <div>
+                                        <p class="mb-2">Late Check-in/Out</p>
+                                        <h2 class="text-black mb-0 fw-bold">{{ $lateCheckinCheckoutCount }}</h2>
+                                    </div>
+                                    <div class="cardIcon">
+                                        <ion-icon name="time-outline" class="text-secondary"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                {{-- END --}}
 
                             <div class="row">
                                 <div class="col-md-8">

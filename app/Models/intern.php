@@ -47,6 +47,9 @@ class Intern extends Authenticatable
         // Work profile
         'designation',
 
+        // ✅ Leave / Holiday
+        'total_holidays',
+
         // Profile image
         'img',
     ];
@@ -69,6 +72,7 @@ class Intern extends Authenticatable
      */
     protected $casts = [
         'dob' => 'date',
+        'total_holidays' => 'integer',
     ];
 
     /**
@@ -78,6 +82,7 @@ class Intern extends Authenticatable
      */
     protected $attributes = [
         'role' => 'intern',
+        'total_holidays' => 10, // default leave balance
     ];
 
     /**
@@ -86,6 +91,7 @@ class Intern extends Authenticatable
     protected static function booted()
     {
         static::creating(function ($intern) {
+
             // Auto-generate random_id
             if (empty($intern->random_id)) {
                 $intern->random_id = Str::random(10);
@@ -94,6 +100,11 @@ class Intern extends Authenticatable
             // Default role
             if (empty($intern->role)) {
                 $intern->role = 'intern';
+            }
+
+            // Default holidays (extra safety)
+            if ($intern->total_holidays === null) {
+                $intern->total_holidays = 10;
             }
         });
     }
