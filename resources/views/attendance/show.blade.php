@@ -139,31 +139,47 @@
                     </a>
                 </form>
 
-                {{-- TABLE --}}
+               {{-- TABLE --}}
                 <table class="excelTable">
                     <tr>
                         <th>#</th>
                         <th><ion-icon name="calendar-outline"></ion-icon> Date</th>
                         <th><ion-icon name="flag-outline"></ion-icon> Status</th>
+                        <th><ion-icon name="time-outline"></ion-icon> Duration</th>
                     </tr>
 
                     @forelse($attendances as $i => $attendance)
                         @php
                             $status = $attendance->status ?? 'absent';
+
+                            $duration = '— —';
+
+                            if($attendance->in_time && $attendance->out_time){
+                                $in = \Carbon\Carbon::parse($attendance->in_time);
+                                $out = \Carbon\Carbon::parse($attendance->out_time);
+
+                                $diff = $in->diff($out);
+
+                                $duration = $diff->h . ' hrs ' . $diff->i . ' mins';
+                            }
                         @endphp
 
                         <tr>
                             <td>{{ $i + 1 }}</td>
+
                             <td>{{ \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') }}</td>
+
                             <td>
                                 <span class="badge {{ $status }}">
                                     {{ ucfirst(str_replace('_', ' ', $status)) }}
                                 </span>
                             </td>
+
+                            <td>{{ $duration }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="empty-state">
+                            <td colspan="4" class="empty-state">
                                 <ion-icon name="file-tray-outline"></ion-icon>
                                 <p>No attendance records found</p>
                             </td>

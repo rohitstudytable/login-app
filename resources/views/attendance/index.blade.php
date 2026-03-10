@@ -93,120 +93,120 @@
       {{-- ===============================
         MARK ATTENDANCE
         ================================ --}}
-        <div class="card card-mark">
-    <div class="card-title">
-        <div class="card-icon bg-green">
-            <ion-icon name="checkmark-done-outline"></ion-icon>
+    <div class="card card-mark">
+        <div class="card-title">
+            <div class="card-icon bg-green">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+            </div>
+            <h3>Mark Attendance for {{ $markDate }}</h3>
         </div>
-        <h3>Mark Attendance for {{ $markDate }}</h3>
-    </div>
 
-    <form method="POST" action="{{ route('attendance.store') }}">
-        @csrf
-        <input type="hidden" name="date" value="{{ $markDate }}">
+        <form method="POST" action="{{ route('attendance.store') }}">
+            @csrf
+            <input type="hidden" name="date" value="{{ $markDate }}">
 
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Location</th>
-                <th>In Time</th>
-                <th>Out Time</th>
-            </tr>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>In Time</th>
+                    <th>Out Time</th>
+                </tr>
 
-            @php
-                $statusOptions = [
-                    'unmark' => 'Unmark',   // ✅ ADD THIS FIRST
-                    'present' => 'Present',
-                    'half_day' => 'Half Day',
-                    'below_half_day' => 'Below Half Day',
-                    'overtime' => 'Overtime',
-                    'absent' => 'Absent',
-                    'paid_leave' => 'Paid Leave',
-                    'late_checkin_checkout' => 'Late Check-in/Checkout',
-                ];
-            @endphp
-
-            @foreach($interns as $intern)
                 @php
-                    $saved = $recordsForDate->firstWhere('intern_id', $intern->id);
-
-                    $workedMinutes = null;
-                    if ($saved?->in_time && $saved?->out_time) {
-                        $workedMinutes = \Carbon\Carbon::parse($saved->in_time)
-                            ->diffInMinutes(\Carbon\Carbon::parse($saved->out_time));
-                    }
-
-                    if ($workedMinutes !== null) {
-                        if ($workedMinutes >= 540) {
-                            $finalStatus = 'overtime';
-                        } elseif ($workedMinutes >= 465) {
-                            $finalStatus = 'present';
-                        } elseif ($workedMinutes >= 420 && $workedMinutes < 465) {
-                             $finalStatus = 'late_checkin_checkout';
-                        } elseif ($workedMinutes >= 240) {
-                            $finalStatus = 'half_day';
-                        } else {
-                            $finalStatus = 'absent';
-                        }
-                    } else {
-                        $finalStatus = $saved->status ?? 'absent';
-                    }
+                    $statusOptions = [
+                        'unmark' => 'Unmark',   // ✅ ADD THIS FIRST
+                        'present' => 'Present',
+                        'half_day' => 'Half Day',
+                        'below_half_day' => 'Below Half Day',
+                        'overtime' => 'Overtime',
+                        'absent' => 'Absent',
+                        'paid_leave' => 'Paid Leave',
+                        'late_checkin_checkout' => 'Late Check-in/Checkout',
+                    ];
                 @endphp
 
-                <tr>
-                    <td>{{ $intern->name }}</td>
-                    <td>{{ $markDate }}</td>
+                @foreach($interns as $intern)
+                    @php
+                        $saved = $recordsForDate->firstWhere('intern_id', $intern->id);
 
-                    {{-- STATUS SELECT --}}
-                    <td>
-                        <select name="interns[{{ $intern->id }}][status]" 
-                                {{ $isBlocked ? 'disabled' : '' }}>
-                            @foreach($statusOptions as $value => $label)
-                                <option value="{{ $value }}"
-                                    {{ ($saved->status ?? $finalStatus) === $value ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </td>
+                        $workedMinutes = null;
+                        if ($saved?->in_time && $saved?->out_time) {
+                            $workedMinutes = \Carbon\Carbon::parse($saved->in_time)
+                                ->diffInMinutes(\Carbon\Carbon::parse($saved->out_time));
+                        }
 
-                    {{-- LOCATION --}}
-                    <td>
-                        <input type="text"
-                            name="interns[{{ $intern->id }}][location]"
-                            value="{{ old('interns.'.$intern->id.'.location', $saved->location ?? 'Office') }}"
-                            {{ $isBlocked ? 'readonly' : '' }}>
-                    </td>
+                        if ($workedMinutes !== null) {
+                            if ($workedMinutes >= 540) {
+                                $finalStatus = 'overtime';
+                            } elseif ($workedMinutes >= 465) {
+                                $finalStatus = 'present';
+                            } elseif ($workedMinutes >= 420 && $workedMinutes < 465) {
+                                $finalStatus = 'late_checkin_checkout';
+                            } elseif ($workedMinutes >= 240) {
+                                $finalStatus = 'half_day';
+                            } else {
+                                $finalStatus = 'absent';
+                            }
+                        } else {
+                            $finalStatus = $saved->status ?? 'absent';
+                        }
+                    @endphp
 
-                    {{-- IN TIME --}}
-                    <td>
-                        <input type="time"
-                            name="interns[{{ $intern->id }}][in_time]"
-                            value="{{ $saved?->in_time ? \Carbon\Carbon::parse($saved->in_time)->format('H:i') : '' }}"
-                            {{ $isBlocked ? 'readonly' : '' }}>
-                    </td>
+                    <tr>
+                        <td>{{ $intern->name }}</td>
+                        <td>{{ $markDate }}</td>
 
-                    {{-- OUT TIME --}}
-                    <td>
-                        <input type="time"
-                            name="interns[{{ $intern->id }}][out_time]"
-                            value="{{ $saved?->out_time ? \Carbon\Carbon::parse($saved->out_time)->format('H:i') : '' }}"
-                            {{ $isBlocked ? 'readonly' : '' }}>
-                    </td>
-                </tr>
-            @endforeach
-        </table>
+                        {{-- STATUS SELECT --}}
+                        <td>
+                            <select name="interns[{{ $intern->id }}][status]" 
+                                    {{ $isBlocked ? 'disabled' : '' }}>
+                                @foreach($statusOptions as $value => $label)
+                                    <option value="{{ $value }}"
+                                        {{ ($saved->status ?? $finalStatus) === $value ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
 
-        @if(!$isBlocked)
-            <button class="btn btn-primary save-attendance-btn">
-                <ion-icon name="save-outline"></ion-icon>
-                Save Attendance
-            </button>
-        @endif
-    </form>
-</div>
+                        {{-- LOCATION --}}
+                        <td>
+                            <input type="text"
+                                name="interns[{{ $intern->id }}][location]"
+                                value="{{ old('interns.'.$intern->id.'.location', $saved->location ?? 'Office') }}"
+                                {{ $isBlocked ? 'readonly' : '' }}>
+                        </td>
+
+                        {{-- IN TIME --}}
+                        <td>
+                            <input type="time"
+                                name="interns[{{ $intern->id }}][in_time]"
+                                value="{{ $saved?->in_time ? \Carbon\Carbon::parse($saved->in_time)->format('H:i') : '' }}"
+                                {{ $isBlocked ? 'readonly' : '' }}>
+                        </td>
+
+                        {{-- OUT TIME --}}
+                        <td>
+                            <input type="time"
+                                name="interns[{{ $intern->id }}][out_time]"
+                                value="{{ $saved?->out_time ? \Carbon\Carbon::parse($saved->out_time)->format('H:i') : '' }}"
+                                {{ $isBlocked ? 'readonly' : '' }}>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+
+            @if(!$isBlocked)
+                <button class="btn btn-primary save-attendance-btn">
+                    <ion-icon name="save-outline"></ion-icon>
+                    Save Attendance
+                </button>
+            @endif
+        </form>
+    </div>
 
     {{-- ===============================
         HISTORY
@@ -219,44 +219,65 @@
             <h3>Attendance History</h3>
         </div>
 
-        <table>
+      <table>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Location</th>
+            <th>In Time</th>
+            <th>Out Time</th>
+            <th>Duration</th>
+        </tr>
+
+        @forelse($allRecords as $i => $att)
             <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Location</th>
-                <th>In Time</th>
-                <th>Out Time</th>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $att->intern->name }}</td>
+                <td>{{ \Carbon\Carbon::parse($att->date)->format('Y-m-d') }}</td>
+
+                {{-- STATUS FROM DB --}}
+                <td>
+                    @if(!empty($att->status))
+                        <span class="badge {{ $att->status }}">
+                            {{ ucwords(str_replace('_', ' ', $att->status)) }}
+                        </span>
+                    @else
+                        -
+                    @endif
+                </td>
+
+                <td>{{ $att->location ?? '-' }}</td>
+
+                <td>
+                    {{ $att->in_time ? \Carbon\Carbon::parse($att->in_time)->format('H:i') : '-' }}
+                </td>
+
+                <td>
+                    {{ $att->out_time ? \Carbon\Carbon::parse($att->out_time)->format('H:i') : '-' }}
+                </td>
+
+                {{-- DURATION --}}
+                <td>
+                    @if($att->in_time && $att->out_time)
+                        @php
+                            $start = \Carbon\Carbon::parse($att->in_time);
+                            $end = \Carbon\Carbon::parse($att->out_time);
+                            $diff = $start->diff($end);
+                        @endphp
+                        {{ $diff->h }}h {{ $diff->i }}m
+                    @else
+                        -
+                    @endif
+                </td>
             </tr>
-
-            @forelse($allRecords as $i => $att)
-                <tr>
-                    <td>{{ $i + 1 }}</td>
-                    <td>{{ $att->intern->name }}</td>
-                    <td>{{ \Carbon\Carbon::parse($att->date)->format('Y-m-d') }}</td>
-
-                    {{-- STATUS FROM DB --}}
-                    <td>
-                        @if(!empty($att->status))
-                            <span class="badge {{ $att->status }}">
-                                {{ ucwords(str_replace('_', ' ', $att->status)) }}
-                            </span>
-                        @else
-                            
-                        @endif
-                    </td>
-
-                    <td>{{ $att->location ?? '-' }}</td>
-                    <td>{{ $att->in_time ? \Carbon\Carbon::parse($att->in_time)->format('H:i') : '-' }}</td>
-                    <td>{{ $att->out_time ? \Carbon\Carbon::parse($att->out_time)->format('H:i') : '-' }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7">No records found</td>
-                </tr>
-            @endforelse
-        </table>
+        @empty
+            <tr>
+                <td colspan="8">No records found</td>
+            </tr>
+        @endforelse
+      </table>
     </div>
 
 </body>
