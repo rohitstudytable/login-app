@@ -27,6 +27,10 @@ class Attendance extends Model
         'in_location',
         'out_location',
 
+        // gps
+        'latitude',
+        'longitude',
+
         // time tracking
         'in_time',
         'out_time',
@@ -47,6 +51,8 @@ class Attendance extends Model
         'in_time' => 'string',
         'out_time' => 'string',
         'worked_minutes' => 'integer',
+        'latitude' => 'string',
+        'longitude' => 'string',
     ];
 
     /*
@@ -93,17 +99,21 @@ class Attendance extends Model
     {
         // ✅ if already calculated
         if (!is_null($this->worked_minutes)) {
+
             $hours = floor($this->worked_minutes / 60);
             $minutes = $this->worked_minutes % 60;
+
             return sprintf('%02d:%02d', $hours, $minutes);
         }
 
         // ✅ fallback calculate from time
         if ($this->in_time && $this->out_time) {
+
             $in = Carbon::createFromFormat('H:i:s', $this->in_time);
             $out = Carbon::createFromFormat('H:i:s', $this->out_time);
 
             $minutes = $in->diffInMinutes($out);
+
             $hours = floor($minutes / 60);
             $remaining = $minutes % 60;
 
@@ -131,5 +141,19 @@ class Attendance extends Model
     public function isCompleted()
     {
         return !is_null($this->in_time) && !is_null($this->out_time);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSOR: FULL GPS LOCATION
+    |--------------------------------------------------------------------------
+    */
+    public function getGpsLocationAttribute()
+    {
+        if ($this->latitude && $this->longitude) {
+            return $this->latitude . ', ' . $this->longitude;
+        }
+
+        return null;
     }
 }

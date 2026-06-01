@@ -28,6 +28,8 @@ return new class extends Migration
             $table->enum('status', [
                 'present',
                 'half_day',
+                'below_half_day',
+                'late_checkin_checkout',
                 'absent',
                 'overtime',
                 'paid_leave'
@@ -38,9 +40,21 @@ return new class extends Migration
             | LOCATION
             |--------------------------------------------------------------------------
             */
-            $table->string('location')->nullable();       // general location (optional)
-            $table->string('in_location')->nullable();    // clock-in GPS
-            $table->string('out_location')->nullable();   // clock-out GPS
+            $table->string('location')->nullable();
+
+            // clock-in location
+            $table->string('in_location')->nullable();
+
+            // clock-out location
+            $table->string('out_location')->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | GPS COORDINATES
+            |--------------------------------------------------------------------------
+            */
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
 
             /*
             |--------------------------------------------------------------------------

@@ -257,118 +257,199 @@ class AttendanceController extends Controller
     |--------------------------------------------------------------------------  
     */
     public function publicStoreByToken(Request $request)
-    {
-        $request->validate([
-            'intern_id' => 'required|exists:interns,id',
-            'location' => 'required|string|max:255',
-            'date' => 'required|date',
-            'action' => 'required|in:in,out',
-        ]);
+{
+    $request->validate([
+        'intern_id' => 'required|exists:interns,id',
+        'location' => 'required|string|max:255',
+        'latitude' => 'required',
+        'longitude' => 'required',
+        'date' => 'required|date',
+        'action' => 'required|in:in,out',
+    ]);
 
-        $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
-        $currentTime = now()->format('H:i:s');
+    $attendanceDate = Carbon::parse($request->date)->format('Y-m-d');
+    $currentTime = now()->format('H:i:s');
 
-        $intern = Intern::findOrFail($request->intern_id);
+    $intern = Intern::findOrFail($request->intern_id);
 
-        if ($this->isHolidayOrSunday($attendanceDate)) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Today is holiday. Attendance closed.'
-            ]);
-        }
+    /* ===== OFFICE LOCATION ===== */
+    $officeLat = 23.856765;
+    $officeLng = 91.296872;
 
-        $attendance = Attendance::where('intern_id', $intern->id)
-            ->whereDate('date', $attendanceDate)
-            ->first();
+    /* ===== ALLOWED DISTANCE IN METERS ===== */
+    $allowedRadius = 100;
 
-        // CLOCK IN
-        if ($request->action === 'in') {
-            if (!$attendance) {
-                Attendance::create([
-                    'intern_id' => $intern->id,
-                    'date' => $attendanceDate,
-                    'status' => null,
-                    'location' => $request->location,
-                    'in_time' => $currentTime,
-                ]);
+    /* ===== USER LOCATION ===== */
+    $userLat = (float) $request->latitude;
+    $userLng = (float) $request->longitude;
 
-                return response()->json([
-                    'success' => true,
-                    'action' => 'in',
-                    'time' => $currentTime,
-                ]);
-            } elseif ($attendance->in_time) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Already clocked in today.'
-                ]);
-            }
-        }
+    /* ===== CALCULATE DISTANCE ===== */
+    $distance = $this->calculateDistance(
+        $userLat,
+        $userLng,
+        $officeLat,
+        $officeLng
+    );
 
-       // CLOCK OUT
-        if ($request->action === 'out') {
-            if ($attendance && $attendance->in_time && !$attendance->out_time) {
+    /* ===== BLOCK OUTSIDE LOCATION ===== */
+    if ($distance > $allowedRadius) {
 
-                $attendance->update([
-                    'out_time' => $currentTime
-                ]);
-
-                // 🔥 Updated status calculation
-                $this->calculateWorkAndStatus($attendance);
-
-                return response()->json([
-                    'success' => true,
-                    'action' => 'out',
-                    'time' => $currentTime,
-                ]);
-
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'You need to clock in first or already clocked out.'
-                ]);
-            }
-        }
-
-        /* ✅ ADD THIS FINAL RETURN */
         return response()->json([
             'success' => false,
-            'error' => 'Attendance already completed for today.'
+            'error' => 'Cannot give attendance for this location.'
         ]);
+    }
 
-        } // ✅ CLOSE publicStoreByToken()
+    if ($this->isHolidayOrSunday($attendanceDate)) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Today is holiday. Attendance closed.'
+        ]);
+    }
 
-        private function calculateWorkAndStatus($attendance)
-        {
-            if (!$attendance->in_time || !$attendance->out_time) {
-                return;
-            }
+    $attendance = Attendance::where('intern_id', $intern->id)
+        ->whereDate('date', $attendanceDate)
+        ->first();
 
-            $in = Carbon::parse($attendance->in_time);
-            $out = Carbon::parse($attendance->out_time);
+    // CLOCK IN
+    if ($request->action === 'in') {
 
-            $workedMinutes = $in->diffInMinutes($out);
+        if (!$attendance) {
 
-            // ✅ Map worked minutes to enum values
-            if ($workedMinutes >= 540) {
-                $status = 'overtime';
-            } elseif ($workedMinutes >= 465) {
-                $status = 'present';
-            } elseif ($workedMinutes >= 420) {
-                $status = 'late_checkin_checkout'; // Early Checkout / Late Check-in
-            } elseif ($workedMinutes >= 240) {
-                $status = 'half_day';
-            } elseif ($workedMinutes >= 120) {
-                $status = 'below_half_day';
-            } else {
-                $status = 'absent';
-            }
+            Attendance::create([
+                'intern_id' => $intern->id,
+                'date' => $attendanceDate,
+                'status' => null,
+                'location' => $request->location,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'in_location' => $request->location,
+                'in_time' => $currentTime,
+            ]);
 
-            $attendance->update([
-                'worked_minutes' => $workedMinutes,
-                'status' => $status,
+            return response()->json([
+                'success' => true,
+                'action' => 'in',
+                'time' => $currentTime,
+            ]);
+
+        } elseif ($attendance->in_time) {
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Already clocked in today.'
             ]);
         }
+    }
+
+    // CLOCK OUT
+    if ($request->action === 'out') {
+
+        if ($attendance && $attendance->in_time && !$attendance->out_time) {
+
+            $attendance->update([
+                'out_time' => $currentTime,
+                'out_location' => $request->location,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+            ]);
+
+            // 🔥 Updated status calculation
+            $this->calculateWorkAndStatus($attendance);
+
+            return response()->json([
+                'success' => true,
+                'action' => 'out',
+                'time' => $currentTime,
+            ]);
+
+        } else {
+
+            return response()->json([
+                'success' => false,
+                'error' => 'You need to clock in first or already clocked out.'
+            ]);
+        }
+    }
+
+    /* ✅ FINAL RETURN */
+    return response()->json([
+        'success' => false,
+        'error' => 'Attendance already completed for today.'
+    ]);
+
+} // ✅ CLOSE publicStoreByToken()
+
+
+
+/* ===== DISTANCE FUNCTION ===== */
+private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+{
+    $earthRadius = 6371000;
+
+    $dLat = deg2rad($lat2 - $lat1);
+    $dLon = deg2rad($lon2 - $lon1);
+
+    $a =
+        sin($dLat / 2) * sin($dLat / 2) +
+        cos(deg2rad($lat1)) *
+        cos(deg2rad($lat2)) *
+        sin($dLon / 2) *
+        sin($dLon / 2);
+
+    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+    return $earthRadius * $c;
+}
+
+
+
+private function calculateWorkAndStatus($attendance)
+{
+    if (!$attendance->in_time || !$attendance->out_time) {
+        return;
+    }
+
+    $in = Carbon::parse($attendance->in_time);
+    $out = Carbon::parse($attendance->out_time);
+
+    $workedMinutes = $in->diffInMinutes($out);
+
+    // ✅ Map worked minutes to enum values
+    if ($workedMinutes >= 540) {
+
+        $status = 'overtime';
+
+    } elseif ($workedMinutes >= 465) {
+
+        $status = 'present';
+
+    } elseif ($workedMinutes >= 420) {
+
+        $status = 'late_checkin_checkout';
+
+    } elseif ($workedMinutes >= 240) {
+
+        $status = 'half_day';
+
+    } elseif ($workedMinutes >= 120) {
+
+        $status = 'below_half_day';
+
+    } else {
+
+        $status = 'absent';
+    }
+
+    $attendance->update([
+        'worked_minutes' => $workedMinutes,
+        'status' => $status,
+    ]);
+}
+
+
+
+
         // ANOTHER
         
     public function empAttendance()

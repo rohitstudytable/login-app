@@ -13,31 +13,31 @@
         <div>
             @include('body.empHeader')
 
-            {{----------------- INTER CARD -------------------------}}
-                <section class="myBodySection">
-                    <div class="conWrepper mb-4">
-                            <div class="myConSm">
-                                <div class="myCard">
-                                    <div class="welcomeFlex">
-                                        <div>
-                                            <h3 class="text-dark mb-2">
-                                                Welcome, {{ $intern->name }}
-                                            </h3>
+            {{-- --------------- INTER CARD ----------------------- --}}
+            <section class="myBodySection">
+                <div class="conWrepper mb-4">
+                    <div class="myConSm">
+                        <div class="myCard">
+                            <div class="welcomeFlex">
+                                <div>
+                                    <h3 class="text-dark mb-2">
+                                        Welcome, {{ $intern->name }}
+                                    </h3>
 
-                                            @if($intern->role === 'employee')
-                                                <p>Employee ID: {{ $intern->employee_code }} | Daily Time Management Center</p>
-                                            @else
-                                                <p>Intern ID: {{ $intern->intern_code }} | Daily Time Management Center</p>
-                                            @endif
-                                        </div>
-                                    </div>
+                                    @if ($intern->role === 'employee')
+                                        <p>Employee ID: {{ $intern->employee_code }} | Daily Time Management Center</p>
+                                    @else
+                                        <p>Intern ID: {{ $intern->intern_code }} | Daily Time Management Center</p>
+                                    @endif
                                 </div>
                             </div>
+                        </div>
                     </div>
-            {{-- ---------------END -------------------------}}
+                </div>
+                {{-- ---------------END ----------------------- --}}
 
 
-            {{---------------CLOCK RUNNING ------------------------------------}}
+                {{-- -------------CLOCK RUNNING ---------------------------------- --}}
                 <div class="conWrepper mb-4">
                     <div class="myConSm">
                         <div class="myCard primaryCard text-center clockCard mb-4">
@@ -63,7 +63,6 @@
 
                                 // Update every second
                                 setInterval(updateTime, 1000);
-
                             </script>
                             <h6 class="mb-0" id="todayDate"></h6>
                             <script>
@@ -82,181 +81,180 @@
                                 }
 
                                 showTodayDate();
-
                             </script>
 
                         </div>
 
-            {{-- -----------END --------------------------}}
+                        {{-- -----------END ------------------------ --}}
 
 
-            {{----------------------- CHECK IN CHECK OUT ----------------------------- --}}
+                        {{-- --------------------- CHECK IN CHECK OUT ----------------------------- --}}
 
-                    @php
-                        $clockInDone = $todayAttendance && $todayAttendance->in_time;
-                        $clockOutDone = $todayAttendance && $todayAttendance->out_time;
-                    @endphp
+                        @php
+                            $clockInDone = $todayAttendance && $todayAttendance->in_time;
+                            $clockOutDone = $todayAttendance && $todayAttendance->out_time;
+                        @endphp
 
-                    <!-- mark attendance alert toaster -->
-                    <div class="myTost tostSuccess mb-4" style="display:none;" id="attendanceToaster">
-                        <ion-icon name="checkmark-circle" class="text-success me-2"></ion-icon>
-                        <div>
-                            <p class="text-success mb-0" id="toasterMessage">Action Successful</p>
-                            <p class="mb-0" id="toasterTime">--:--:--</p>
-                        </div>
-                    </div>
-
-                    <!-- clock in clock out Buttons -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            {{-- IF today the user not check in keep this enable & after check in keep the disable class till next day --}}
-                            <button 
-                                class="clockBtn clockIn" 
-                                id="btnClockIn"
-                                {{ $clockInDone ? 'disabled' : '' }}>
-                                <ion-icon name="arrow-forward-circle"></ion-icon>
-                                Clock In
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            {{-- till the user not clock in keep it class dissable and after check in enable it and after check out again disable it till next day --}}
-                            <button 
-                                class="clockBtn clockOut" 
-                                id="btnClockOut"
-                                {{ !$clockInDone || $clockOutDone ? 'disabled' : '' }}>
-                                <ion-icon name="arrow-back-circle"></ion-icon>
-                                Clock Out
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- last action -->
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <div class="lastActionCard text-center" id="lastActionCard">
-                                <p class="mb-1">Last Action</p>
-                                <p class="text-dark mb-0" style="font-size: 16px">
-                                    @if($clockOutDone)
-                                        Clocked Out at {{ \Carbon\Carbon::parse($todayAttendance->out_time)->format('h:i:s a') }}
-                                    @elseif($clockInDone)
-                                        Clocked In at {{ \Carbon\Carbon::parse($todayAttendance->in_time)->format('h:i:s a') }}
-                                    @else
-                                        No action yet
-                                    @endif
-                                </p>
+                        <!-- mark attendance alert toaster -->
+                        <div class="myTost tostSuccess mb-4" style="display:none;" id="attendanceToaster">
+                            <ion-icon name="checkmark-circle" class="text-success me-2"></ion-icon>
+                            <div>
+                                <p class="text-success mb-0" id="toasterMessage">Action Successful</p>
+                                <p class="mb-0" id="toasterTime">--:--:--</p>
                             </div>
                         </div>
-                    </div>
-                    <script>
-                        const clockInBtn = document.getElementById('btnClockIn');
-                        const clockOutBtn = document.getElementById('btnClockOut');
-                        const toaster = document.getElementById('attendanceToaster');
-                        const toasterMessage = document.getElementById('toasterMessage');
-                        const toasterTime = document.getElementById('toasterTime');
-                        const lastActionCard = document.getElementById('lastActionCard');
 
-                        function showToaster(message, time) {
-                            toasterMessage.innerText = message;
-                            toasterTime.innerText = time;
-                            toaster.style.display = 'flex';
-                            setTimeout(() => toaster.style.display = 'none', 3000);
-                        }
+                        <!-- clock in clock out Buttons -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{-- IF today the user not check in keep this enable & after check in keep the disable class till next day --}}
+                                <button class="clockBtn clockIn" id="btnClockIn" {{ $clockInDone ? 'disabled' : '' }}>
+                                    <ion-icon name="arrow-forward-circle"></ion-icon>
+                                    Clock In
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                {{-- till the user not clock in keep it class dissable and after check in enable it and after check out again disable it till next day --}}
+                                <button class="clockBtn clockOut" id="btnClockOut"
+                                    {{ !$clockInDone || $clockOutDone ? 'disabled' : '' }}>
+                                    <ion-icon name="arrow-back-circle"></ion-icon>
+                                    Clock Out
+                                </button>
+                            </div>
+                        </div>
 
-                        function updateLastAction(message, time) {
-                            lastActionCard.querySelector('p.text-dark').innerText = `${message} at ${time}`;
-                        }
+                        <!-- last action -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="lastActionCard text-center" id="lastActionCard">
+                                    <p class="mb-1">Last Action</p>
+                                    <p class="text-dark mb-0" style="font-size: 16px">
+                                        @if ($clockOutDone)
+                                            Clocked Out at
+                                            {{ \Carbon\Carbon::parse($todayAttendance->out_time)->format('h:i:s a') }}
+                                        @elseif($clockInDone)
+                                            Clocked In at
+                                            {{ \Carbon\Carbon::parse($todayAttendance->in_time)->format('h:i:s a') }}
+                                        @else
+                                            No action yet
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <script>
+                            const clockInBtn = document.getElementById('btnClockIn');
+                            const clockOutBtn = document.getElementById('btnClockOut');
+                            const toaster = document.getElementById('attendanceToaster');
+                            const toasterMessage = document.getElementById('toasterMessage');
+                            const toasterTime = document.getElementById('toasterTime');
+                            const lastActionCard = document.getElementById('lastActionCard');
 
-                        async function getLocationName(lat, lon) {
-                            try {
-                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-                                const data = await response.json();
-                                return data.display_name || `${lat}, ${lon}`;
-                            } catch (err) {
-                                console.error('Reverse geocoding failed:', err);
-                                return `${lat}, ${lon}`;
+                            function showToaster(message, time) {
+                                toasterMessage.innerText = message;
+                                toasterTime.innerText = time;
+                                toaster.style.display = 'flex';
+                                setTimeout(() => toaster.style.display = 'none', 3000);
                             }
-                        }
 
-                        async function markAttendance(action) {
-                            // Disable the button immediately
-                            if (action === 'in') clockInBtn.disabled = true;
-                            else clockOutBtn.disabled = true;
-
-                            if (!navigator.geolocation) {
-                                alert('Geolocation is not supported by your browser.');
-                                if (action === 'in') clockInBtn.disabled = false;
-                                else clockOutBtn.disabled = false;
-                                return;
+                            function updateLastAction(message, time) {
+                                lastActionCard.querySelector('p.text-dark').innerText = `${message} at ${time}`;
                             }
 
-                            navigator.geolocation.getCurrentPosition(async position => {
-                                const lat = position.coords.latitude;
-                                const lon = position.coords.longitude;
-                                const locationName = await getLocationName(lat, lon);
+                            async function getLocationName(lat, lon) {
+                                try {
+                                    const response = await fetch(
+                                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+                                    const data = await response.json();
+                                    return data.display_name || `${lat}, ${lon}`;
+                                } catch (err) {
+                                    console.error('Reverse geocoding failed:', err);
+                                    return `${lat}, ${lon}`;
+                                }
+                            }
 
-                                fetch('{{ route("attendance.publicStoreByToken") }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json'
-                                    },
-                                    credentials: 'same-origin',
-                                    body: JSON.stringify({
-                                        intern_id: {{ $intern->id }},
-                                        date: '{{ $date }}',
-                                        action: action,
-                                        location: locationName
-                                    })
-                                })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        const actionName = data.action === 'in' ? 'Clocked In' : 'Clocked Out';
-                                        showToaster(actionName, data.time);
-                                        updateLastAction(actionName, data.time);
+                            async function markAttendance(action) {
+                                // Disable the button immediately
+                                if (action === 'in') clockInBtn.disabled = true;
+                                else clockOutBtn.disabled = true;
 
-                                        // Update buttons properly
-                                        if (data.action === 'in') {
-                                            clockInBtn.disabled = true;
-                                            clockOutBtn.disabled = false;
-                                        } else {
-                                            clockOutBtn.disabled = true;
-                                            clockInBtn.disabled = true;
-                                        }
-                                    } else {
-                                        alert(data.error || 'Something went wrong');
-                                        // Re-enable button if failed
-                                        if (action === 'in') clockInBtn.disabled = false;
-                                        else clockOutBtn.disabled = false;
-                                    }
-                                })
-                                .catch(err => {
-                                    console.error(err);
+                                if (!navigator.geolocation) {
+                                    alert('Geolocation is not supported by your browser.');
+                                    if (action === 'in') clockInBtn.disabled = false;
+                                    else clockOutBtn.disabled = false;
+                                    return;
+                                }
+
+                                navigator.geolocation.getCurrentPosition(async position => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+                                    const locationName = await getLocationName(lat, lon);
+
+                                    fetch('{{ route('attendance.publicStoreByToken') }}', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                'Accept': 'application/json'
+                                            },
+                                            credentials: 'same-origin',
+                                            body: JSON.stringify({
+                                                intern_id: {{ $intern->id }},
+                                                date: '{{ $date }}',
+                                                action: action,
+                                                location: locationName
+                                            })
+                                        })
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                const actionName = data.action === 'in' ? 'Clocked In' : 'Clocked Out';
+                                                showToaster(actionName, data.time);
+                                                updateLastAction(actionName, data.time);
+
+                                                // Update buttons properly
+                                                if (data.action === 'in') {
+                                                    clockInBtn.disabled = true;
+                                                    clockOutBtn.disabled = false;
+                                                } else {
+                                                    clockOutBtn.disabled = true;
+                                                    clockInBtn.disabled = true;
+                                                }
+                                            } else {
+                                                alert(data.error || 'Something went wrong');
+                                                // Re-enable button if failed
+                                                if (action === 'in') clockInBtn.disabled = false;
+                                                else clockOutBtn.disabled = false;
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                            if (action === 'in') clockInBtn.disabled = false;
+                                            else clockOutBtn.disabled = false;
+                                        });
+                                }, error => {
+                                    alert('Unable to get your location. Please allow location access.');
                                     if (action === 'in') clockInBtn.disabled = false;
                                     else clockOutBtn.disabled = false;
                                 });
-                            }, error => {
-                                alert('Unable to get your location. Please allow location access.');
-                                if (action === 'in') clockInBtn.disabled = false;
-                                else clockOutBtn.disabled = false;
-                            });
-                        }
+                            }
 
-                        clockInBtn?.addEventListener('click', () => markAttendance('in'));
-                        clockOutBtn?.addEventListener('click', () => markAttendance('out'));
-                    </script>
+                            clockInBtn?.addEventListener('click', () => markAttendance('in'));
+                            clockOutBtn?.addEventListener('click', () => markAttendance('out'));
+                        </script> --}}
 
-            {{---------------------------- END ---------------------------}}
+                        {{-- -------------------------- END ------------------------- --}}
 
                         <div class="row mb-4">
                             <div class="col-md-6">
 
-                            {{-- ----------------- LOCATION ------------------------- --}}
+                                {{-- ----------------- LOCATION ------------------------- --}}
 
                                 <div class="whiteBigCard h-100">
+
                                     <h4 class="mb-3">
-                                        <ion-icon name="location-outline"></ion-icon> Location Verification
+                                        <ion-icon name="location-outline"></ion-icon>
+                                        Location Verification
                                     </h4>
 
                                     {{-- VERIFIED (HIDDEN INITIALLY) --}}
@@ -272,27 +270,73 @@
                                     </p>
 
                                     <div class="myCard2 d-none" id="locationCard">
+
+                                        {{-- ADDRESS --}}
                                         <div class="card2Flex mb-2">
+
                                             <ion-icon name="business-outline"></ion-icon>
+
                                             <div>
-                                                <h6 class="mb-0" id="locationAddress">Fetching address...</h6>
-                                                <p class="mb-0" id="locationCity">---</p>
+
+                                                <h6 class="mb-0" id="locationAddress">
+                                                    Fetching address...
+                                                </h6>
+
+                                                <p class="mb-0" id="locationCity">
+                                                    City: ---
+                                                </p>
+
                                             </div>
+
                                         </div>
 
-                                        <div class="card2Flex">
+                                        {{-- COUNTRY --}}
+                                        <div class="card2Flex mb-2">
+
                                             <ion-icon name="globe-outline"></ion-icon>
-                                            <p class="mb-0" id="locationCountry">---</p>
-                                        </div>
-                                    </div>
-                                </div>
 
+                                            <p class="mb-0" id="locationCountry">
+                                                Country: ---
+                                            </p>
+
+                                        </div>
+
+                                        {{-- LATITUDE --}}
+                                        <div class="card2Flex mb-2">
+
+                                            <ion-icon name="navigate-outline"></ion-icon>
+
+                                            <p class="mb-0" id="locationLatitude">
+                                                Latitude: ---
+                                            </p>
+
+                                        </div>
+
+                                        {{-- LONGITUDE --}}
+                                        <div class="card2Flex">
+
+                                            <ion-icon name="compass-outline"></ion-icon>
+
+                                            <p class="mb-0" id="locationLongitude">
+                                                Longitude: ---
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
                                 <script>
-                                    /* ===== GLOBAL (USED BY ATTENDANCE SCRIPT) ===== */
-                                    let userLocation = null;
-                                    let userLat = null;
-                                    let userLng = null;
-                                    /* ============================================== */
+                                    const clockInBtn = document.getElementById('btnClockIn');
+                                    const clockOutBtn = document.getElementById('btnClockOut');
+
+                                    const toaster = document.getElementById('attendanceToaster');
+                                    const toasterMessage = document.getElementById('toasterMessage');
+                                    const toasterTime = document.getElementById('toasterTime');
+
+                                    const lastActionCard = document.getElementById('lastActionCard');
+
+                                    /* ===== LOCATION UI ELEMENTS ===== */
 
                                     const fetchingEl = document.getElementById('locationFetching');
                                     const verifiedEl = document.getElementById('locationVerified');
@@ -302,149 +346,427 @@
                                     const cityEl = document.getElementById('locationCity');
                                     const countryEl = document.getElementById('locationCountry');
 
-                                    function showFetching() {
-                                        fetchingEl.classList.remove('d-none');
-                                        verifiedEl.classList.add('d-none');
-                                        cardEl.classList.add('d-none');
+                                    const latitudeEl = document.getElementById('locationLatitude');
+                                    const longitudeEl = document.getElementById('locationLongitude');
+
+                                    /* ===== GLOBAL LOCATION VARIABLES ===== */
+
+                                    let userLat = null;
+                                    let userLng = null;
+                                    let userLocation = null;
+
+                                    /* ===== TOASTER ===== */
+
+                                    function showToaster(message, time) {
+
+                                        toasterMessage.innerText = message;
+
+                                        toasterTime.innerText = time;
+
+                                        toaster.style.display = 'flex';
+
+                                        setTimeout(() => {
+
+                                            toaster.style.display = 'none';
+
+                                        }, 3000);
                                     }
 
-                                    function showVerified(address, city, country) {
+                                    /* ===== LAST ACTION ===== */
+
+                                    function updateLastAction(message, time) {
+
+                                        lastActionCard.querySelector('p.text-dark').innerText =
+                                            `${message} at ${time}`;
+                                    }
+
+                                    /* ===== LOCATION UI ===== */
+
+                                    function showFetching() {
+
+                                        fetchingEl.classList.remove('d-none');
+
+                                        verifiedEl.classList.add('d-none');
+
+                                        cardEl.classList.add('d-none');
+
+                                        fetchingEl.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Location Fetching...
+        `;
+                                    }
+
+                                    function showVerified() {
+
                                         fetchingEl.classList.add('d-none');
+
                                         verifiedEl.classList.remove('d-none');
+
                                         cardEl.classList.remove('d-none');
-
-                                        addressEl.innerText = address;
-                                        cityEl.innerText = city;
-                                        countryEl.innerText = country;
-
-                                        userLocation = `${address}, ${city}, ${country}`;
                                     }
 
                                     function showLocationError(msg) {
+
+                                        fetchingEl.classList.remove('d-none');
+
+                                        verifiedEl.classList.add('d-none');
+
+                                        cardEl.classList.add('d-none');
+
                                         fetchingEl.innerText = msg;
                                     }
 
-                                    /* ===== MAIN LOCATION FUNCTION ===== */
-                                    function fetchLocation() {
+                                    /* ===== GET LOCATION NAME ===== */
+
+                                    async function getLocationName(lat, lon) {
+
+                                        try {
+
+                                            const response = await fetch(
+                                                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+                                            );
+
+                                            const data = await response.json();
+
+                                            return data;
+
+                                        } catch (err) {
+
+                                            console.error('Reverse geocoding failed:', err);
+
+                                            return null;
+                                        }
+                                    }
+
+                                    /* ===== FETCH LOCATION ===== */
+
+                                    async function fetchLocation() {
 
                                         if (!navigator.geolocation) {
+
                                             showLocationError('Geolocation not supported');
+
                                             return;
                                         }
 
                                         showFetching();
 
                                         navigator.geolocation.getCurrentPosition(
-                                            position => {
 
-                                                userLat = position.coords.latitude;
-                                                userLng = position.coords.longitude;
+                                            async (position) => {
 
-                                                /* ✅ IMMEDIATE FALLBACK (IMPORTANT) */
-                                                userLocation = `Lat: ${userLat}, Lng: ${userLng}`;
+                                                    userLat = position.coords.latitude;
+                                                    userLng = position.coords.longitude;
 
-                                                /* Stop infinite loading immediately */
-                                                showVerified(
-                                                    'Current GPS Location',
-                                                    `Lat ${userLat.toFixed(5)}`,
-                                                    `Lng ${userLng.toFixed(5)}`
-                                                );
+                                                    /* ===== SHOW LAT/LONG IMMEDIATELY ===== */
 
-                                                /* OPTIONAL: Reverse geocoding (NON-BLOCKING) */
-                                                fetch(
-                                                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLng}`,
-                                                    {
-                                                        headers: {
-                                                            'Accept': 'application/json',
-                                                            'User-Agent': 'AttendanceApp/1.0'
-                                                        }
-                                                    }
-                                                )
-                                                .then(res => res.json())
-                                                .then(data => {
-                                                    if (data?.display_name) {
+                                                    latitudeEl.innerText =
+                                                        `Latitude: ${userLat.toFixed(6)}`;
+
+                                                    longitudeEl.innerText =
+                                                        `Longitude: ${userLng.toFixed(6)}`;
+
+                                                    /* ===== TEMP DATA ===== */
+
+                                                    addressEl.innerText = 'Current GPS Location';
+
+                                                    cityEl.innerText = 'Fetching city...';
+
+                                                    countryEl.innerText = 'Fetching country...';
+
+                                                    userLocation = `Lat: ${userLat}, Lng: ${userLng}`;
+
+                                                    /* ===== STOP LOADING ===== */
+
+                                                    showVerified();
+
+                                                    /* ===== OPTIONAL ADDRESS FETCH ===== */
+
+                                                    const data = await getLocationName(
+                                                        userLat,
+                                                        userLng
+                                                    );
+
+                                                    if (data) {
+
                                                         const city =
-                                                            data.address.city ||
-                                                            data.address.town ||
-                                                            data.address.village ||
+                                                            data.address?.city ||
+                                                            data.address?.town ||
+                                                            data.address?.village ||
                                                             'Unknown City';
 
-                                                        const country = data.address.country || 'Unknown Country';
+                                                        const country =
+                                                            data.address?.country ||
+                                                            'Unknown Country';
 
-                                                        showVerified(data.display_name, city, country);
+                                                        addressEl.innerText =
+                                                            data.display_name || 'Current Location';
+
+                                                        cityEl.innerText =
+                                                            `City: ${city}`;
+
+                                                        countryEl.innerText =
+                                                            `Country: ${country}`;
+
+                                                        userLocation =
+                                                            data.display_name || userLocation;
                                                     }
-                                                })
-                                                .catch(() => {
-                                                    /* silently fail – fallback already set */
-                                                });
-                                            },
-                                            error => {
-                                                showLocationError('Location permission denied');
-                                            },
-                                            {
-                                                enableHighAccuracy: true,
-                                                timeout: 15000,
-                                                maximumAge: 0
-                                            }
+
+                                                },
+
+                                                (error) => {
+
+                                                    showLocationError(
+                                                        'Location permission denied'
+                                                    );
+
+                                                },
+
+                                                {
+                                                    enableHighAccuracy: true,
+                                                    timeout: 10000,
+                                                    maximumAge: 0
+                                                }
                                         );
                                     }
+
+                                    /* ===== MARK ATTENDANCE ===== */
+
+                                    async function markAttendance(action) {
+
+                                        if (action === 'in') {
+
+                                            clockInBtn.disabled = true;
+
+                                        } else {
+
+                                            clockOutBtn.disabled = true;
+                                        }
+
+                                        if (!navigator.geolocation) {
+
+                                            alert('Geolocation is not supported by your browser.');
+
+                                            if (action === 'in') {
+
+                                                clockInBtn.disabled = false;
+
+                                            } else {
+
+                                                clockOutBtn.disabled = false;
+                                            }
+
+                                            return;
+                                        }
+
+                                        navigator.geolocation.getCurrentPosition(
+
+                                            async (position) => {
+
+                                                    userLat = position.coords.latitude;
+                                                    userLng = position.coords.longitude;
+
+                                                    const locationData =
+                                                        await getLocationName(
+                                                            userLat,
+                                                            userLng
+                                                        );
+
+                                                    userLocation =
+                                                        locationData?.display_name ||
+                                                        `Lat: ${userLat}, Lng: ${userLng}`;
+
+                                                    fetch('{{ route('attendance.publicStoreByToken') }}', {
+
+                                                            method: 'POST',
+
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                                'Accept': 'application/json'
+                                                            },
+
+                                                            credentials: 'same-origin',
+
+                                                            body: JSON.stringify({
+
+                                                                intern_id: {{ $intern->id }},
+
+                                                                date: '{{ $date }}',
+
+                                                                action: action,
+
+                                                                location: userLocation,
+
+                                                                latitude: userLat,
+
+                                                                longitude: userLng
+
+                                                            })
+                                                        })
+
+                                                        .then(res => res.json())
+
+                                                        .then(data => {
+
+                                                            if (data.success) {
+
+                                                                const actionName =
+                                                                    data.action === 'in' ?
+                                                                    'Clocked In' :
+                                                                    'Clocked Out';
+
+                                                                showToaster(
+                                                                    actionName,
+                                                                    data.time
+                                                                );
+
+                                                                updateLastAction(
+                                                                    actionName,
+                                                                    data.time
+                                                                );
+
+                                                                if (data.action === 'in') {
+
+                                                                    clockInBtn.disabled = true;
+                                                                    clockOutBtn.disabled = false;
+
+                                                                } else {
+
+                                                                    clockOutBtn.disabled = true;
+                                                                    clockInBtn.disabled = true;
+                                                                }
+
+                                                            } else {
+
+                                                                alert(data.error || 'Something went wrong');
+
+                                                                if (action === 'in') {
+
+                                                                    clockInBtn.disabled = false;
+
+                                                                } else {
+
+                                                                    clockOutBtn.disabled = false;
+                                                                }
+                                                            }
+
+                                                        })
+
+                                                        .catch(err => {
+
+                                                            console.error(err);
+
+                                                            if (action === 'in') {
+
+                                                                clockInBtn.disabled = false;
+
+                                                            } else {
+
+                                                                clockOutBtn.disabled = false;
+                                                            }
+
+                                                        });
+
+                                                },
+
+                                                (error) => {
+
+                                                    alert(
+                                                        'Unable to get your location. Please allow location access.'
+                                                    );
+
+                                                    if (action === 'in') {
+
+                                                        clockInBtn.disabled = false;
+
+                                                    } else {
+
+                                                        clockOutBtn.disabled = false;
+                                                    }
+
+                                                },
+
+                                                {
+                                                    enableHighAccuracy: true,
+                                                    timeout: 10000,
+                                                    maximumAge: 0
+                                                }
+                                        );
+                                    }
+
+                                    /* ===== EVENTS ===== */
+
+                                    clockInBtn?.addEventListener(
+                                        'click',
+                                        () => markAttendance('in')
+                                    );
+
+                                    clockOutBtn?.addEventListener(
+                                        'click',
+                                        () => markAttendance('out')
+                                    );
+
+                                    /* ===== AUTO FETCH LOCATION ===== */
 
                                     fetchLocation();
                                 </script>
 
-                            {{------------- END -----------------------}}
-
-                            {{------------ TABLE CLOCK IN ----------}}
-                                </div>
-                                <div class="col-md-6">
+                                {{-- ---------- TABLE CLOCK IN -------- --}}
+                            </div>
+                            <div class="col-md-6">
                                 @php
-                                use Carbon\Carbon;
+                                    use Carbon\Carbon;
 
-                                /*
+                                    /*
                                 |--------------------------------------------------------------------------
                                 | REQUIRED VARIABLES (from controller)
                                 |--------------------------------------------------------------------------
                                 | $attendance  -> today's attendance record OR null
                                 | $shift       -> shift details (start_time, end_time, break_minutes)
-                                */
+                                */ /* ===== SAFETY FALLBACKS ===== */
+$attendance = $attendance ?? null;
 
-                                /* ===== SAFETY FALLBACKS ===== */
-                                $attendance = $attendance ?? null;
+$shift =
+    $shift ??
+    (object) [
+        'start_time' => '10:00',
+        'end_time' => '18:00',
+        'break_minutes' => 45,
+    ];
 
-                                $shift = $shift ?? (object)[
-                                    'start_time'    => '10:00',
-                                    'end_time'      => '18:00',
-                                    'break_minutes' => 45
-                                ];
+/* ===== START TIME ===== */
+$clockInTime =
+    $attendance && $attendance->in_time
+        ? Carbon::parse($attendance->in_time)->format('h:i A')
+        : '— —';
 
-                                /* ===== START TIME ===== */
-                                $clockInTime = ($attendance && $attendance->in_time)
-                                    ? Carbon::parse($attendance->in_time)->format('h:i A')
-                                    : '— —';
+/* ===== END TIME ===== */
+$clockOutTime =
+    $attendance && $attendance->out_time
+        ? Carbon::parse($attendance->out_time)->format('h:i A')
+        : '— —';
 
-                                /* ===== END TIME ===== */
-                                $clockOutTime = ($attendance && $attendance->out_time)
-                                    ? Carbon::parse($attendance->out_time)->format('h:i A')
-                                    : '— —';
+/* ===== EXPECTED HOURS ===== */
+                                    $expectedHours = Carbon::parse($shift->start_time)->diffInHours(
+                                        Carbon::parse($shift->end_time),
+                                    );
 
-                                /* ===== EXPECTED HOURS ===== */
-                                $expectedHours = Carbon::parse($shift->start_time)
-                                    ->diffInHours(Carbon::parse($shift->end_time));
+                                    /* ===== WORKING HOURS (hrs + mins) ===== */
+                                    $hours = 0;
+                                    $minutes = 0;
 
-                                /* ===== WORKING HOURS (hrs + mins) ===== */
-                                $hours = 0;
-                                $minutes = 0;
+                                    if ($attendance && $attendance->in_time && $attendance->out_time) {
+                                        $workedMinutes = Carbon::parse($attendance->in_time)->diffInMinutes(
+                                            Carbon::parse($attendance->out_time),
+                                        );
 
-                                if ($attendance && $attendance->in_time && $attendance->out_time) {
-                                    $workedMinutes = Carbon::parse($attendance->in_time)
-                                        ->diffInMinutes(Carbon::parse($attendance->out_time));
+                                        // subtract break safely
+                                        $workedMinutes = max(0, $workedMinutes - $shift->break_minutes);
 
-                                    // subtract break safely
-                                    $workedMinutes = max(0, $workedMinutes - $shift->break_minutes);
-
-                                    $hours   = floor($workedMinutes / 60);
-                                    $minutes = $workedMinutes % 60;
-                                }
+                                        $hours = floor($workedMinutes / 60);
+                                        $minutes = $workedMinutes % 60;
+                                    }
                                 @endphp
 
                                 <div class="whiteBigCard">
@@ -460,7 +782,7 @@
 
                                         {{-- STATUS FROM DB ONLY --}}
                                         <h5 class="mb-0 text-dark fw-semibold">
-                                            @if(!empty($attendance?->out_time) && !empty($attendance?->status))
+                                            @if (!empty($attendance?->out_time) && !empty($attendance?->status))
                                                 {{ ucwords(str_replace('_', ' ', $attendance->status)) }}
                                             @endif
                                         </h5>
@@ -470,7 +792,8 @@
                                         <div class="col-md-6">
                                             <div class="myCard2">
                                                 <div class="card2Flex mb-2">
-                                                    <ion-icon name="arrow-forward-circle-outline" class="text-success"></ion-icon>
+                                                    <ion-icon name="arrow-forward-circle-outline"
+                                                        class="text-success"></ion-icon>
                                                     <p class="mb-0">Start Time</p>
                                                 </div>
 
@@ -483,7 +806,8 @@
                                         <div class="col-md-6">
                                             <div class="myCard2">
                                                 <div class="card2Flex mb-2">
-                                                    <ion-icon name="arrow-back-circle-outline" class="text-danger"></ion-icon>
+                                                    <ion-icon name="arrow-back-circle-outline"
+                                                        class="text-danger"></ion-icon>
                                                     <p class="mb-0">End Time</p>
                                                 </div>
 
@@ -511,7 +835,7 @@
                                         </span>
                                     </p>
                                 </div>
-                            {{------------ END ----------------}}
+                                {{-- ---------- END -------------- --}}
 
 
                             </div>
@@ -519,99 +843,100 @@
 
                         <div class="row mb-4">
 
-                {{-------------- ATTENDANCE HISTORY  ----------------------------}}
-                    <div class="col-md-12">
-                        <div class="whiteBigCard">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h4 class="mb-0">
-                                    <ion-icon name="time-outline"></ion-icon> Recent Clock History
-                                </h4>
-                                <p class="mb-0 sm">Last 7 days</p>
+                            {{-- ------------ ATTENDANCE HISTORY  -------------------------- --}}
+                            <div class="col-md-12">
+                                <div class="whiteBigCard">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="mb-0">
+                                            <ion-icon name="time-outline"></ion-icon> Recent Clock History
+                                        </h4>
+                                        <p class="mb-0 sm">Last 7 days</p>
+                                    </div>
+
+                                    @forelse($recentAttendances as $record)
+                                        @php
+                                            // CLOCK IN
+                                            $clockIn = $record->in_time
+                                                ? \Carbon\Carbon::parse($record->in_time)->format('h:i a')
+                                                : '-- --';
+
+                                            // CLOCK OUT
+                                            $clockOut = $record->out_time
+                                                ? \Carbon\Carbon::parse($record->out_time)->format('h:i a')
+                                                : '-- --';
+
+                                            // DATE
+                                            $date = $record->date
+                                                ? \Carbon\Carbon::parse($record->date)->format('d M Y')
+                                                : \Carbon\Carbon::parse($record->created_at)->format('d M Y');
+
+                                            // DURATION
+                                            $duration = '-- --';
+                                            if ($record->in_time && $record->out_time) {
+                                                $minutes = \Carbon\Carbon::parse($record->in_time)->diffInMinutes(
+                                                    \Carbon\Carbon::parse($record->out_time),
+                                                );
+
+                                                $h = floor($minutes / 60);
+                                                $m = $minutes % 60;
+
+                                                $duration = $h . 'h ' . $m . ' m';
+                                            }
+
+                                            // STATUS FROM DB
+                                            $statusText = '';
+                                            $statusClass = '';
+
+                                            if (!empty($record->status) && $record->out_time) {
+                                                $statusText = ucwords(str_replace('_', ' ', $record->status));
+
+                                                // optional color mapping (NO DESIGN CHANGE)
+                                                $statusClass = match ($record->status) {
+                                                    'present' => 'text-success',
+                                                    'late_checkin_checkout' => 'text-warning',
+                                                    'half_day' => 'text-warning',
+                                                    'below_half_day' => 'text-danger',
+                                                    'overtime' => 'text-primary',
+                                                    'absent' => 'text-danger',
+                                                    default => 'text-muted',
+                                                };
+                                            }
+                                        @endphp
+
+                                        <div class="myCard2 mb-3">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <p class="mb-0">{{ $date }}</p>
+                                                <p class="{{ $statusClass }} mb-0">
+                                                    {{ $statusText }}
+                                                </p>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <p class="mb-1 sm">Clock In</p>
+                                                    <p class="mb-0 text-dark">{{ $clockIn }}</p>
+                                                </div>
+
+                                                <div class="col-4">
+                                                    <p class="mb-1 sm">Clock Out</p>
+                                                    <p class="mb-0 text-dark">{{ $clockOut }}</p>
+                                                </div>
+
+                                                <div class="col-4">
+                                                    <p class="mb-1 sm">Duration</p>
+                                                    <p class="mb-0 text-dark">{{ $duration }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    @empty
+                                        <div class="text-center py-4">
+                                            <p class="mb-0 text-muted">No attendance records found</p>
+                                        </div>
+                                    @endforelse
+                                </div>
                             </div>
-
-                            @forelse($recentAttendances as $record)
-                                @php
-                                    // CLOCK IN
-                                    $clockIn = $record->in_time
-                                        ? \Carbon\Carbon::parse($record->in_time)->format('h:i a')
-                                        : '-- --';
-
-                                    // CLOCK OUT
-                                    $clockOut = $record->out_time
-                                        ? \Carbon\Carbon::parse($record->out_time)->format('h:i a')
-                                        : '-- --';
-
-                                    // DATE
-                                    $date = $record->date
-                                        ? \Carbon\Carbon::parse($record->date)->format('d M Y')
-                                        : \Carbon\Carbon::parse($record->created_at)->format('d M Y');
-
-                                    // DURATION
-                                    $duration = '-- --';
-                                    if ($record->in_time && $record->out_time) {
-                                        $minutes = \Carbon\Carbon::parse($record->in_time)
-                                            ->diffInMinutes(\Carbon\Carbon::parse($record->out_time));
-
-                                        $h = floor($minutes / 60);
-                                        $m = $minutes % 60;
-
-                                        $duration = $h . 'h ' . $m . ' m';
-                                    }
-
-                                    // STATUS FROM DB
-                                    $statusText  = '';
-                                    $statusClass = '';
-
-                                    if (!empty($record->status) && $record->out_time) {
-                                        $statusText = ucwords(str_replace('_', ' ', $record->status));
-
-                                        // optional color mapping (NO DESIGN CHANGE)
-                                        $statusClass = match ($record->status) {
-                                            'present'                => 'text-success',
-                                            'late_checkin_checkout'  => 'text-warning',
-                                            'half_day'               => 'text-warning',
-                                            'below_half_day'         => 'text-danger',
-                                            'overtime'               => 'text-primary',
-                                            'absent'                 => 'text-danger',
-                                            default                  => 'text-muted',
-                                        };
-                                    }
-                                @endphp
-
-                                <div class="myCard2 mb-3">
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <p class="mb-0">{{ $date }}</p>
-                                        <p class="{{ $statusClass }} mb-0">
-                                            {{ $statusText }}
-                                        </p>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <p class="mb-1 sm">Clock In</p>
-                                            <p class="mb-0 text-dark">{{ $clockIn }}</p>
-                                        </div>
-
-                                        <div class="col-4">
-                                            <p class="mb-1 sm">Clock Out</p>
-                                            <p class="mb-0 text-dark">{{ $clockOut }}</p>
-                                        </div>
-
-                                        <div class="col-4">
-                                            <p class="mb-1 sm">Duration</p>
-                                            <p class="mb-0 text-dark">{{ $duration }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            @empty
-                                <div class="text-center py-4">
-                                    <p class="mb-0 text-muted">No attendance records found</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                {{--------------- END  -----------------------------}}
+                            {{-- ------------- END  --------------------------- --}}
                         </div>
                     </div>
 
@@ -623,8 +948,8 @@
     </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-    crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+    </script>
 
 </body>
