@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Intern;
+use App\Models\EodReport;
 use App\Models\Holiday;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -440,5 +441,120 @@ class AttendanceController extends Controller
             'paidLeaveCount' => $attendances->where('status', 'paid_leave')->count(),
         ]);
     }
+
+    /*
+|--------------------------------------------------------------------------
+| EMPLOYEE – EOD PAGE
+|--------------------------------------------------------------------------
+*/
+public function empEod()
+{
+    $intern = Auth::guard('intern')->user();
+
+    $reports = EodReport::where('intern_id', $intern->id)
+        ->latest()
+        ->take(10)
+        ->get();
+
+    return view('attendance.empEod', compact('intern', 'reports'));
+}
+
+/*
+|--------------------------------------------------------------------------
+| EMPLOYEE – STORE EOD
+|--------------------------------------------------------------------------
+*/
+public function storeEod(Request $request)
+{
+    $request->validate([
+        'tasks_completed' => 'required|string',
+        'challenges_faced' => 'nullable|string',
+        'plan_for_tomorrow' => 'nullable|string',
+    ]);
+
+    EodReport::create([
+        'intern_id' => Auth::guard('intern')->id(),
+        'report_date' => now()->toDateString(),
+        'tasks_completed' => $request->tasks_completed,
+        'challenges_faced' => $request->challenges_faced,
+        'plan_for_tomorrow' => $request->plan_for_tomorrow,
+    ]);
+
+    return redirect()
+        ->route('empeod')
+        ->with('success', 'EOD submitted successfully.');
+}
+
+/*
+|--------------------------------------------------------------------------
+| EMPLOYEE – EOD HISTORY
+|--------------------------------------------------------------------------
+*/
+public function eodHistory()
+{
+    $intern = Auth::guard('intern')->user();
+
+    $reports = EodReport::where('intern_id', $intern->id)
+        ->latest()
+        ->paginate(20);
+
+    return view('attendance.eodHistory', compact('intern', 'reports'));
+}
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN – EOD REPORTS LIST
+|--------------------------------------------------------------------------
+*/
+public function adminEod(Request $request)
+{
+    $query = EodReport::with('intern');
+
+    // Filter by employee
+    if ($request->filled('intern_id')) {
+        $query->where('intern_id', $request->intern_id);
+    }
+
+    // Filter by date
+    if ($request->filled('report_date')) {
+        $query->whereDate('report_date', $request->report_date);
+    }
+
+    $reports = $query->latest()->get();
+
+    // All employees for filter dropdown
+    $interns = Intern::orderBy('name')->get();
+
+    // Dashboard Cards
+    $todayReports = EodReport::whereDate('report_date', today())->count();
+
+    $totalReports = EodReport::count();
+
+    $submittedToday = EodReport::whereDate('report_date', today())
+        ->distinct('intern_id')
+        ->count('intern_id');
+
+    $pendingReports = max(0, Intern::count() - $submittedToday);
+
+    return view('eod.adminEod', compact(
+        'reports',
+        'interns',
+        'todayReports',
+        'totalReports',
+        'pendingReports'
+    ));
+}
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN – VIEW SINGLE EOD
+|--------------------------------------------------------------------------
+*/
+public function showEod($id)
+{
+    $report = EodReport::with('intern')->findOrFail($id);
+
+    return view('eod.show', compact('report'));
+}
 
 }

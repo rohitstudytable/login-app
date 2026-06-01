@@ -43,15 +43,31 @@ Route::middleware('auth:intern')->group(function () {
     Route::get('/empreport', [AttendanceController::class, 'empReport'])
         ->name('empreport');
 
+    /*
+    |--------------------------------------------------------------------------
+    | EOD ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/empeod', [AttendanceController::class, 'empEod'])
+        ->name('empeod');
+
+    Route::post('/empeod/store', [AttendanceController::class, 'storeEod'])
+        ->name('empeod.store');
+
+    Route::get('/empeod/history', [AttendanceController::class, 'eodHistory'])
+        ->name('empeod.history');
+
     Route::get('/empprofile', function () {
         return view('attendance.empProfile', [
             'intern' => Auth::guard('intern')->user()
         ]);
     })->name('empprofile');
- Route::get('/storage-link', function () {
+
+    Route::get('/storage-link', function () {
         Artisan::call('storage:link');
         return 'Storage link created successfully!';
     });
+
     Route::post('/intern/profile/image', [InternProfileController::class, 'updateImage'])
         ->name('intern.profile.image');
 
@@ -129,17 +145,50 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/interns/{id}', [InternController::class, 'show'])
         ->name('interns.show');
 
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN EOD REPORTS
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/admin/eod-reports', [AttendanceController::class, 'adminEod'])
+        ->name('admin.eod.index');
+
+    Route::get('/admin/eod-reports/{id}', [AttendanceController::class, 'showEod'])
+        ->name('admin.eod.show');
+
+    /*
+    |--------------------------------------------------------------------------
+    | HOLIDAYS
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::resource('holidays', \App\Http\Controllers\Admin\HolidayController::class);
+
+        Route::resource(
+            'holidays',
+            \App\Http\Controllers\Admin\HolidayController::class
+        );
+
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN LOGOUT
+    |--------------------------------------------------------------------------
+    */
     Route::post('/admin/logout', function () {
+
         Auth::guard('web')->logout();
+
         request()->session()->invalidate();
+
         request()->session()->regenerateToken();
+
         return redirect()->route('login');
+
     })->name('admin.logout');
+
 });
+
 
 /*
 |--------------------------------------------------------------------------

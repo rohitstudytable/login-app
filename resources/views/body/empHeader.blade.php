@@ -14,7 +14,7 @@
                 <ion-icon id="menuIcon" name="menu-outline"></ion-icon>
             </span>
             {{-- MENU --}}
-            <div class="topMenu" id="topManu">
+            {{-- <div class="topMenu" id="topManu">
 
                 <a href="/" class="menuItem {{ Request::is('empdashboard') ? 'active' : '' }}">
                     <ion-icon name="home-outline"></ion-icon>
@@ -32,7 +32,39 @@
                     Report
                 </a>
 
-                @if(isset($intern))
+                @if (isset($intern))
+                    <a href="/empprofile" class="menuItem {{ Request::is('empprofile') ? 'active' : '' }}">
+                        <ion-icon name="person-outline"></ion-icon>
+                        {{ $intern->name }}
+                    </a>
+                @endif
+
+            </div> --}}
+
+            <div class="topMenu" id="topManu">
+
+                <a href="/" class="menuItem {{ Request::is('empdashboard') ? 'active' : '' }}">
+                    <ion-icon name="home-outline"></ion-icon>
+                    Home
+                </a>
+
+                <a href="{{ route('empattendance') }}"
+                    class="menuItem {{ Request::is('empattendance') ? 'active' : '' }}">
+                    <ion-icon name="timer-outline"></ion-icon>
+                    Attendance
+                </a>
+
+                <a href="{{ route('empeod') }}" class="menuItem {{ Request::is('empeod') ? 'active' : '' }}">
+                    <ion-icon name="document-text-outline"></ion-icon>
+                    EOD
+                </a>
+
+                <a href="/empreport" class="menuItem {{ Request::is('empreport') ? 'active' : '' }}">
+                    <ion-icon name="calendar-clear-outline"></ion-icon>
+                    Report
+                </a>
+
+                @if (isset($intern))
                     <a href="/empprofile" class="menuItem {{ Request::is('empprofile') ? 'active' : '' }}">
                         <ion-icon name="person-outline"></ion-icon>
                         {{ $intern->name }}
@@ -40,7 +72,6 @@
                 @endif
 
             </div>
-
 
 
             <script>

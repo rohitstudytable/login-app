@@ -47,7 +47,7 @@ class Intern extends Authenticatable
         // Work profile
         'designation',
 
-        // ✅ Leave / Holiday
+        // Leave / Holiday
         'total_holidays',
 
         // Profile image
@@ -82,7 +82,7 @@ class Intern extends Authenticatable
      */
     protected $attributes = [
         'role' => 'intern',
-        'total_holidays' => 10, // default leave balance
+        'total_holidays' => 10,
     ];
 
     /**
@@ -102,7 +102,7 @@ class Intern extends Authenticatable
                 $intern->role = 'intern';
             }
 
-            // Default holidays (extra safety)
+            // Default holidays
             if ($intern->total_holidays === null) {
                 $intern->total_holidays = 10;
             }
@@ -115,5 +115,13 @@ class Intern extends Authenticatable
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    /**
+     * Relationship: Intern has many EOD reports.
+     */
+    public function eodReports()
+    {
+        return $this->hasMany(EodReport::class, 'intern_id');
     }
 }
