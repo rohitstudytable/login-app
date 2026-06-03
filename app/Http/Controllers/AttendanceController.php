@@ -458,7 +458,6 @@ public function empEod()
 
     return view('attendance.empEod', compact('intern', 'reports'));
 }
-
 /*
 |--------------------------------------------------------------------------
 | EMPLOYEE – STORE EOD
@@ -468,16 +467,12 @@ public function storeEod(Request $request)
 {
     $request->validate([
         'tasks_completed' => 'required|string',
-        'challenges_faced' => 'nullable|string',
-        'plan_for_tomorrow' => 'nullable|string',
     ]);
 
     EodReport::create([
-        'intern_id' => Auth::guard('intern')->id(),
-        'report_date' => now()->toDateString(),
+        'intern_id'       => Auth::guard('intern')->id(),
+        'report_date'     => now()->toDateString(),
         'tasks_completed' => $request->tasks_completed,
-        'challenges_faced' => $request->challenges_faced,
-        'plan_for_tomorrow' => $request->plan_for_tomorrow,
     ]);
 
     return redirect()
@@ -495,7 +490,7 @@ public function eodHistory()
     $intern = Auth::guard('intern')->user();
 
     $reports = EodReport::where('intern_id', $intern->id)
-        ->latest()
+        ->orderBy('report_date', 'desc')
         ->paginate(20);
 
     return view('attendance.eodHistory', compact('intern', 'reports'));

@@ -15,8 +15,6 @@ class EodReport extends Model
         'intern_id',
         'report_date',
         'tasks_completed',
-        'challenges_faced',
-        'plan_for_tomorrow',
     ];
 
     protected $casts = [
